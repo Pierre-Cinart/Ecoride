@@ -3,22 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Recherche de trajet - EcoRide</title>
+  <title>Proposer un  trajet - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/research.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-
   <div class="search-container">
     <div class="form-container">
-      <h2>Proposer un trajet</h2>
       <form>
+        <h2>Proposer un trajet</h2>
         <label for="depart">Ville de départ</label>
         <input type="text" id="depart" name="depart" required />
 
         <label for="destination">Ville d’arrivée</label>
         <input type="text" id="destination" name="destination" required />
+
+        <label for="vehicle">Véhicule utilisé</label>
+        <select id="vehicle" name="vehicle" required>
+        <option value="" disabled selected>-- Sélectionnez un véhicule --</option>
+        <option value="1">Renault Zoé - 4 places</option>
+        <option value="2">Peugeot 208 - 5 places</option>
+        <option value="3">Tesla Model 3 - 5 places</option>
+        </select>
+
+        <label for="seats">Nombre de places disponibles</label>
+        <input type="number" id="seats" name="seats" min="1" max="7" required />
+
 
         <label for="date">Date</label>
         <input type="date" id="date" name="date" required />
