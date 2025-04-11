@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recherche de trajet - EcoRide</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/research.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+
+  <div class="search-container">
+    <div class="form-container">
+      <h2>Rechercher un trajet</h2>
+      <form>
+        <label for="depart">Ville de départ</label>
+        <input type="text" id="depart" name="depart" required />
+
+        <label for="destination">Ville d’arrivée</label>
+        <input type="text" id="destination" name="destination" required />
+
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="heure">Heure (optionnelle)</label>
+        <input type="time" id="heure" name="heure" />
+
+        <button type="submit">Rechercher</button>
+      </form>
+    </div>
+
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([48.8566, 2.3522], 12); // Centré sur Paris
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      minZoom: 1,
+      maxZoom: 20
+    }).addTo(map);
+
+    L.marker([48.8566, 2.3522]).addTo(map)
+      .bindPopup('Paris - Point de départ par défaut')
+      .openPopup();
+  </script>
+
+</body>
+</html>
