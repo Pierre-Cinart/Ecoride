@@ -1,7 +1,7 @@
 body {
     max-width: 1440px;
     margin : auto;
-    margin: 0;
+  
     padding: 0;
     display: flex;
     justify-content: center;
@@ -60,3 +60,18 @@ body {
     text-decoration: underline;
   }
   
+  .blue{
+    background-color: blue;
+  }
+
+  .yellow {
+    background-color: #FFD700;
+  }
+
+  .green {
+    background-color: yellowgreen;
+  }
+
+  .red {
+    background-color: red;
+  }

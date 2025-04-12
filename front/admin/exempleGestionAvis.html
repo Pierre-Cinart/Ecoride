@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gérer les avis - Employé | EcoRide</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .gestion-container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .avis-liste {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .avis-card {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .pagination {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #60775D;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container gestion-container">
+    <h2>Gérer les avis</h2>
+
+    <!-- Boutons haut -->
+    <div class="top-buttons">
+      <button type="button" class = "blue">⬅ Retour</button>
+      <button type="button" class = "yellow">Avis en attente</button>
+      <button type="button" class = "green">Avis validés</button>
+    </div>
+
+    <!-- Liste des avis -->
+    <div class="avis-liste">
+
+      <div class="avis-card">
+        <p><strong>Passager :</strong> Laura</p>
+        <p><strong>Conducteur :</strong> Kevin</p>
+        <p><strong>Note :</strong> ★★★★☆</p>
+        <p><strong>Avis :</strong> Le trajet s'est bien passé, le conducteur est ponctuel.</p>
+        <button type="button">Valider l'avis</button>
+        <button type="button">Refuser l'avis</button>
+      </div>
+
+      <div class="avis-card">
+        <p><strong>Passager :</strong> Jules</p>
+        <p><strong>Conducteur :</strong> Emma</p>
+        <p><strong>Note :</strong> ★★★★★</p>
+        <p><strong>Avis :</strong> Chauffeuse au top, très agréable.</p>
+        <button type="button">Valider l'avis</button>
+        <button type="button">Refuser l'avis</button>
+      </div>
+
+    </div>
+
+    <!-- Pagination simulée -->
+    <div class="pagination">
+      ← Précédent | Page 1 sur 3 | Suivant →
+    </div>
+  </div>
+
+</body>
+</html>

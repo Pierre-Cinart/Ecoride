@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contacter les conducteurs - Employé | EcoRide</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .gestion-container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-bar {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 1rem;
+    }
+
+    .search-bar input {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.7rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .conducteurs-liste {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .conducteur-card {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .pagination {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #60775D;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container gestion-container">
+    <h2>Contacter les conducteurs</h2>
+
+    <!-- Boutons haut -->
+    <div class="top-buttons">
+      <button type="button" class="blue">⬅ Retour</button>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input type="text" placeholder="Rechercher un conducteur par pseudo..." />
+      <button type="submit" >🔍 Rechercher</button>
+    </div>
+
+    <!-- Liste des conducteurs -->
+    <div class="conducteurs-liste">
+
+      <div class="conducteur-card">
+        <p><strong>Nom :</strong> Kevin Dubois</p>
+        <p><strong>Email :</strong> kevin.dubois@mail.com</p>
+        <p><strong>Nombre de trajets :</strong> 12</p>
+        <p><strong>Note moyenne :</strong> ★★★★☆</p>
+        <button type="button" class="yellow">Contacter par mail</button>
+      </div>
+
+      <div class="conducteur-card">
+        <p><strong>Nom :</strong> Emma Moreau</p>
+        <p><strong>Email :</strong> emma.moreau@mail.com</p>
+        <p><strong>Nombre de trajets :</strong> 8</p>
+        <p><strong>Note moyenne :</strong> ★★★★★</p>
+        <button type="button" class="yellow">Contacter par mail</button>
+      </div>
+
+    </div>
+
+    <!-- Pagination simulée -->
+    <div class="pagination">
+      ← Précédent | Page 1 sur 2 | Suivant →
+    </div>
+  </div>
+
+</body>
+</html>
