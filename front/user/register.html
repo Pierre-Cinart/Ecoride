@@ -4,12 +4,18 @@
   <meta charset="UTF-8">
   <title>Inscription</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Ajout léger pour le champ masqué */
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
   <div class="form-container">
     <h2>Créer un compte</h2>
-    <form action="#" method="post">
+    <form action="#" method="post" enctype="multipart/form-data">
       <label for="email">Adresse email :</label>
       <input type="email" id="email" name="email" required>
 
@@ -22,11 +28,39 @@
       <label for="confirm-password">Confirmer mot de passe :</label>
       <input type="password" id="confirm-password" name="confirm-password" required>
 
+      <!-- Checkbox chauffeur -->
+      <label>
+        <input type="checkbox" id="is-driver" name="is-driver">
+        Je souhaite m’inscrire en tant que chauffeur
+      </label>
+
+      <!--  Input pour le permis, caché par défaut -->
+      <div id="driver-permit" class="hidden">
+        <label for="permit">Télécharger votre permis de conduire :</label>
+        <input type="file" id="permit" name="permit" accept="image/*">
+      </div>
+
       <button type="submit">S'inscrire</button>
     </form>
 
     <p>Déjà un compte ? <a href="login.html">Se connecter</a></p>
   </div>
+
+  <script>
+    const checkbox = document.getElementById('is-driver');
+    const permitField = document.getElementById('driver-permit');
+    const permitInput = document.getElementById('permit');
+
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        permitField.classList.remove('hidden');
+        permitInput.required = true;
+      } else {
+        permitField.classList.add('hidden');
+        permitInput.required = false;
+      }
+    });
+  </script>
 
 </body>
 </html>

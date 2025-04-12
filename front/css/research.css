@@ -1,14 +1,108 @@
-.search-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 2rem;
-    padding: 2rem;
-  }
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 2rem;
+}
 
-  #map {
-    height: 500px;
-    width: 600px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  }
+/* FILTRES */
+.filters {
+  width: 220px;
+  background-color: #f5f5f5;
+  padding: 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.filters h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #60775D;
+}
+
+.filters label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+/* ÉTOILES */
+.star-rating {
+  direction: rtl;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.star-rating input[type="radio"] {
+  display: none;
+}
+
+.star-rating label {
+  font-size: 1.4rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.star-rating input[type="radio"]:checked ~ label {
+  color: #FFD700;
+}
+
+/* FORMULAIRE */
+.form-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+label {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+input,
+select {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+button {
+  margin-top: 1.5rem;
+  padding: 0.7rem;
+  border: none;
+  background-color: #60775D;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #4a5f48;
+}
+
+/* MAP */
+.map-container {
+  width: 600px;
+}
+
+#map {
+  height: 500px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
