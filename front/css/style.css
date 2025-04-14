@@ -1,15 +1,15 @@
 body {
     max-width: 1440px;
-    margin : auto;
-  
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    /* background :url('../img/images/background.png') center center / cover no-repeat fixed ; */
   }
   
   .form-container {
+    margin-top: 10px;
     background-color: white;
     padding: 2rem;
     border-radius: 12px;
@@ -74,4 +74,20 @@ body {
 
   .red {
     background-color: red;
+  }
+
+  /* mobile et tablette */
+  @media (max-width : 800px){
+    body{
+      max-width: 360px;
+      /* background: url('../img/images/background.png') center -50% / cover no-repeat fixed; */
+    }
+    .form-container {
+      margin: auto 10px;
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 360px;
+    }
   }
