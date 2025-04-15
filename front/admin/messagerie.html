@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Messagerie - EcoRide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .messagerie-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .messagerie-container h2 {
+      color: #60775D;
+      margin-bottom: 2rem;
+    }
+
+    .messagerie-container button {
+      padding: 0.8rem 1.5rem;
+      margin: 1rem;
+      background-color: #60775D;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .messagerie-container button:hover {
+      background-color: #4a5f48;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container messagerie-container">
+    <h2>Messagerie</h2>
+    <button onclick="location.href='messagesAttente.html'"> Messages en attente</button>
+    <button onclick="location.href='messagesHistorique.html'"> Historique des messages</button>
+  </div>
+</body>
+</html>

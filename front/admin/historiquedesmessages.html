@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historique des messages - EcoRide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .gestion-container {
+      max-width: 900px;
+      width: 100%;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #60775D;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .search-bar input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      flex: 1;
+    }
+
+    .message-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message-item {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .pagination {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #60775D;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container gestion-container">
+    <h2>Historique des messages</h2>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input type="text" placeholder="Laisser vide pour afficher tous les messages...">
+      <button type="submit">🔍 Rechercher</button>
+    </div>
+
+    <!-- Liste des messages -->
+    <div class="message-list">
+      <div class="message-item">
+        <p><strong>Objet :</strong> Suggestion</p>
+        <p><strong>De :</strong> emilie.travail@email.com</p>
+        <p><strong>Aperçu :</strong> Bonjour, je voulais simplement dire que j’ai trouvé le service très pratique...</p>
+      </div>
+
+      <div class="message-item">
+        <p><strong>Objet :</strong> Problème de paiement</p>
+        <p><strong>De :</strong> pierre87@email.com</p>
+        <p><strong>Aperçu :</strong> J’ai effectué un paiement pour un trajet mais je n’ai pas reçu de confirmation...</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      ← Précédent | Page 1 sur 3 | Suivant →
+    </div>
+  </div>
+</body>
+</html>

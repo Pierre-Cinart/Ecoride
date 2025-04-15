@@ -1,0 +1,42 @@
+
+.gestion-container {
+    max-width: 900px;
+    width: 100%;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .search-bar input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    flex: 1;
+  }
+  
+  .user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .user-card {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .pagination {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #60775D;
+  }
+  
