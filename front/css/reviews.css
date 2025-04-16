@@ -1,0 +1,31 @@
+.reviews-section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .reviews-section h2 {
+    color: #60775D;
+    margin-bottom: 1rem;
+  }
+  
+  .review-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f1f8f4;
+    border-left: 4px solid #52EE0A;
+    border-radius: 8px;
+  }
+  
+  .review-card p {
+    margin: 0.3rem 0;
+  }
+  
+  .stars {
+    color: #FFD700;
+    font-size: 1rem;
+  }
+  

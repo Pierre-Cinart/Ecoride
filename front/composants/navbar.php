@@ -9,7 +9,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
   <!-- Logo aligné à gauche -->
   <div class="logo">
     <a href="../index.php">
-      <img src="../img/logo/logo.png" alt="Logo EcoRide" height="40">
+      <img src="../img/logo/logo.png" alt="Logo EcoRide">
     </a>
   </div>
 
@@ -17,7 +17,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
   <div class="nav-links">
     <?php if ($type === null): ?>
       <!-- VISITEUR -->
-      <a href="../index.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
+      <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
       <a href="../user/contact.php" class="<?= ($navSelected === 'contact') ? 'selected' : '' ?>">Contact</a>
       <a href="../user/search.php" class="<?= ($navSelected === 'search') ? 'selected' : '' ?>">Rechercher un trajet</a>
       <a href="../user/reviews.php" class="<?= ($navSelected === 'reviews') ? 'selected' : '' ?>">Avis</a>
@@ -27,7 +27,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
 
     <?php elseif ($type === 'user'): ?>
       <!-- UTILISATEUR CONNECTÉ -->
-      <a href="../index.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
+      <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
       <a href="../user/contact.php" class="<?= ($navSelected === 'contact') ? 'selected' : '' ?>">Contact</a>
       <a href="../user/search.php" class="<?= ($navSelected === 'search') ? 'selected' : '' ?>">Rechercher un trajet</a>
       <a href="../user/reviews.php" class="<?= ($navSelected === 'reviews') ? 'selected' : '' ?>">Avis</a>
@@ -37,7 +37,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
 
     <?php elseif ($type === 'driver'): ?>
       <!-- CONDUCTEUR -->
-      <a href="../index.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
+      <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
       <a href="../driver/offer.php" class="<?= ($navSelected === 'offer') ? 'selected' : '' ?>">Proposer un trajet</a>
       <a href="../user/search.php" class="<?= ($navSelected === 'search') ? 'selected' : '' ?>">Rechercher un trajet</a>
       <a href="../user/reviews.php" class="<?= ($navSelected === 'reviews') ? 'selected' : '' ?>">Avis</a>
@@ -47,14 +47,14 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
 
     <?php elseif ($type === 'employee'): ?>
       <!-- EMPLOYÉ -->
-      <a href="../index.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
+      <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
       <a href="../employee/manage.php" class="<?= ($navSelected === 'manage') ? 'selected' : '' ?>">Gestion</a>
       <a href="../employee/messages.php" class="<?= ($navSelected === 'messages') ? 'selected' : '' ?>">Messages</a>
       <a href="../user/logout.php">Déconnexion</a>
 
     <?php elseif ($type === 'admin'): ?>
       <!-- ADMIN -->
-      <a href="../index.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
+      <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
       <a href="../admin/stats.php" class="<?= ($navSelected === 'stats') ? 'selected' : '' ?>">Statistiques</a>
       <a href="../admin/manage.php" class="<?= ($navSelected === 'manage') ? 'selected' : '' ?>">Gestion</a>
       <a href="../admin/messages.php" class="<?= ($navSelected === 'messages') ? 'selected' : '' ?>">Messages</a>

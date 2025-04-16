@@ -3,7 +3,7 @@ session_start();
 
 // Simule un visiteur (à modifier plus tard selon les connexions)
 $_SESSION['typeOfUser'] = null;
-$_SESSION['navSelected'] = 'accueil';
+$_SESSION['navSelected'] = 'home';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -13,11 +13,19 @@ $_SESSION['navSelected'] = 'accueil';
   <title>Accueil - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/home.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+
 </head>
 <body>
 
-  <!-- Navbar dynamique -->
+  <header>
+
+    <!-- Navbar dynamique -->
   <?php include_once '../composants/navbar.php'; ?>
+
+  </header>
 
   <!-- Contenu principal -->
   <main>
@@ -35,7 +43,7 @@ $_SESSION['navSelected'] = 'accueil';
     <section class="home-presentation">
       <h2>Présentation d’EcoRide</h2><br>
       <p>Bienvenue sur <strong>EcoRide</strong>, l’alternative écologique pour vos déplacements quotidiens ! </p>
-      <p>Notre mission est simple : <em>réduire l’empreinte carbone liée aux transports</em> tout en facilitant les trajets partagés entre particuliers.<br><br>
+      <p>Notre mission est simple : réduire l’empreinte carbone liée aux transports tout en facilitant les trajets partagés entre particuliers.<br><br>
       Chez EcoRide, nous croyons qu’un avenir plus vert passe par des actions concrètes et accessibles. </p>
       <p>C’est pourquoi nous avons créé une plateforme de covoiturage écoresponsable, pensée pour tous — que vous soyez conducteur ou passager, habitant en ville ou en zone rurale.
       </p>
@@ -43,8 +51,10 @@ $_SESSION['navSelected'] = 'accueil';
 
   </main>
 
-  <!-- Footer global -->
-  <?php include_once '../composants/footer.html'; ?>
+   <!-- Footer -->
+  <footer>
+    <?php include_once '../composants/footer.html'; ?>
+  </footer>
 
 </body>
 </html>

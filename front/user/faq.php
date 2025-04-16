@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+// Simule un visiteur (à modifier plus tard selon les connexions)
+$_SESSION['typeOfUser'] = null;
+$_SESSION['navSelected'] = 'faq';
+?>
+
+<header>
+
+<!-- Navbar dynamique -->
+<?php include_once '../composants/navbar.php'; ?>
+
+</header>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,6 +20,9 @@
   <title>FAQ - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/FAQ.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -43,6 +60,11 @@
       <p>Vous pouvez utiliser le formulaire de contact disponible via le bouton "Contact" dans le menu ou envoyer un mail à contact@ecoride.fr.</p>
     </div>
   </div>
+  
+   <!-- Footer -->
+   <footer>
+    <?php include_once '../composants/footer.html'; ?>
+  </footer>
 
 </body>
 </html>
