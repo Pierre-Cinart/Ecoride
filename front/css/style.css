@@ -1,86 +1,189 @@
 body {
-    max-width: 1440px;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    /* background :url('../img/images/background.png') center center / cover no-repeat fixed ; */
-  }
-  
-  .form-container {
-    margin-top: 10px;
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
-  }
-  
-  label {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-  }
-  
-  input {
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-  }
-  
-  button {
-    margin-top: 1.5rem;
-    padding: 0.7rem;
-    border: none;
-    background-color: #60775D;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  button:hover {
-    background-color: #4a5f48;
-  }
-  
-  a {
-    color: #60775D;
-    text-decoration: none;
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
-  .blue{
-    background-color: blue;
-  }
+  margin: 0;
+  padding: 0;
+  min-height : 100vh;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  background: url('../img/images/background.png') center center/ cover no-repeat fixed;
+}
 
-  .yellow {
-    background-color: #FFD700;
-  }
+/* contenu principal  */
+main{
+  width:90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 1rem;
+}
 
-  .green {
-    background-color: yellowgreen;
-  }
+/* formulmaires */
+.form-container {
+  margin-top: 10px;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+  
+form {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+  
+label {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+  
+input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
 
-  .red {
-    background-color: red;
-  }
+/* boutons */
+button {
+  margin-top: 1.5rem;
+  padding: 0.7rem;
+  border: none;
+  background-color: #60775D;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+  
+button:hover {
+  background-color: #4a5f48;
+}
+  
+a {
+  color: #60775D;
+  text-decoration: none;
+}
+  
+a:hover {
+  text-decoration: underline;
+}
+  
+.blue{
+  background-color: blue;
+}
+
+.yellow {
+  background-color: #FFD700;
+}
+
+.green {
+  background-color: yellowgreen;
+}
+
+.red {
+  background-color: red;
+}
+
+/* pagination */
+.pagination {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #60775D;
+}
+
+/* navbar */
+.navbar {
+  margin-bottom: 10px;
+  background-color: #59775D;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  flex-wrap: wrap;
+}
+  
+.navbar .logo img {
+  height: 40px;
+}
+  
+.navbar .nav-links {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+  
+.navbar .nav-links a {
+  color: white;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: bold;
+}
+  
+.navbar .nav-links a:hover {
+  background-color: #52EE0A;
+  color: white;
+}
+  
+.navbar .nav-links a.selected {
+  background-color: #D9D9D9;
+  color: #52EE0A;
+}
+  
+/*footer*/
+footer {
+  background-color: #59775D;
+  color: white;
+  padding: 2rem 1rem;
+}
+
+footer .footer-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  flex-wrap: wrap;
+}
+.footer-col {
+  flex: 1 1 33%;
+}
+
+footer h3 {
+  margin: 0;
+}
+
+footer p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+footer a.legal-link {
+  color: #039BE5;
+  text-decoration: underline;
+}
+
+footer .footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+footer .footer-icons img {
+  width: 36px;
+  height: 36px;
+}
+
 
   /* mobile et tablette */
   @media (max-width : 800px){
     body{
       max-width: 360px;
-      /* background: url('../img/images/background.png') center -50% / cover no-repeat fixed; */
+      background: url('../img/images/background.png') center -50% / cover no-repeat fixed;
     }
     .form-container {
       margin: auto 10px;
@@ -90,12 +193,4 @@ body {
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
       max-width: 360px;
     }
-  }
-
-  /* pagination */
-  .pagination {
-    margin-top: 2rem;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #60775D;
   }
