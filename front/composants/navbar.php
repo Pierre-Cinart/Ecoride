@@ -8,7 +8,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
 <nav class="navbar">
   <!-- Logo aligné à gauche -->
   <div class="logo">
-    <a href="../index.php">
+    <a href="../user/home.php">
       <img src="../img/logo/logo.png" alt="Logo EcoRide">
     </a>
   </div>
