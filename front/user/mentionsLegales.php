@@ -55,7 +55,7 @@ $_SESSION['navSelected'] = '';
 
     <h3>Contact</h3>
     <p class = "arial">
-      Pour toute question, un formulaire est à votre dispostion via la page <a href="contact.html">Contact</a>.
+      Pour toute question, un formulaire est à votre dispostion via la page <a href="../user/contact.php">Contact</a>.
     </p>
   </div>
 

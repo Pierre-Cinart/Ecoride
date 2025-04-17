@@ -33,11 +33,19 @@ $_SESSION['navSelected'] = 'faq';
     <div class="faq-item">
       <h3>🔐 Comment créer un compte sur EcoRide ?</h3>
       <p>Vous pouvez créer un compte en cliquant sur "Inscription" dans la barre de navigation. Il vous suffira de remplir vos informations et de valider.</p>
+      <br>
+      <p>Vous pouvez vous inscrire en tant qu' utilisateur ou chauffeur en cliquant sur la case correspondante . Si vous décidé de postulé en tant que conducteur
+        une photo de votre permis sera demandé en format jpeg. Vos documents seront soumis à une vérification par un adminstrateur .
+      </p>
+      <br>
+      <p>
+      </p>
     </div>
 
     <div class="faq-item">
       <h3>🚘 Comment proposer un trajet en tant que conducteur ?</h3>
-      <p>Après vous être inscrit comme conducteur, vous pourrez proposer un trajet depuis votre espace personnel en remplissant le formulaire dédié.</p>
+      <p>Après vous être inscrit en tant que conducteur , une fois vos documents validés vous aurez la possibilité de proposer vos trajet via le bouton "proposer un trajet dans le menu ou 
+      via votre gestion de compte (bouton "mon compte" dans le menu) .</p>
     </div>
 
     <div class="faq-item">
@@ -57,7 +65,7 @@ $_SESSION['navSelected'] = 'faq';
 
     <div class="faq-item">
       <h3>📧 Comment contacter l’équipe EcoRide ?</h3>
-      <p>Vous pouvez utiliser le formulaire de contact disponible via le bouton "Contact" dans le menu ou envoyer un mail à contact@ecoride.fr.</p>
+      <p>Vous pouvez utiliser le formulaire de contact disponible via le bouton <a href="../user/contact.php">"Contact"</a> dans le menu ainsi que sur l ' icone <a href="../user/contact.php"><img src="../img/logo/logomail.png" alt="logo mail" style = "transform : translate(0 , 25px);">présent sur le footer du site</a></p>
     </div>
   </div>
   

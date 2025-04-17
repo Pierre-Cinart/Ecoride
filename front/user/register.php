@@ -72,7 +72,7 @@ $_SESSION['navSelected'] = 'signup';
       <button type="submit">S'inscrire</button>
     </form>
 
-    <p>Déjà un compte ? <a href="login.html">Se connecter</a></p>
+    <p>Déjà un compte ? <a href="../user/login.php">Se connecter</a></p>
   </div>
   
    <!-- Footer -->

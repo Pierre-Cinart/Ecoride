@@ -40,7 +40,7 @@ $_SESSION['navSelected'] = 'login';
     </form>
 
     <p><a href="#">Mot de passe oublié ?</a></p>
-    <p>Pas encore inscrit ? <a href="register.html" target="_blank" rel="noopener noreferrer">Créer un compte</a></p>
+    <p>Pas encore inscrit ? <a href="../user/register.php">Créer un compte</a></p>
   </div>
 
    <!-- Footer -->
