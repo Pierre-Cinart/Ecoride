@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-// Simule un visiteur (à modifier plus tard selon les connexions)
-$_SESSION['typeOfUser'] = null;
 $_SESSION['navSelected'] = 'contact';
 ?>
 
@@ -24,6 +22,7 @@ $_SESSION['navSelected'] = 'contact';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 <header>
 

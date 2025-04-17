@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// Simule un visiteur (à modifier plus tard selon les connexions)
-$_SESSION['typeOfUser'] = null;
 $_SESSION['navSelected'] = 'home';
+
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>

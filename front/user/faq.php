@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-// Simule un visiteur (à modifier plus tard selon les connexions)
-$_SESSION['typeOfUser'] = null;
 $_SESSION['navSelected'] = 'faq';
 ?>
 
@@ -65,7 +63,7 @@ $_SESSION['navSelected'] = 'faq';
 
     <div class="faq-item">
       <h3>📧 Comment contacter l’équipe EcoRide ?</h3>
-      <p>Vous pouvez utiliser le formulaire de contact disponible via le bouton <a href="../user/contact.php">"Contact"</a> dans le menu ainsi que sur l ' icone <a href="../user/contact.php"><img src="../img/logo/logomail.png" alt="logo mail" style = "transform : translate(0 , 25px);">présent sur le footer du site</a></p>
+      <p style = "transform : translate(0 , -25px)";>Vous pouvez utiliser le formulaire de contact disponible via le bouton <a href="../user/contact.php">"Contact"</a> dans le menu ainsi que sur l ' icone <a href="../user/contact.php"><img src="../img/logo/logomail.png" alt="logo mail" style = "transform : translate(0 , 25px);"></a>présent sur le footer du site</a></p>
     </div>
   </div>
   

@@ -61,4 +61,9 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
       <a href="../user/logout.php">Déconnexion</a>
     <?php endif; ?>
   </div>
+  <div class="burger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 </nav>

@@ -8,6 +8,7 @@
     flex-direction: column;
     gap: 5px;
     position: relative;
+    margin: auto;
   }
   
 
@@ -21,7 +22,9 @@
 
 .home-presentation {
     font-weight: bold;
+    margin: auto;
     margin-bottom : 50px;
+    max-width: 80%;
     
 }
 
@@ -38,6 +41,15 @@
     
 }
 
+/* MOBILE */
+@media (max-width : 800px){
+    
+    .home-presentation {
+        width: 90%;
+        min-width: 360px;
+        margin: auto;
+    }
+}
 
 
 
