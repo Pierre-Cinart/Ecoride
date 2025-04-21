@@ -1,7 +1,7 @@
 <?php
 session_start();
 //pour test
-$_SESSION['typeOfUser'] = "driver";
+$_SESSION['typeOfUser'] = "user";
 
 $_SESSION['navSelected'] = 'account';
 // Redirection si non connecté
@@ -23,7 +23,6 @@ $credits = $_SESSION['credits'] ?? 20;
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mon Compte - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/monCompte.css" />
   <link rel="stylesheet" href="../css/account.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
@@ -37,7 +36,7 @@ $credits = $_SESSION['credits'] ?? 20;
 
 <div class="account-container">
   <div class="header-info">
-    <div><strong>Connecté en tant que :</strong> <?= htmlspecialchars($pseudo) ?></div>
+    <div><strong>Connecté en tant que :</strong> <?= htmlspecialchars($pseudo) ?> &nbsp;</div>
     <div class="credit">
       <strong>Crédits :</strong> <?= $credits ?>
       <img src="../img/ico/coins.png" alt="Pièces" class="coin-icon">
@@ -45,6 +44,7 @@ $credits = $_SESSION['credits'] ?? 20;
       <?php if ($type === 'driver'): ?>
         <strong>Note :</strong> 4.5 / 5 <span style="color: gold;">★ ★ ★ ★ ☆</span>
         &nbsp;&nbsp; <strong>Statut permis :</strong>
+        <!-- sera dynamique une fois le back codé -->
         <span style="color: green; font-weight:bold;">✔ Vérifié</span>
       <?php endif; ?>
     </div>
@@ -89,7 +89,9 @@ $credits = $_SESSION['credits'] ?? 20;
       </select>
       <button class="delete-vehicle">🗑</button>
       <br>
-      <button class="add-vehicle">➕</button>
+      <!-- ajouter un véhicule -->
+      <button onclick="location.href='../driver/addCar.php'">➕</button>
+
 
       <div id="vehicle-preferences" class="section" style="display:none;">
         <p><strong>Préférences du véhicule sélectionné :</strong></p>
@@ -103,14 +105,15 @@ $credits = $_SESSION['credits'] ?? 20;
 
   <!-- Boutons pour tous -->
   <div class="button-group">
-    <button onclick="location.href='voirTrajets.php'">Mes trajets réservés</button>
-    <button onclick="location.href='historique.php'">Historique des voyages</button>
-    <button onclick="location.href='mesCommentaires.php'">Mes commentaires</button>
-    <button onclick="location.href='credits.php'">Obtenir des crédits</button>
-    <button onclick="location.href='remboursement.php'">Demander un remboursement</button>
+    <button onclick="location.href='../user/showMyTrips.php'">Mes trajets réservés</button>
+    <button onclick="location.href='../user/tripsStory.php'">Historique des voyages</button>
+    <button onclick="location.href='../user/showMyreviews.php'">Mes commentaires</button>
+    <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
+    <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
     <?php if ($type === 'driver'): ?>
-      <button onclick="location.href='ajouterTrajet.php'">Proposer un trajet</button>
+      <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
       <button onclick="location.href='avisRecus.php'">Mes avis reçus</button>
+      <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
     <?php endif; ?>
   </div>
 </div>
