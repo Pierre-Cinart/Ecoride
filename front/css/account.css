@@ -1,0 +1,72 @@
+.account-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  .header-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .credit img.coin-icon {
+    width: 24px;
+    vertical-align: middle;
+  }
+  .section {
+    margin-top: 1.5rem;
+  }
+  .button-group {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .button-group button {
+    padding: 0.8rem;
+    background-color: #60775D;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .button-group button:hover {
+    background-color: #4a5f48;
+  }
+  .preferences label {
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  .add-vehicle, .delete-vehicle {
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    font-size: 1.2em;
+    background-color: #ccc;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+  .delete-vehicle {
+    background-color: #e57373;
+    color: white;
+    margin-left: 0.5rem;
+  }
+  #savePreferencesBtn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #52EE0A;
+    border: none;
+    border-radius: 6px;
+    display: none;
+    cursor: pointer;
+    font-weight: bold;
+  }

@@ -1,5 +1,5 @@
 <?php
-//récupération des variables de session
+
 $type = $_SESSION['typeOfUser'] ?? null;         // Rôle de l'utilisateur
 $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
 ?>
@@ -42,7 +42,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
       <a href="../user/search.php" class="<?= ($navSelected === 'search') ? 'selected' : '' ?>">Rechercher un trajet</a>
       <a href="../user/reviews.php" class="<?= ($navSelected === 'reviews') ? 'selected' : '' ?>">Avis</a>
       <a href="../user/faq.php" class="<?= ($navSelected === 'faq') ? 'selected' : '' ?>">FAQ</a>
-      <a href="../driver/account.php" class="<?= ($navSelected === 'account') ? 'selected' : '' ?>">Mon compte</a>
+      <a href="../user/account.php" class="<?= ($navSelected === 'account') ? 'selected' : '' ?>">Mon compte</a>
       <a href="../user/logout.php">Déconnexion</a>
 
     <?php elseif ($type === 'employee'): ?>
