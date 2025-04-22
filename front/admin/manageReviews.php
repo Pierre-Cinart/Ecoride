@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+$_SESSION['navSelected'] = 'manage';
+// Redirection si non connecté
+if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_SESSION['typeOfUser'] != "admin" && $_SESSION['typeOfUser'] != "employee" ) ) ) {
+  header('Location: ../user/login.php');
+  exit();
+}
+
+$type = $_SESSION['typeOfUser'];
+$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,51 +19,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gérer les avis - Employé | EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <style>
-    .gestion-container {
-      max-width: 900px;
-      width: 100%;
-    }
-
-    .top-buttons {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .avis-liste {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-    }
-
-    .avis-card {
-      background-color: #f5f5f5;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .pagination {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #60775D;
-    }
-  </style>
+  <link rel="stylesheet" href="../css/manage.css" />
 </head>
 <body>
 
-  <div class="form-container gestion-container">
+  <header>
+    <?php include_once '../composants/navbar.php'; ?>
+  </header>
+
+  <?php include_once '../composants/inProgress.php'; ?>
+
+ <main>
+   <div class="form-container manage-container">
     <h2>Gérer les avis</h2>
 
     <!-- Boutons haut -->
     <div class="top-buttons">
-      <button type="button" class = "blue">⬅ Retour</button>
+      <button type="button"  class = "blue" onclick="location.href='manage.php'" >⬅ Retour</button>
       <button type="button" class = "yellow">Avis en attente</button>
       <button type="button" class = "green">Avis validés</button>
     </div>
@@ -82,6 +68,10 @@
       ← Précédent | Page 1 sur 3 | Suivant →
     </div>
   </div>
+ </main>
 
+    <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
+  
 </body>
 </html>

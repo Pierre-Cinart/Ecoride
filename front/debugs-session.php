@@ -4,7 +4,7 @@ session_unset();
 session_destroy();
 session_start();
 
-$_SESSION['typeOfUser'] = "user";
+$_SESSION['typeOfUser'] = "employee";
 // debug session 
 echo '<pre>';
 print_r($_SESSION);

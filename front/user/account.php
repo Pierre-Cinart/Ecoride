@@ -1,7 +1,5 @@
 <?php
 session_start();
-//pour test
-$_SESSION['typeOfUser'] = "user";
 
 $_SESSION['navSelected'] = 'account';
 // Redirection si non connecté
@@ -118,7 +116,10 @@ $credits = $_SESSION['credits'] ?? 20;
   </div>
 </div>
 
-<!-- JS interactivité -->
+<!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
+  
+  <!-- JS interactivité -->
 <script>
   const toggleBtn = document.getElementById("toggleDriverForm");
   if (toggleBtn) {
@@ -141,10 +142,6 @@ $credits = $_SESSION['credits'] ?? 20;
     }
   }
 </script>
-
-<!-- footer -->
-  <?php include_once '../composants/footer.html'; ?>
-
 
 </body>
 </html>

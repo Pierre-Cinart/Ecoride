@@ -1,7 +1,10 @@
 <?php
 
-$type = $_SESSION['typeOfUser'] ?? null;         // Rôle de l'utilisateur
-$navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
+// Rôle de l'utilisateur
+$allowedRoles = ['user', 'driver', 'employee', 'admin'];
+$type = in_array($_SESSION['typeOfUser'] ?? null, $allowedRoles) ? $_SESSION['typeOfUser'] : null;
+ // Lien sélectionné mise en évidence du bouton de la navbar
+$navSelected = $_SESSION['navSelected'] ?? '';  
 ?>
 
 <!-- Navbar HTML -->
@@ -48,8 +51,8 @@ $navSelected = $_SESSION['navSelected'] ?? '';   // Lien sélectionné
     <?php elseif ($type === 'employee'): ?>
       <!-- EMPLOYÉ -->
       <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
-      <a href="../employee/manage.php" class="<?= ($navSelected === 'manage') ? 'selected' : '' ?>">Gestion</a>
-      <a href="../employee/messages.php" class="<?= ($navSelected === 'messages') ? 'selected' : '' ?>">Messages</a>
+      <a href="../admin/manage.php" class="<?= ($navSelected === 'manage') ? 'selected' : '' ?>">Gestion</a>
+      <a href="../admin/messages.php" class="<?= ($navSelected === 'messages') ? 'selected' : '' ?>">Messages</a>
       <a href="../user/logout.php">Déconnexion</a>
 
     <?php elseif ($type === 'admin'): ?>

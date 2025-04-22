@@ -1,14 +1,28 @@
+<?php
+session_start();
+
+$_SESSION['navSelected'] = 'manage';
+// Redirection si non connecté
+if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_SESSION['typeOfUser'] != "admin" && $_SESSION['typeOfUser'] != "employee" ) ) ) {
+  header('Location: ../user/login.php');
+  exit();
+}
+
+$type = $_SESSION['typeOfUser'];
+$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Membres actifs | EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/gestion.css" />
+  <link rel="stylesheet" href="../css/manage.css" />
 </head>
 <body>
 
-  <div class="form-container gestion-container">
+  <div class="form-container manage-container">
     <h2>Membres actifs</h2>
 
     <div class="search-bar">
