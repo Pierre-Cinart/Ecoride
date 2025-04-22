@@ -58,7 +58,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';
     <?php elseif ($type === 'admin'): ?>
       <!-- ADMIN -->
       <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
-      <a href="../admin/stats.php" class="<?= ($navSelected === 'stats') ? 'selected' : '' ?>">Statistiques</a>
+      <a href="../admin/charts.php" class="<?= ($navSelected === 'stats') ? 'selected' : '' ?>">Statistiques</a>
       <a href="../admin/manage.php" class="<?= ($navSelected === 'manage') ? 'selected' : '' ?>">Gestion</a>
       <a href="../admin/messages.php" class="<?= ($navSelected === 'messages') ? 'selected' : '' ?>">Messages</a>
       <a href="../user/logout.php">Déconnexion</a>

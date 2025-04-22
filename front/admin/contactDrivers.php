@@ -71,6 +71,7 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
       </div>
     </div>
   </main>
+    <br><br>
      <!-- footer -->
      <?php include_once '../composants/footer.html'; ?>
 

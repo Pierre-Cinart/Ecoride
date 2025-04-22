@@ -10,7 +10,6 @@ if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_
 
 $type = $_SESSION['typeOfUser'];
 $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
-$credits = $_SESSION['credits'] ?? 20;
 
 ?>
 
@@ -39,6 +38,11 @@ $credits = $_SESSION['credits'] ?? 20;
         <button type="button" onclick="location.href='pendingDrivers.php'">Chauffeurs en attente de validation</button>
         <button type="button" onclick="location.href='blockMember.php'">Bloquer un membre</button>
         <button type="button" onclick="location.href='unblockMember.php'">Débloquer un membre</button>
+        <!-- bouton admin pour gérer les employee -->
+        <?php if ($type === 'admin'): ?>
+          <button type="button" onclick="location.href='manageEmployees.php'">Gérer les employés</button>
+          <button type="button" onclick="location.href='manageCredits.php'">Offrir des crédits</button>
+        <?php endif; ?>
       </form>
     </div>
   </main>

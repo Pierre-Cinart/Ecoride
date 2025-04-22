@@ -25,8 +25,11 @@ $_SESSION['navSelected'] = 'search';
   <main>
   
     <div class="trips-container">
-      <h2>Résultats de recherche</h2>
-
+        
+      <h2 style = "color:black">Résultats de recherche</h2>
+        <div class="top-buttons">
+            <button type="button"  class = "blue" onclick="location.href='search.php'" >⬅ Retour</button>
+        </div>
       <div class="trip-cards">
 
         <!-- Exemple de carte -->

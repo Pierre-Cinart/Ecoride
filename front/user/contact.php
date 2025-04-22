@@ -52,7 +52,7 @@ $_SESSION['navSelected'] = 'contact';
       <button type="submit">Envoyer</button>
     </form>
   </div>
-
+  <br><br>
   <!-- footer -->
   <?php include_once '../composants/footer.html'; ?>
 

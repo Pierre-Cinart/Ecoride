@@ -51,8 +51,8 @@ $_SESSION['navSelected'] = 'search';
         <option value="electrique">Électrique</option>
       </select>
 
-      <label for="prix_max">Prix maximum (€)</label>
-      <input type="number" id="prix_max" name="prix_max" min="0" step="0.5" />
+      <label for="prix_max">Prix maximum (en crédits)</label>
+      <input type="number" id="prix_max" name="prix_max" min="1" step="1" />
 
       <label for="duree_max">Durée max (minutes)</label>
       <input type="number" id="duree_max" name="duree_max" min="1" />
@@ -69,7 +69,7 @@ $_SESSION['navSelected'] = 'search';
 
   <!-- Colonne : FORMULAIRE -->
     <div class="form-container" style="margin-top:0px;">
-      <h2>Rechercher un trajet</h2>
+      <h2 style = "color:black">Rechercher un trajet</h2>
       <form action="triplist.php" method="get">
         <label for="depart">Ville de départ</label>
         <input type="text" id="depart" name="depart" required />
