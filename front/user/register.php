@@ -74,10 +74,8 @@ $_SESSION['navSelected'] = 'signup';
     <p>Déjà un compte ? <a href="../user/login.php">Se connecter</a></p>
   </div>
   
-   <!-- Footer -->
-   <footer>
-    <?php include_once '../composants/footer.html'; ?>
-  </footer>
+   <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
 
   <script>
     // ***script pour afficher ou masquer l upload de permis en cas d inscription en tant que chauffeur***

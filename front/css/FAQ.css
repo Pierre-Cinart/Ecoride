@@ -27,3 +27,16 @@
     margin: 0;
     line-height: 1.6;
   }
+  .y- a img{ 
+    transform : translate(0 , 25px);
+    }
+  @media (max-width:800px){
+    .y- {
+      transform : translate(0 , -5px);
+      }
+      .y- a img{
+      width: 36px;
+      height: 36px;
+      transform : translate(0 , 15px);
+    }
+  }

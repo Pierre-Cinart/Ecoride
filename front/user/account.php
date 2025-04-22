@@ -142,9 +142,9 @@ $credits = $_SESSION['credits'] ?? 20;
   }
 </script>
 
-<footer>
+<!-- footer -->
   <?php include_once '../composants/footer.html'; ?>
-</footer>
+
 
 </body>
 </html>

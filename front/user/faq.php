@@ -63,14 +63,12 @@ $_SESSION['navSelected'] = 'faq';
 
     <div class="faq-item">
       <h3>📧 Comment contacter l’équipe EcoRide ?</h3>
-      <p style = "transform : translate(0 , -25px)";>Vous pouvez utiliser le formulaire de contact disponible via le bouton <a href="../user/contact.php">"Contact"</a> dans le menu ainsi que sur l ' icone <a href="../user/contact.php"><img src="../img/logo/logomail.png" alt="logo mail" style = "transform : translate(0 , 25px);"></a>présent sur le footer du site</a></p>
+      <p class = "y-";>Vous pouvez utiliser le formulaire de contact disponible via le bouton <a href="../user/contact.php">"Contact"</a> dans le menu ainsi que sur l ' icone <a href="../user/contact.php"><img src="../img/logo/logomail.png" alt="logo mail" ></a>présent sur le footer du site</a></p>
     </div>
   </div>
   
-   <!-- Footer -->
-   <footer>
-    <?php include_once '../composants/footer.html'; ?>
-  </footer>
+   <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
 
 </body>
 </html>

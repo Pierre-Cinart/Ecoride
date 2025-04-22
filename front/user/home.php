@@ -52,9 +52,8 @@ $_SESSION['navSelected'] = 'home';
   </main>
 
    <!-- Footer -->
-  <footer>
     <?php include_once '../composants/footer.html'; ?>
-  </footer>
-
+ 
+ 
 </body>
 </html>

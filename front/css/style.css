@@ -161,12 +161,6 @@ a:hover {
   color: #60775D;
 }
 
-/* hidden */
-.hidden {
-  display: none;
-}
-
-  
 /*footer*/
 footer {
   width:100%;
@@ -217,10 +211,33 @@ footer .footer-icons img {
   width: 36px;
   height: 36px;
 }
-.hidden {display:none;}
+
+
 /* responsive navbarr (menu burger) */
 
 @media (max-width: 1200px) {
+  .navbar .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: #60775D;
+    position: absolute;
+    top: 70px;
+    left: 0px;
+    width: 200px;
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 10;
+  }
+
+  .navbar .nav-links.active {
+    display: flex;
+  }
+
+  .navbar .nav-links a {
+    border: solid 1px black;
+    width: 100%;
+  }
+
   .burger {
     display: flex;
     flex-direction: column;
@@ -233,38 +250,26 @@ footer .footer-icons img {
     margin: 4px;
     border-radius: 2px;
   }
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    background-color: #60775D;
-    position: absolute;
-    top: 70px;
-    left: 20px;
-    width: 200px;
-    border-radius: 10px;
-    padding: 10px;
-    z-index: 10;
-  }
-
-  .nav-links.active {
-    display: flex;
-  }
-
-  
 }
+
 
 
 
   /* mobile et tablette */
   @media (max-width : 800px){
+    
     body{
       width:100%;
       min-width: 360px;
       background: url('../img/images/background.png') center -50% / cover no-repeat fixed;
       font-size:14px;
     }
-    header
-    {width: 100%;}
+
+    header{
+      width: 100%;
+    }
+
+   
   /* main */
     main {
       width: 100%;

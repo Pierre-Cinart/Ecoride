@@ -60,9 +60,8 @@ $commentairesLaisses = [
     </section>
   </main>
 
-  <footer>
-    <?php include_once '../composants/footer.html'; ?>
-  </footer>
+  <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
 
 </body>
 </html>

@@ -4,6 +4,7 @@
   align-items: flex-start;
   gap: 2rem;
   padding: 2rem;
+  flex-wrap: wrap;
 }
 
 /* FILTRES */
@@ -52,48 +53,6 @@
 }
 
 /* FORMULAIRE */
-.form-container {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  font-family: Arial, sans-serif;
-}
-
-label {
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-input,
-select {
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-button {
-  margin-top: 1.5rem;
-  padding: 0.7rem;
-  border: none;
-  background-color: #60775D;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover {
-  background-color: #4a5f48;
-}
 
 /* MAP */
 .map-container {
@@ -106,3 +65,10 @@ button:hover {
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
+
+  /* mobile et tablette */
+  @media (max-width : 800px){
+
+   
+
+  }

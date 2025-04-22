@@ -42,10 +42,8 @@ $_SESSION['navSelected'] = 'login';
     <p>Pas encore inscrit ? <a href="../user/register.php">Créer un compte</a></p>
   </div>
 
-   <!-- Footer -->
-   <footer>
-    <?php include_once '../composants/footer.html'; ?>
-  </footer>
+   <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
 
 </body>
 </html>

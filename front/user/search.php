@@ -94,6 +94,9 @@ $_SESSION['navSelected'] = 'search';
 
   </div>
 
+  <!-- footer -->
+  <?php include_once '../composants/footer.html'; ?>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([48.8566, 2.3522], 12);
