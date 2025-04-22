@@ -33,7 +33,7 @@ $credits = $_SESSION['credits'] ?? 20;
 <header>
   <?php include_once '../composants/navbar.php'; ?>
 </header>
-
+<?php include_once '../composants/inProgress.php'; ?>
 <div class="account-container">
   <div class="header-info">
     <div><strong>Connecté en tant que :</strong> <?= htmlspecialchars($pseudo) ?> &nbsp;</div>

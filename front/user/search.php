@@ -30,9 +30,9 @@ $_SESSION['navSelected'] = 'search';
   <?php include_once '../composants/navbar.php'; ?>
 
   </header>
-
+  <?php include_once '../composants/inProgress.php'; ?>
   <div class="main-container">
-
+  
     <!-- Colonne : FILTRES -->
     <div class="filters">
       <h3>Filtres</h3>
@@ -67,10 +67,10 @@ $_SESSION['navSelected'] = 'search';
       </div>
     </div>
 
-    <!-- Colonne : FORMULAIRE -->
-    <div class="form-container" style = "margin-top:0px;">
+  <!-- Colonne : FORMULAIRE -->
+    <div class="form-container" style="margin-top:0px;">
       <h2>Rechercher un trajet</h2>
-      <form>
+      <form action="triplist.php" method="get">
         <label for="depart">Ville de départ</label>
         <input type="text" id="depart" name="depart" required />
 
@@ -78,7 +78,7 @@ $_SESSION['navSelected'] = 'search';
         <input type="text" id="destination" name="destination" required />
 
         <label for="date">Date</label>
-        <input type="date" id="date" name="date" required />
+        <input type="date" id="date" name="date" min="<?= date('Y-m-d') ?>" required />
 
         <label for="heure">Heure (optionnelle)</label>
         <input type="time" id="heure" name="heure" />

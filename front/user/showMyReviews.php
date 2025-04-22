@@ -35,6 +35,7 @@ $commentairesLaisses = [
   </header>
 
   <main>
+    <?php include_once '../composants/inProgress.php'; ?>
     <section class="reviews-section">
       <h2>Mes commentaires</h2>
       <p>Voici les avis que vous avez laissés après vos trajets.</p>

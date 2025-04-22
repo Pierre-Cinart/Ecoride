@@ -1,0 +1,84 @@
+.trip-container {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  h2 {
+    text-align: center;
+    color: #60775D;
+    margin-bottom: 2rem;
+  }
+
+  .grid-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .column {
+    flex: 1 1 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .trip-info {
+    background-color: #fff;
+    padding: 1.2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .trip-info h3 {
+    margin-top: 0;
+    color: #60775D;
+  }
+
+  .stars {
+    color: #FFD700;
+    font-size: 1.2rem;
+  }
+
+  .driver-photo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+  }
+
+  .vehicle-photo {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .driver-section {
+    display: flex;
+    align-items: center;
+  }
+
+  .preferences label {
+    display: inline-block;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .avis {
+    background-color: #eee;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+  }
+
+  .avis p {
+    margin: 0.3rem 0;
+  }
+
+  .btn-center {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }

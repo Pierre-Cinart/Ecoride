@@ -1,5 +1,6 @@
 <?php
 session_start();
+$_SESSION['navSelected'] = 'account';
 
 // Vérif connexion
 if (!isset($_SESSION['typeOfUser'])) {
@@ -36,6 +37,7 @@ $trajetsConducteur = ($type === 'driver') ? [
 <?php include_once '../composants/navbar.php'; ?>
 
 <main>
+  <?php include_once '../composants/inProgress.php'; ?>
   <div class="form-container">
     <h2>Mes trajets réservés</h2>
 

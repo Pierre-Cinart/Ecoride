@@ -30,14 +30,13 @@ $_SESSION['navSelected'] = 'home';
   <!-- Contenu principal -->
   <main>
 
-    <!-- Section de recherche -->
-    <section class="home-search">
-      <form class="home-search-form" action="#" method="get">
-        <input type="text" name="depart" placeholder="Ville de départ" required>
-        <input type="text" name="arrivee" placeholder="Ville d’arrivée" required>
-        <button type="submit">🔍 Rechercher</button>
-      </form>
-    </section>
+  <section class="home-search">
+    <form class="home-search-form" action="triplist.php" method="get">
+      <input type="text" name="depart" placeholder="Ville de départ" required>
+      <input type="text" name="arrivee" placeholder="Ville d’arrivée" required>
+      <button type="submit">🔍 Rechercher</button>
+    </form>
+  </section>
 
     <!-- Section de présentation -->
     <section class="home-presentation">

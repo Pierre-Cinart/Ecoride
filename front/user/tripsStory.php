@@ -37,6 +37,7 @@ $voyagesConducteur = ($type === 'driver') ? [
 </header>
 
 <main>
+<?php include_once '../composants/inProgress.php'; ?>
   <div class="form-container">
     <h2>Historique de vos voyages</h2>
 
@@ -75,9 +76,9 @@ $voyagesConducteur = ($type === 'driver') ? [
             <p><strong>Départ :</strong> <?= $trajet['ville_depart'] ?> → <strong>Arrivée :</strong> <?= $trajet['ville_arrivee'] ?></p>
             <p><strong>Date :</strong> <?= $trajet['date'] ?></p>
             <!-- bouton pour voir les avis -->
-            <form method="get" action="avisRecus.php" style="margin-top: 0.5rem;">
+            <form method="get" action="../driver/myTripsReviews.php" style="margin-top: 0.5rem;">
                 <input type="hidden" name="trip_id" value="...">
-                <button class="green" type="submit">📝 Voir les avis reçus</button>
+                <button class="green" type="submit">Voir les avis reçus</button>
             </form>
 
           </div>

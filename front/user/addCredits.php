@@ -19,6 +19,7 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
 </header>
 
 <main>
+<?php include_once '../composants/inProgress.php'; ?>
   <div class="form-container">
     <h2>Obtenir des crédits</h2>
     <p>Ajoutez des crédits à votre compte pour réserver des trajets ou participer en tant que conducteur.</p>

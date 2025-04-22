@@ -23,6 +23,7 @@ $_SESSION['navSelected'] = 'reviews';
   </header>
 
   <main>
+  <?php include_once '../composants/inProgress.php'; ?>
     <section class="reviews-section">
       <h2>Les avis des passagers</h2>
       <p>Consultez les retours d’expérience des utilisateurs ayant voyagé avec nos conducteurs.</p>
