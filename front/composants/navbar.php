@@ -41,7 +41,7 @@ $navSelected = $_SESSION['navSelected'] ?? '';
     <?php elseif ($type === 'driver'): ?>
       <!-- CONDUCTEUR -->
       <a href="../user/home.php" class="<?= ($navSelected === 'home') ? 'selected' : '' ?>">Accueil</a>
-      <a href="../driver/offer.php" class="<?= ($navSelected === 'offer') ? 'selected' : '' ?>">Proposer un trajet</a>
+      <a href="../driver/addTrip.php" class="<?= ($navSelected === 'offer') ? 'selected' : '' ?>">Proposer un trajet</a>
       <a href="../user/search.php" class="<?= ($navSelected === 'search') ? 'selected' : '' ?>">Rechercher un trajet</a>
       <a href="../user/reviews.php" class="<?= ($navSelected === 'reviews') ? 'selected' : '' ?>">Avis</a>
       <a href="../user/faq.php" class="<?= ($navSelected === 'faq') ? 'selected' : '' ?>">FAQ</a>
@@ -64,9 +64,20 @@ $navSelected = $_SESSION['navSelected'] ?? '';
       <a href="../user/logout.php">Déconnexion</a>
     <?php endif; ?>
   </div>
+  
   <div class="burger">
     <span></span>
     <span></span>
     <span></span>
   </div>
+
+  <!-- pop up messages erreurs et succés -->
+  <div id="popup" class="<?= isset($_SESSION['success']) ? 'success' : (isset($_SESSION['error']) ? 'error' : '') ?>">
+    <?= $_SESSION['success'] ?? $_SESSION['error'] ?? '' ?>
+
+  </div>
+  <!--  destruction session message popup après affichage pour ne pas qu'il reste -->
+  <?php
+  unset($_SESSION['success'], $_SESSION['error']);?>
+
 </nav>

@@ -29,12 +29,15 @@ $_SESSION['navSelected'] = 'signup';
   <main>
     <div class="form-container" >
       <h2>Créer un compte</h2>
-      <form action="#" method="post" enctype="multipart/form-data">
+      <form action="../back/register.php" method="post" enctype="multipart/form-data">
         <label for="first-name">Prénom :</label>
         <input type="text" id="first-name" name="first-name" required>
 
         <label for="name">Nom :</label>
         <input type="text" id="name" name="name" required>
+
+        <label for="name">Pseudo :</label>
+        <input type="text" id="pseudo" name="pseudo" >
 
         <label for="email">Adresse email :</label>
         <input type="email" id="email" name="email" required>
@@ -79,25 +82,6 @@ $_SESSION['navSelected'] = 'signup';
    <!-- footer -->
   <?php include_once '../composants/footer.html'; ?>
 
-  <script>
-    // ***script pour afficher ou masquer l upload de permis en cas d inscription en tant que chauffeur***
-    //récupération des champs concernés
-    const checkbox = document.getElementById('is-driver');
-    const permitField = document.getElementById('driver-permit');
-    const permitInput = document.getElementById('permit');
-    // event listener sur la checkbox
-    checkbox.addEventListener('change', () => {
-      // affiche le champs d upload et le rend obligatoire si inscription chauffeur est cliqué
-      if (checkbox.checked) {
-        permitField.classList.remove('hidden');
-        permitInput.required = true;
-        //si non le masque et supprime sont obligation
-      } else {
-        permitField.classList.add('hidden');
-        permitInput.required = false;
-      }
-    });
-  </script>
-
+  <script src="../js/register.js"></script>
 </body>
 </html>
