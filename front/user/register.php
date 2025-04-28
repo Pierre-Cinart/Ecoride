@@ -29,7 +29,7 @@ $_SESSION['navSelected'] = 'signup';
   <main>
     <div class="form-container" >
       <h2>Créer un compte</h2>
-      <form action="../back/register.php" method="post" enctype="multipart/form-data">
+      <form action="../../back/register.php" method="post" enctype="multipart/form-data">
         <label for="first-name">Prénom :</label>
         <input type="text" id="first-name" name="first-name" required>
 
