@@ -27,8 +27,11 @@ $_SESSION['navSelected'] = 'login';
   </header>
 
   <div class="form-container">
+
     <h2>Connexion</h2>
-    <form action="#" method="post">
+
+    <form action="../../back/login.php" method="post">
+
       <label for="email">Adresse email :</label>
       <input type="email" id="email" name="email" required>
 
@@ -40,6 +43,7 @@ $_SESSION['navSelected'] = 'login';
 
     <p><a href="#">Mot de passe oublié ?</a></p>
     <p>Pas encore inscrit ? <a href="../user/register.php">Créer un compte</a></p>
+    
   </div>
 
    <!-- footer -->

@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once './composants/db_connect.php'; //  connexion à ta BDD 
+require_once './composants/sanitizeArray.php'; //  pour échapper les données
+
 
 // Vérifie que le formulaire a bien été soumis en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -9,13 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// 1. Sécurisation des entrées
-$pseudo = trim($_POST['pseudo']);
-$firstName = trim($_POST['first-name']);
-$lastName = trim($_POST['name']);
-$email = trim($_POST['email']);
-$confirmEmail = trim($_POST['confirm-email']);
-$phone = trim($_POST['phone']);
+// 1. Sécurisation des entrées 
+$_POST = sanitizeArray($_POST ,'../front/user/register.php');
+
+// récupération des données 
+$pseudo = $_POST['pseudo'];
+$firstName = $_POST['first-name'];
+$lastName = $_POST['name'];
+$email = $_POST['email'];
+$confirmEmail = $_POST['confirm-email'];
+$phone = $_POST['phone'];
 $password = $_POST['password'];
 $confirmPassword = $_POST['confirm-password'];
 $isDriver = isset($_POST['is-driver']) ? 1 : 0;
