@@ -2,7 +2,20 @@
 session_start();
 require_once './composants/db_connect.php'; //  connexion à ta BDD 
 require_once './composants/sanitizeArray.php'; //  pour échapper les données
+require_once './config/configCaptcha.php';//google recaptcha 
 
+//verification google - Recaptcha
+$recaptchaToken = $_POST['g-recaptcha-response'] ?? '';
+$secret = $RECAPTCHA_PRIVATE_KEY;
+
+$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secret&response=$recaptchaToken");
+$result = json_decode($response, true);
+
+if (!$result['success'] || $result['score'] < 0.5) {
+    $_SESSION['error'] = "Échec de vérification reCAPTCHA.";
+    header('Location: ../front/user/login.php');
+    exit();
+}
 
 // Vérifie que le formulaire a bien été soumis en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -12,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // 1.Sécurisation des entrées 
-$_POST = sanitizeArray($_POST ,'../front/user/register.php');
+$_POST = sanitizeArray($_POST ,'../../front/user/login.php');
 
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
@@ -55,7 +68,7 @@ try {
           
 } catch (Exception $e) {
     $_SESSION['error'] = "Erreur lors de la connexion.";
-    header('Location: ../front/user/login.php');
+    header('Location: ../../front/user/login.php');
     exit();
 }
 
