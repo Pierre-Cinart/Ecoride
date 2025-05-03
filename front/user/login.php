@@ -18,8 +18,9 @@ $_SESSION['navSelected'] = 'login';
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 
   <!-- Google reCAPTCHA v3 -->
-  <?php include_once '../composants/captcha.php'; ?> 
-  
+  <?php $captchaAction = 'login'; // action personnalisée pour cette page
+  include_once '../composants/captcha.php'; ?> 
+
 </head>
 <body>
 

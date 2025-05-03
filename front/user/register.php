@@ -16,6 +16,10 @@ $_SESSION['navSelected'] = 'signup';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 
+  <!-- google recaptcha v3 -->
+  <?php $captchaAction = 'register'; // action personnalisée pour cette page
+  include_once '../composants/captcha.php'; ?> 
+
 </head>
 <body>
 
@@ -71,6 +75,9 @@ $_SESSION['navSelected'] = 'signup';
           <input type="checkbox" id="terms" name="terms" required>
           J’accepte les <a href="mentionsLegales.php" target="_blank">mentions légales</a>
         </label>
+
+        <!-- Champ caché pour recevoir le token reCAPTCHA -->
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
 
         <button type="submit">S'inscrire</button>
       </form>
