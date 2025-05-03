@@ -83,21 +83,44 @@ Vérifier que les chemin soeint bien présents dans le fichier .gitignore :
 
 /back/config/db_config.php
 
-## Créer un compte admin 
-mettez le contenu du fichier /database/.htacess en commentaire
-configurez vos nom  d utilisateur et mot de passe dans le fichier : database/CreateAdmin.php'
-exemples : 
-    $pseudo = 'admin';
-    $firstName = 'José';
-    $lastName = 'Admin';
-    $email = 'admin@ecoride.fr';
-    $phone = '0101010101';
-    $role = 'admin';
-    $password = 'Mot2Passe'; 
+## Injecter des comptes de test (Admin, Employé, Utilisateur, Conducteurs)
+Pour tester facilement votre site avec plusieurs types d’utilisateurs (admin, employé, utilisateur simple, conducteur avec permis validé ou en attente), suivez les étapes suivantes :
 
-puis rendez vous à l ' adresse 'VotreSite/database/CreateAdmin.php' pour executer le php
-vous pouvez maintenant vous connecter en tant qu administrateur
+🔐 1. Désactiver temporairement la protection .htaccess
+Si vous avez placé un fichier .htaccess dans le dossier /database/, commentez temporairement son contenu (ajoutez # en début de ligne) afin de pouvoir exécuter le script PHP.
 
+⚙️ 2. Modifier les comptes à injecter (facultatif)
+Le fichier /database/CreateUsers.php injecte automatiquement plusieurs comptes de démonstration (admin, employé, utilisateurs, conducteurs…).
+
+Si vous souhaitez changer les pseudos, emails ou mots de passe, vous pouvez modifier directement les blocs de création dans le fichier CreateUsers.php.
+
+🚀 3. Exécuter le script
+Accédez à l’URL suivante dans votre navigateur (depuis localhost ou votre hébergement) :
+
+arduino
+Copier
+Modifier
+http://VotreSite/database/CreateUsers.php
+Vous verrez un message de confirmation si les données ont bien été injectées.
+
+👤 Comptes créés automatiquement
+1 administrateur
+
+1 employé
+
+1 utilisateur simple
+
+1 conducteur avec permis validé
+
+1 conducteur avec permis en attente
+
+⚠️ Le fichier test.jpg doit être présent dans le dossier suivant pour simuler un permis :
+
+/back/uploads/test/test.jpg
+
+Une fois terminé, remettez en place la protection .htaccess du dossier /database/ pour empêcher toute réexécution ou accès non autorisé.
+
+Les mots de passe sont automatiquement hachés avec password_hash() avant d'être enregistrés.
 ## À venir
 Authentification sécurisée via tokens (JWT-like)
 
