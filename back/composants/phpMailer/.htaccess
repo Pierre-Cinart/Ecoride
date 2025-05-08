@@ -1,0 +1,4 @@
+# Bloque tout accès web aux fichiers du dossier
+
+Order Deny,Allow
+Deny from all

@@ -1,21 +1,22 @@
 <?php
 session_start();
-require_once './composants/db_connect.php'; //  connexion à ta BDD 
-require_once './composants/sanitizeArray.php'; //  pour échapper les données
-
+require_once './composants/db_connect.php'; // Connexion à la base de données
+require_once './composants/sanitizeArray.php'; // Nettoyage des données
+require_once './composants/JWT.php'; // Pour la création de tokens
+require_once './composants/phpMailer/src/sendMail.php'; // Pour envoyer les mails avec PHPMailer
 
 // Vérifie que le formulaire a bien été soumis en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = "Méthode non autorisée.";
-    header('Location: ../user/register.php');
+    header('Location: ../front/user/register.php');
     exit();
 }
 
-// 1. Sécurisation des entrées 
-$_POST = sanitizeArray($_POST ,'../front/user/register.php');
+// Nettoyage des données postées (et sécurité contre les tableaux malicieux)
+$_POST = sanitizeArray($_POST, '../front/user/register.php');
 
-// récupération des données 
-$pseudo = $_POST['pseudo'];
+// Récupération des champs du formulaire
+$username = $_POST['pseudo'];
 $firstName = $_POST['first-name'];
 $lastName = $_POST['name'];
 $email = $_POST['email'];
@@ -25,31 +26,31 @@ $password = $_POST['password'];
 $confirmPassword = $_POST['confirm-password'];
 $isDriver = isset($_POST['is-driver']) ? 1 : 0;
 
-// Vérifications basiques
-if (empty($pseudo) || empty($firstName) || empty($lastName) || empty($email) || empty($phone) || empty($password)) {
+// Vérification que tous les champs obligatoires sont remplis
+if (empty($username) || empty($firstName) || empty($lastName) || empty($email) || empty($phone) || empty($password)) {
     $_SESSION['error'] = "Veuillez remplir tous les champs obligatoires.";
     header('Location: ../front/user/register.php');
     exit();
 }
 
-// Emails identiques
+// Vérification que les emails correspondent
 if ($email !== $confirmEmail) {
     $_SESSION['error'] = "Les emails ne correspondent pas.";
     header('Location: ../front/user/register.php');
     exit();
 }
 
-// Passwords identiques
+// Vérification que les mots de passe correspondent
 if ($password !== $confirmPassword) {
     $_SESSION['error'] = "Les mots de passe ne correspondent pas.";
     header('Location: ../front/user/register.php');
     exit();
 }
 
-// 2. Vérifier unicité du pseudo, email, téléphone
+// Vérifie que l'email, le pseudo ou le numéro de téléphone ne sont pas déjà utilisés
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE pseudo = :pseudo OR email = :email OR phone_number = :phone");
 $stmt->execute([
-    ':pseudo' => $pseudo,
+    ':pseudo' => $username,
     ':email' => $email,
     ':phone' => $phone
 ]);
@@ -59,7 +60,7 @@ if ($stmt->fetchColumn() > 0) {
     exit();
 }
 
-// 3. Si chauffeur => vérifier upload du permis
+// Si l'utilisateur est chauffeur, on vérifie qu'un permis est bien envoyé
 if ($isDriver) {
     if (!isset($_FILES['permit']) || $_FILES['permit']['error'] !== 0) {
         $_SESSION['error'] = "Le permis de conduire est obligatoire pour être chauffeur.";
@@ -67,7 +68,7 @@ if ($isDriver) {
         exit();
     }
 
-    // Vérification du format JPEG
+    // On vérifie le format du fichier (doit être JPEG)
     $permitType = mime_content_type($_FILES['permit']['tmp_name']);
     if ($permitType !== 'image/jpeg') {
         $_SESSION['error'] = "Le permis doit être au format JPEG.";
@@ -76,32 +77,40 @@ if ($isDriver) {
     }
 }
 
-// 4. Hachage du mot de passe
+// On hash le mot de passe pour le stocker de façon sécurisée
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-// 5. Création du compte utilisateur
+// On génère le token de vérification d'email
+$emailToken = createToken();
+$emailTokenExpiration = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
 try {
+    // On démarre une transaction pour garantir que tout s'insère proprement
     $pdo->beginTransaction();
 
-    $insertUser = $pdo->prepare("INSERT INTO users (pseudo, first_name, last_name, email, password, phone_number, role) VALUES (:pseudo, :first_name, :last_name, :email, :password, :phone_number, :role)");
-    $insertUser->execute([
-        ':pseudo' => $pseudo,
-        ':first_name' => $firstName,
-        ':last_name' => $lastName,
+    // Insertion de l'utilisateur dans la base
+    $insert = $pdo->prepare("INSERT INTO users (pseudo, first_name, last_name, email, password, phone_number, role, is_verified_email, email_verification_token, email_token_expires_at)
+    VALUES (:username, :firstName, :lastName, :email, :password, :phone, :role, 0, :token, :tokenExp)");
+    $insert->execute([
+        ':username' => $username,
+        ':firstName' => $firstName,
+        ':lastName' => $lastName,
         ':email' => $email,
         ':password' => $hashedPassword,
-        ':phone_number' => $phone,
-        ':role' => $isDriver ? 'driver' : 'user'
+        ':phone' => $phone,
+        ':role' => $isDriver ? 'driver' : 'user',
+        ':token' => $emailToken,
+        ':tokenExp' => $emailTokenExpiration
     ]);
 
     $userId = $pdo->lastInsertId();
 
-    // 6. Gestion de l'upload du permis
+    // Si l'utilisateur est chauffeur, on traite l'upload du permis
     if ($isDriver) {
-        $userFolder = '../back/uploads/' . $pseudo;
+        $userFolder = '../back/uploads/' . $username;
         if (!is_dir($userFolder)) {
-            mkdir($userFolder, 0777, true); // Création du dossier
-            // Protection du dossier via .htaccess
+            mkdir($userFolder, 0777, true);
+            // On protège le dossier contre l'accès direct
             file_put_contents($userFolder . '/.htaccess', "Order Deny,Allow\nDeny from all");
         }
 
@@ -112,17 +121,26 @@ try {
             throw new Exception("Erreur lors du téléchargement du permis.");
         }
 
-        // Insertion en base dans documents
-        $insertDoc = $pdo->prepare("INSERT INTO documents (user_id, type, file_path) VALUES (:user_id, :type, :file_path)");
+        // Insertion du document dans la table documents
+        $insertDoc = $pdo->prepare("INSERT INTO documents (user_id, type, file_path) VALUES (:userId, :type, :filePath)");
         $insertDoc->execute([
-            ':user_id' => $userId,
+            ':userId' => $userId,
             ':type' => 'permit',
-            ':file_path' => $filePath
+            ':filePath' => $filePath
         ]);
     }
 
+    // Envoi du mail de confirmation avec le lien contenant le token
+    $subject = "Confirmation de votre inscription - EcoRide";
+    // adresse du lien a changer pour local non local
+    $link = "http://localhost/ecoride/back/verify_email.php?token=" . urlencode($emailToken);
+    $message = "Bonjour $firstName,<br><br>Merci pour votre inscription sur EcoRide.<br><br>Veuillez cliquer sur le lien suivant pour valider votre adresse e-mail :<br><a href='$link'>$link</a><br><br>Ce lien est valable pendant 24 heures.";
+
+    sendMail("no-reply@ecoride.fr", $email, $subject, $message);
+
     $pdo->commit();
-    $_SESSION['success'] = "Inscription réussie, vous pouvez vous connecter !";
+
+    $_SESSION['success'] = "Nous vous avons envoyé un mail de vérification. Veuillez consulter votre messagerie et cliquer sur le lien de validation.";
     header('Location: ../front/user/login.php');
     exit();
 

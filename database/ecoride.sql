@@ -100,7 +100,9 @@ CREATE TABLE `users` (
   `phone_number` varchar(20) DEFAULT NULL,
   `role` enum('user','driver','employee','admin') NOT NULL DEFAULT 'user',
   `credits` int DEFAULT '20',
-  `is_verified` tinyint(1) DEFAULT '0',
+  `is_verified_email` tinyint(1) DEFAULT '0',
+  `email_verification_token` varchar(255) DEFAULT NULL,
+  `email_token_expires_at` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `jws_token` varchar(255) DEFAULT NULL,
   `jws_token_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP
