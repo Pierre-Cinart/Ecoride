@@ -133,7 +133,7 @@ try {
     // Envoi du mail de confirmation avec le lien contenant le token
     $subject = "Confirmation de votre inscription - EcoRide";
     // adresse du lien a changer pour local non local
-    $link = "http://localhost/ecoride/back/verify_email.php?token=" . urlencode($emailToken);
+    $link = "$webAddress/back/verify_email.php?token=" . urlencode($emailToken);
     $message = "Bonjour $firstName,<br><br>Merci pour votre inscription sur EcoRide.<br><br>Veuillez cliquer sur le lien suivant pour valider votre adresse e-mail :<br><a href='$link'>$link</a><br><br>Ce lien est valable pendant 24 heures.";
 
     sendMail("no-reply@ecoride.fr", $email, $subject, $message);

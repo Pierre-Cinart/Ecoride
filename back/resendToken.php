@@ -55,8 +55,8 @@ $update->execute([
 $firstName = $user['first_name'];
 $subject = "Confirmation de votre inscription - EcoRide";
 
-// ⚠️ Pense à adapter ce lien pour mise en ligne
-$link = "http://localhost/ecoride/back/verify_email.php?token=" . urlencode($newToken);
+
+$link = $webAddress . "/back/verify_email.php?token=" . urlencode($newToken);
 
 $message = "
     Bonjour <strong>$firstName</strong>,<br><br>
