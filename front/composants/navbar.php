@@ -6,7 +6,6 @@ require_once '../../back/classes/Employee.php';
 require_once '../../back/classes/Admin.php';
 
 session_start();
-var_dump($_SESSION['user']);
 // Mise en surbrillance du lien actif
 $navSelected = $_SESSION['navSelected'] ?? '';
 $user = $_SESSION['user'] ?? null;

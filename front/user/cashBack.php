@@ -1,6 +1,6 @@
 <!-- Page : refundRequest.php -->
 <?php
-session_start();
+
 $_SESSION['navSelected'] = 'account';
 $pseudo = $_SESSION['pseudo'] ?? 'NomUtilisateur';
 $credits = $_SESSION['credits'] ?? 20; // affiché mais non modifiable

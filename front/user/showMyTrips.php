@@ -1,5 +1,4 @@
 <?php
-session_start();
 $_SESSION['navSelected'] = 'account';
 
 // Vérif connexion

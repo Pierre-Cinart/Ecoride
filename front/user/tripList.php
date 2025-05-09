@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../../back/classes/User.php';
 require_once '../../back/classes/SimpleUser.php';
 require_once '../../back/classes/Driver.php';
