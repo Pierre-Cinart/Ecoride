@@ -21,6 +21,8 @@ Paiement factice et gestion de crédits
 
 Téléversement de permis (vérification manuelle par l’équipe)
 
+Envoie de mails 
+
 Arborescence du projet (extrait)
 /back/
 ├── composants/
@@ -53,6 +55,10 @@ phpMyAdmin (recommandé)
 Git
 
 Compte googleRECAPTCHA requiert l obtention clé V3 (https://developers.google.com/recaptcha/docs/v3?hl=fr)
+
+phpMailer 
+
+mailhog pour les teste de mailing (recommandé)
 
 ## Cloner le projet
 git clone https://github.com/Pierre-Cinart/Ecoride.git
@@ -121,6 +127,36 @@ Vous verrez un message de confirmation si les données ont bien été injectées
 Une fois terminé, remettez en place la protection .htaccess du dossier /database/ pour empêcher toute réexécution ou accès non autorisé.
 
 Les mots de passe sont automatiquement hachés avec password_hash() avant d'être enregistrés.
+
+Envoi d’e-mails avec PHPMailer et MailHog
+Le projet utilise PHPMailer pour gérer l’envoi des e-mails (confirmation d’inscription, renouvellement de lien de vérification...).
+
+Mode local avec MailHog
+Pour tester l’envoi de mails en local :
+
+Télécharge et lance MailHog :
+https://github.com/mailhog/MailHog/releases
+Lance l’exécutable MailHog.exe. L’interface de réception des e-mails est accessible via :
+http://localhost:8025
+
+Configuration du mode local :
+Dans le fichier /back/config/db_config.php, assurez-vous que la variable suivante est bien définie :
+
+$onLine = false; // indique qu'on est en local
+$webAddress = 'http://localhost/nom du site';
+PHPMailer enverra alors les e-mails vers MailHog via localhost:1025.
+
+Mode production (en ligne)
+Pour passer en ligne, mettez simplement :
+
+
+$onLine = true;
+$webAddress = 'https://votre-domaine.fr';
+Dans ce mode, configurez également les paramètres SMTP réels dans le fichier sendMail.php, section else.
+
+Le lien d’activation ou de réinitialisation sera automatiquement généré avec $webAddress comme base, ce qui garantit un fonctionnement correct en local comme en production.
+
+
 ## À venir
 Authentification sécurisée via tokens (JWT-like)
 
