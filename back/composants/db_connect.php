@@ -9,8 +9,8 @@ try {
     // Définir les attributs PDO pour une gestion propre des erreurs
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Message de succès (pour debug uniquement)
-    echo "✅ Connexion à la base de données réussie.";
+    // // Message de succès (pour debug uniquement)
+    // echo "✅ Connexion à la base de données réussie.";
 } catch (PDOException $e) {
     // Message d'erreur en cas d'échec
     echo "❌ Erreur de connexion : " . $e->getMessage();

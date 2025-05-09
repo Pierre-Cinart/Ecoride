@@ -10,7 +10,7 @@ function sanitizeArray($array, $location = '../index.php') {
             $_SESSION['error'] = "Tentative de données invalides détectée.";
             header('Location: ' . $location);
             exit();
-        } else {
+        } else { //si non efface les espaces inutiles et échappe les données
             $clean[$key] = htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
         }
     }

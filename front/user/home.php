@@ -1,8 +1,6 @@
 <?php
 session_start();
-
 $_SESSION['navSelected'] = 'home';
-
 ?>
 
 <!DOCTYPE html>
@@ -13,46 +11,50 @@ $_SESSION['navSelected'] = 'home';
   <title>Accueil - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/home.css" />
+  <!-- Font Google -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
-
 </head>
 <body>
 
-  <header>
-
-    <!-- Navbar dynamique -->
+<header>
   <?php include_once '../composants/navbar.php'; ?>
+</header>
 
-  </header>
-
-  <!-- Contenu principal -->
-  <main>
-
+<main>
   <section class="home-search">
-    <form class="home-search-form" action="triplist.php" method="get">
-      <input type="text" name="depart" placeholder="Ville de départ" required>
-      <input type="text" name="arrivee" placeholder="Ville d’arrivée" required>
+    <form class="home-search-form" action="tripList.php" method="get">
+      <input type="text" name="depart" id="depart" placeholder="Ville de départ" list="depart-list" required>
+      <datalist id="depart-list"></datalist>
+
+      <input type="text" name="arrivee" id="arrivee" placeholder="Ville d’arrivée" list="arrivee-list" required>
+      <datalist id="arrivee-list"></datalist>
+
       <button type="submit">🔍 Rechercher</button>
     </form>
   </section>
 
-    <!-- Section de présentation -->
-    <section class="home-presentation">
-      <h2>Présentation d’EcoRide</h2><br>
-      <p>Bienvenue sur <strong>EcoRide</strong>, l’alternative écologique pour vos déplacements quotidiens ! </p>
-      <p>Notre mission est simple : réduire l’empreinte carbone liée aux transports tout en facilitant les trajets partagés entre particuliers.<br><br>
-      Chez EcoRide, nous croyons qu’un avenir plus vert passe par des actions concrètes et accessibles. </p>
-      <p>C’est pourquoi nous avons créé une plateforme de covoiturage écoresponsable, pensée pour tous — que vous soyez conducteur ou passager, habitant en ville ou en zone rurale.
-      </p>
-    </section>
+  <section class="home-presentation">
+    <h2>Présentation d’EcoRide</h2>
+    <p>
+      Bienvenue sur <strong>EcoRide</strong>, l’alternative écologique pour vos déplacements quotidiens !
 
-  </main>
+      Notre mission est simple : réduire l’empreinte carbone liée aux transports tout en facilitant les trajets partagés entre particuliers.
 
-   <!-- Footer -->
-    <?php include_once '../composants/footer.html'; ?>
- 
- 
+      Chez EcoRide, nous croyons qu’un avenir plus vert passe par des actions concrètes et accessibles.
+
+      C’est pourquoi nous avons créé une plateforme de covoiturage écoresponsable, pensée pour tous — que vous soyez conducteur ou passager, habitant en ville ou en zone rurale.
+
+      Ensemble, roulons vers un futur plus propre. 🌱
+    </p>
+  </section>
+</main>
+
+<?php include_once '../composants/footer.html'; ?>
+
+<!-- Autocomplétion avec GeoAPI.gouv -->
+<script src="../js/geoApi.js"></script>
+
 </body>
 </html>
