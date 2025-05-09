@@ -1,7 +1,4 @@
 <?php
-session_start();
-// google recaptcha
-require_once '../../back/config/configCaptcha.php';
 $_SESSION['navSelected'] = 'login';
 ?>
 

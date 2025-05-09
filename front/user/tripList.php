@@ -1,9 +1,12 @@
 <?php
 session_start();
+require_once '../../back/classes/User.php';
+require_once '../../back/classes/SimpleUser.php';
+require_once '../../back/classes/Driver.php';
 require_once '../../back/composants/db_connect.php';
 require_once '../../back/composants/paginate.php';
 
-// Fonction de formatage pour sécuriser et capitaliser les villes
+// Fonction pour sécuriser et capitaliser une ville
 function formatCity($city) {
     $city = htmlspecialchars(trim($city));
     return ucfirst(strtolower($city));
@@ -19,14 +22,14 @@ $vehicleType = $_GET['vehicleType'] ?? '';
 $prix_max = $_GET['prix_max'] ?? null;
 $note_min = $_GET['note_min'] ?? null;
 $sort = $_GET['sort'] ?? 'date';
-$similar = isset($_GET['similar']); // affichage alternatif sans contrainte
+$similar = isset($_GET['similar']);
 
 // Pagination
 $itemsPerPage = 5;
 $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($currentPage - 1) * $itemsPerPage;
 
-// Construction dynamique de la clause WHERE
+// Construction de la clause WHERE dynamique
 $where = "
     LOWER(t.departure_city) = LOWER(:depart)
     AND LOWER(t.arrival_city) = LOWER(:arrivee)
@@ -34,10 +37,7 @@ $where = "
     AND t.status = 'planned'
     AND t.available_seats > 0
 ";
-$params = [
-    ':depart' => $departure,
-    ':arrivee' => $arrival
-];
+$params = [':depart' => $departure, ':arrivee' => $arrival];
 
 if (!$similar) {
     if (!empty($date)) {
@@ -61,44 +61,44 @@ if (!$similar) {
     }
 }
 
-// Tri des résultats
+// Tri personnalisé
 $orderBy = "t.departure_date ASC, t.departure_time ASC";
 if ($sort === 'price') $orderBy = "t.price ASC";
 if ($sort === 'rating') $orderBy = "driver_rating DESC";
 
-// Compter les résultats
+// Comptage des résultats
 $countSql = "
     SELECT COUNT(*) FROM (
         SELECT t.id
         FROM trips t
         JOIN vehicles v ON t.vehicle_id = v.id
-        LEFT JOIN ratings r ON r.trip_id = t.id AND r.status = 'accepted'
         WHERE $where
         GROUP BY t.id
-    ) AS sub
-";
+    ) AS sub";
 $countStmt = $pdo->prepare($countSql);
 $countStmt->execute($params);
 $totalItems = $countStmt->fetchColumn();
 
-// Requête principale avec note moyenne par voyage
+// Requête principale avec note moyenne PAR CONDUCTEUR
 $query = $pdo->prepare("
     SELECT 
         t.*, 
         u.pseudo AS driver_name, 
-        v.brand, 
-        v.model,
-        COALESCE(AVG(r.rating), 0) AS driver_rating
+        v.brand, v.model,
+        (
+            SELECT ROUND(AVG(r.rating), 1)
+            FROM ratings r
+            JOIN trips t2 ON r.trip_id = t2.id
+            WHERE t2.driver_id = t.driver_id AND r.status = 'accepted'
+        ) AS driver_rating
     FROM trips t
     JOIN users u ON t.driver_id = u.id
     JOIN vehicles v ON t.vehicle_id = v.id
-    LEFT JOIN ratings r ON r.trip_id = t.id AND r.status = 'accepted'
     WHERE $where
     GROUP BY t.id
     ORDER BY $orderBy
     LIMIT :limit OFFSET :offset
 ");
-
 foreach ($params as $key => $val) {
     $query->bindValue($key, $val);
 }
@@ -115,6 +115,7 @@ $trips = $query->fetchAll(PDO::FETCH_ASSOC);
   <title>Résultats de recherche - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/tripList.css">
+  <!-- Google Font restaurée -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
@@ -128,7 +129,7 @@ $trips = $query->fetchAll(PDO::FETCH_ASSOC);
       <button class="blue" onclick="window.location.href='search.php'">⬅ Nouvelle recherche</button>
     </div>
 
-    <!-- Tri -->
+    <!-- Formulaire de tri -->
     <form class="form-container" method="get" action="tripList.php">
       <input type="hidden" name="depart" value="<?= htmlspecialchars($departure) ?>">
       <input type="hidden" name="arrivee" value="<?= htmlspecialchars($arrival) ?>">
@@ -143,6 +144,7 @@ $trips = $query->fetchAll(PDO::FETCH_ASSOC);
       </select>
     </form>
 
+    <!-- Affichage des trajets -->
     <div class="trip-cards">
       <?php if (empty($trips)): ?>
         <p>Aucun trajet trouvé pour ces critères.</p>
@@ -159,13 +161,35 @@ $trips = $query->fetchAll(PDO::FETCH_ASSOC);
             <p><strong>Arrivée :</strong> <?= htmlspecialchars($trip['arrival_city']) ?></p>
             <p><strong>Date :</strong> <?= date('d/m/Y', strtotime($trip['departure_date'])) ?> à <?= substr($trip['departure_time'], 0, 5) ?></p>
             <p><strong>Conducteur :</strong> <?= htmlspecialchars($trip['driver_name']) ?> -
-              <span class="stars"><?= str_repeat("★", round($trip['driver_rating'])) . str_repeat("☆", 5 - round($trip['driver_rating'])) ?></span>
-              (<?= number_format($trip['driver_rating'], 1) ?>)
+              <?php
+              $rating = floatval($trip['driver_rating']);
+              $fullStars = floor($rating);
+              $emptyStars = 5 - $fullStars;
+              ?>
+              <span class="stars"><?= str_repeat("★", $fullStars) . str_repeat("☆", $emptyStars) ?></span>
+              (<?= number_format($rating, 1) ?>)
             </p>
             <p><strong>Véhicule :</strong> <?= htmlspecialchars($trip['brand']) ?> <?= htmlspecialchars($trip['model']) ?></p>
             <p><strong>Places disponibles :</strong> <?= (int)$trip['available_seats'] ?></p>
             <p><strong>Prix :</strong> <?= (float)$trip['price'] ?> crédits</p>
             <p><strong>Écologique :</strong> <?= $trip['is_ecological'] ? '✅' : '❌' ?></p>
+
+            <?php
+            $canReserve = isset($_SESSION['user']) &&
+              ($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver);
+            ?>
+            <?php if ($canReserve): ?>
+              <form method="post" action="../../back/reserv.php" class="reservation-form">
+                <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                <button class="blue" type="submit">Réserver ce trajet</button>
+              </form>
+            <?php else: ?>
+              <div class="reservation-warning">
+                <p>🔒 Vous devez être connecté pour réserver</p>
+                <a href="../user/login.php">Se connecter</a> |
+                <a href="../user/register.php">Créer un compte</a>
+              </div>
+            <?php endif; ?>
           </div>
         <?php endforeach; ?>
       <?php endif; ?>

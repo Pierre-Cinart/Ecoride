@@ -1,14 +1,17 @@
 <?php
+require_once './classes/User.php';
+require_once './classes/SimpleUser.php';
+require_once './classes/Driver.php';
+require_once './classes/Admin.php';
+require_once './classes/Employee.php';
+
 session_start();
 
 // Import des dépendances
 require_once './composants/db_connect.php';
 require_once './composants/sanitizeArray.php';
 require_once './composants/JWT.php';
-require_once './classes/User.php';
-require_once './classes/Driver.php';
-require_once './classes/Admin.php';
-require_once './classes/Employee.php';
+
 
 // Vérifie que le formulaire a été soumis en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -73,6 +76,9 @@ $args = [
 ];
 
 switch ($data['role']) {
+    case 'user' : 
+        $user = new SimpleUser(...$args);
+        break;
     case 'admin':
         $user = new Admin(...$args);
         break;
