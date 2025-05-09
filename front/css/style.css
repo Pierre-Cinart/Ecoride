@@ -13,14 +13,14 @@ body {
   font-size:16px;
   overflow-x: hidden;
 }
-
+/* ------------------------------------------------ */
 header {
   width: 100vw;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
-
+/* -------------------------------------------------- */
 /* navbar */
 .navbar {
   width: 100%;
@@ -68,7 +68,7 @@ header {
 .burger {
   display: none;
 }
-
+/* ------------------------------------------------ */
 /* contenu principal  */
 main{
   flex: 1;
@@ -78,7 +78,7 @@ main{
   margin-bottom: 20px;
   padding: 0 1rem;
 }
-
+/* ------------------------------------------------ */
 /* formulmaires */
 .form-container {
   margin:20px auto;
@@ -112,7 +112,7 @@ input {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-
+/* ------------------------------------------------ */
 /* boutons */
 .top-buttons {
   display: flex;
@@ -161,15 +161,7 @@ a:hover {
 .red {
   background-color: red;
 }
-
-/* pagination */
-.pagination {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #60775D;
-}
-
+/* ------------------------------------------------ */
 /*footer*/
 footer {
   width:100%;
@@ -222,12 +214,13 @@ footer .footer-icons img {
   width: 36px;
   height: 36px;
 }
-
+/* ------------------------------------------------ */
+/* pagination */
 .pagination {
   margin-top: 2rem;
   text-align: center;
   font-size: 1rem;
-  font-style: bolder;
+  font-weight: bold;
   color: #1126df;
   text-shadow:
     -3px -3px 4px #ffffff,  
@@ -236,6 +229,21 @@ footer .footer-icons img {
     3px 3px 4px #ffffff;
 }
 
+.pagination a {
+  margin: 0 5px;
+  text-decoration: none;
+  color: #1126df;
+}
+
+.pagination .active {
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #1126df;
+  padding: 0.2em 0.5em;
+  border-radius: 5px;
+}
+
+/* ------------------------------------------------ */
 /* popup */
 #popup {
   position: fixed;
@@ -261,12 +269,13 @@ footer .footer-icons img {
   background-color: #f44336; /* rouge */
   color: white;
 }
+/* ------------------------------------------------ */
 /*  invisibilité */
 .hidden {
   display : none;
 }
+/* ------------------------------------------------ */
 /* responsive navbarr (menu burger) */
-
 @media (max-width: 1200px) {
   .navbar .nav-links {
     display: none;
@@ -304,24 +313,26 @@ footer .footer-icons img {
   }
 }
 
-
-
+/* ------------------------------------------------ */
+/* ------------------------------------------------ */
 
   /* mobile et tablette */
   @media (max-width : 800px){
-    
-    body{
+/* body */
+body{
       width:100%;
       min-width: 360px;
       background: url('../img/images/background.png') center -50% / cover no-repeat fixed;
       font-size:14px;
     }
+/* ------------------------------------------------ */
+/* header */
 
-    header{
+header{
       width: 100%;
     }
 
-   
+/* ------------------------------------------------ */
   /* main */
     main {
       width: 100%;
@@ -329,7 +340,7 @@ footer .footer-icons img {
       padding: 0;
       flex: 1;
     }
-
+/* ------------------------------------------------ */
   /* formulaires */
     form{
       width: 90%;
@@ -362,7 +373,7 @@ footer .footer-icons img {
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-
+/* ------------------------------------------------ */
  /* footer */
     footer  {
       width:100vw;
