@@ -1,7 +1,5 @@
 <?php
 
-
-$_SESSION['navSelected'] = 'contact';
 ?>
 
 <header>
@@ -27,7 +25,8 @@ $_SESSION['navSelected'] = 'contact';
 <header>
 
 <!-- Navbar dynamique -->
-<?php include_once '../composants/navbar.php'; ?>
+<?php include_once '../composants/navbar.php'; 
+$_SESSION['navSelected'] = 'contact';?>
 
 </header>
 

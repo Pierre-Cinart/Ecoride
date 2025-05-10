@@ -1,7 +1,3 @@
-<?php
-
-$_SESSION['navSelected'] = 'faq';
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -17,7 +13,8 @@ $_SESSION['navSelected'] = 'faq';
 <body>
 
 <header>
-  <?php include_once '../composants/navbar.php'; ?>
+  <?php include_once '../composants/navbar.php'; 
+  $_SESSION['navSelected'] = 'faq';?>
 </header>
 
 <div class="faq-container">

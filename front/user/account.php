@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 $_SESSION['navSelected'] = 'account';
 // Redirection si non connecté
@@ -22,6 +21,7 @@ $credits = $_SESSION['credits'] ?? 20;
   <title>Mon Compte - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/account.css">
+  <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 

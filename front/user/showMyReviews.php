@@ -1,6 +1,6 @@
 <?php
 
-$_SESSION['navSelected'] = 'account';
+
 
 $pseudo = $_SESSION['pseudo'] ?? 'Moi';
 $type = $_SESSION['typeOfUser'] ?? null;
@@ -31,7 +31,8 @@ $commentairesLaisses = [
 <body>
 
   <header>
-    <?php include_once '../composants/navbar.php'; ?>
+    <?php include_once '../composants/navbar.php';
+    $_SESSION['navSelected'] = 'account'; ?>
   </header>
 
   <main>

@@ -9,7 +9,7 @@ session_start();
 // Mise en surbrillance du lien actif
 $navSelected = $_SESSION['navSelected'] ?? '';
 $user = $_SESSION['user'] ?? null;
-
+var_dump($_SESSION);
 ?>
 
 <nav class="navbar">
@@ -74,10 +74,20 @@ $user = $_SESSION['user'] ?? null;
     <span></span>
     <span></span>
   </div>
+</nav>
 
-  <!-- Pop-up messages -->
+<!-- Pop-up messages -->
   <div id="popup" class="<?= isset($_SESSION['success']) ? 'success' : (isset($_SESSION['error']) ? 'error' : '') ?>">
     <?= $_SESSION['success'] ?? $_SESSION['error'] ?? '' ?>
   </div>
   <?php unset($_SESSION['success'], $_SESSION['error']); ?>
-</nav>
+
+ <!-- reservation en attente de validation -->
+ <?php if (isset($_SESSION['tripPending']) && isset($_SESSION['user']) && ($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)): ?>
+  <div class="pending-alert">
+    <a href="../../back/cancelPending.php" class="close-btn" title="Annuler la réservation">x</a>
+    🚗 Vous avez une réservation en attente. <a href="/front/user/reserv.php">Cliquez ici pour finaliser</a>.
+  </div>
+<?php endif; ?>
+
+

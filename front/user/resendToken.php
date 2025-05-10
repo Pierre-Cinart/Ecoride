@@ -1,7 +1,3 @@
-<?php
-session_start();
-$_SESSION['navSelected'] = 'signup';
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -22,7 +18,8 @@ $_SESSION['navSelected'] = 'signup';
 <body>
 
   <header>
-    <?php include_once '../composants/navbar.php'; ?>
+    <?php include_once '../composants/navbar.php';
+    $_SESSION['navSelected'] = 'signup'; ?>
   </header>
 
   <main>

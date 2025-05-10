@@ -1,7 +1,3 @@
-<?php
-$_SESSION['navSelected'] = 'search';
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -24,7 +20,8 @@ $_SESSION['navSelected'] = 'search';
 <body>
 
 <header>
-  <?php include_once '../composants/navbar.php'; ?>
+  <?php include_once '../composants/navbar.php';
+  $_SESSION['navSelected'] = 'search'; ?>
 </header>
 
 <div class="main-container">

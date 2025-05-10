@@ -1,7 +1,5 @@
 <?php
-require_once '../../back/classes/User.php';
-require_once '../../back/classes/SimpleUser.php';
-require_once '../../back/classes/Driver.php';
+
 require_once '../../back/composants/db_connect.php';
 require_once '../../back/composants/paginate.php';
 
@@ -178,15 +176,24 @@ $trips = $query->fetchAll(PDO::FETCH_ASSOC);
               ($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver);
             ?>
             <?php if ($canReserve): ?>
-              <form method="post" action="../../back/reserv.php" class="reservation-form">
+              <form method="post" action="reserv.php" class="reservation-form">
                 <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
                 <button class="blue" type="submit">Réserver ce trajet</button>
               </form>
             <?php else: ?>
               <div class="reservation-warning">
                 <p>🔒 Vous devez être connecté pour réserver</p>
-                <a href="../user/login.php">Se connecter</a> |
-                <a href="../user/register.php">Créer un compte</a>
+                <form method="post" action="../../back/pendingTrip.php">
+                  <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                  <input type="hidden" name="location" value="connect">
+                  <button class="blue" type="submit">Se connecter</button>
+                </form>
+                <form method="post" action="../../back/pendingTrip.php">
+                  <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+                  <input type="hidden" name="location" value="register">
+                  <button class="blue" type="submit">Créer un compte</button>
+                </form>
+                
               </div>
             <?php endif; ?>
           </div>

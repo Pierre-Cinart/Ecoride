@@ -1,9 +1,3 @@
-<?php
-
-
-$_SESSION['navSelected'] = 'signup';
-
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -26,7 +20,8 @@ $_SESSION['navSelected'] = 'signup';
   <header>
 
     <!-- Navbar dynamique -->
-  <?php include_once '../composants/navbar.php'; ?>
+  <?php include_once '../composants/navbar.php'; 
+  $_SESSION['navSelected'] = 'signup';?>
 
   </header>
 

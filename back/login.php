@@ -1,17 +1,16 @@
 <?php
+// Import des dépendances
+require_once './composants/db_connect.php';
+require_once './composants/sanitizeArray.php';
+require_once './composants/JWT.php';
 require_once './classes/User.php';
 require_once './classes/SimpleUser.php';
 require_once './classes/Driver.php';
 require_once './classes/Admin.php';
 require_once './classes/Employee.php';
 
+//demarage de session
 session_start();
-
-// Import des dépendances
-require_once './composants/db_connect.php';
-require_once './composants/sanitizeArray.php';
-require_once './composants/JWT.php';
-
 
 // Vérifie que le formulaire a été soumis en POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -96,8 +95,11 @@ switch ($data['role']) {
     //  6. Stockage dans la session
     $_SESSION['user'] = $user;         // Objet complet
     $_SESSION['jwt'] = $jwtToken;      // Token à part
-
     $_SESSION['success'] = "Connexion réussie. Bienvenue " . $user->getPseudo() . " !";
+    // reservation offline et droits de reservation
+    if (!($user instanceof SimpleUser || $user instanceof Driver)) {
+    unset($_SESSION['tripPending']); 
+    }
     header('Location: ../front/user/home.php');
     exit();
 

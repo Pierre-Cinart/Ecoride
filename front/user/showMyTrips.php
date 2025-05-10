@@ -1,5 +1,5 @@
 <?php
-$_SESSION['navSelected'] = 'account';
+
 
 // Vérif connexion
 if (!isset($_SESSION['typeOfUser'])) {
@@ -33,7 +33,8 @@ $trajetsConducteur = ($type === 'driver') ? [
 </head>
 <body>
 
-<?php include_once '../composants/navbar.php'; ?>
+<?php include_once '../composants/navbar.php'; 
+$_SESSION['navSelected'] = 'account';?>
 
 <main>
   <?php include_once '../composants/inProgress.php'; ?>

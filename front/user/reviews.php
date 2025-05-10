@@ -1,9 +1,3 @@
-<?php
-
-
-$_SESSION['navSelected'] = 'reviews';
-
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -19,7 +13,8 @@ $_SESSION['navSelected'] = 'reviews';
 <body>
 
   <header>
-    <?php include_once '../composants/navbar.php'; ?>
+    <?php include_once '../composants/navbar.php'; 
+    $_SESSION['navSelected'] = 'reviews';?>
   </header>
 
   <main>
