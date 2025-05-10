@@ -1,4 +1,8 @@
 <?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'search';
 
 require_once '../../back/composants/db_connect.php';
 require_once '../../back/composants/paginate.php';

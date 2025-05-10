@@ -1,7 +1,11 @@
 <?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'contact';
 
 
-// Vérif connexion
+// Vérif connexion // a modif
 if (!isset($_SESSION['typeOfUser'])) {
   header("Location: login.php");
   exit();
@@ -33,8 +37,7 @@ $trajetsConducteur = ($type === 'driver') ? [
 </head>
 <body>
 
-<?php include_once '../composants/navbar.php'; 
-$_SESSION['navSelected'] = 'account';?>
+<?php include_once '../composants/navbar.php'; ?>
 
 <main>
   <?php include_once '../composants/inProgress.php'; ?>

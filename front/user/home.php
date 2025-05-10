@@ -1,3 +1,9 @@
+<?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'home';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,8 +20,9 @@
 <body>
 
 <header>
-  <?php include_once '../composants/navbar.php'; 
-  $_SESSION['navSelected'] = 'home';?>
+  <?php  
+  include_once '../composants/navbar.php'; 
+ ?>
 </header>
 
 <main>

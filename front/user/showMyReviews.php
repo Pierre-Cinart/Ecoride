@@ -1,4 +1,8 @@
 <?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'account';
 
 
 
@@ -31,8 +35,7 @@ $commentairesLaisses = [
 <body>
 
   <header>
-    <?php include_once '../composants/navbar.php';
-    $_SESSION['navSelected'] = 'account'; ?>
+    <?php include_once '../composants/navbar.php';?>
   </header>
 
   <main>

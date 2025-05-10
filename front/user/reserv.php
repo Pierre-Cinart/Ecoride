@@ -1,10 +1,9 @@
 <?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'account';
 
-require_once '../../back/composants/db_connect.php';
-require_once '../../back/classes/User.php';
-require_once '../../back/classes/SimpleUser.php';
-require_once '../../back/classes/Driver.php';
-session_start();
 // Sécurité : seulement pour utilisateurs connectés autorisés
 if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
     $_SESSION['error'] = "Vous devez être connecté pour réserver.";

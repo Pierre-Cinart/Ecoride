@@ -1,3 +1,9 @@
+<?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'search';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,8 +16,7 @@
 <header>
 
 <!-- Navbar dynamique -->
-<?php include_once '../composants/navbar.php'; 
-  $_SESSION['navSelected'] = 'search';?>
+<?php include_once '../composants/navbar.php'; ?>
 
 </header>
   <main>

@@ -1,3 +1,9 @@
+<?php
+  // chargement des classes
+  include_once '../composants/autoload.php';
+  //bouton select dans la navbar
+  $_SESSION['navSelected'] = 'login';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -19,8 +25,8 @@
 
   <header>
     <!-- Navbar dynamique -->
-    <?php include_once '../composants/navbar.php'; 
-    $_SESSION['navSelected'] = 'login';?>
+    <?php include_once '../composants/navbar.php';?> 
+    
   </header>
 
   <div class="form-container">
