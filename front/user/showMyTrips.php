@@ -1,9 +1,11 @@
 <?php
-// Chargement des classes et démarrage de session
-require_once '../composants/autoload.php';
+// chargement des class + demarage de sessions + update token
+require_once '../../back/composants/autoload.php';
+
 
 // Contrôle d'accès : uniquement SimpleUser ou Driver
 require_once '../../back/composants/checkAccess.php';
+
 checkAccess(['SimpleUser', 'Driver']);
 
 // Pour la navbar
@@ -22,6 +24,7 @@ $sql = "SELECT t.*, tp.confirmation_date
         FROM trip_participants tp
         JOIN trips t ON tp.trip_id = t.id
         WHERE tp.user_id = :user_id
+          AND tp.confirmed = 1
         ORDER BY t.departure_date ASC, t.departure_time ASC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([':user_id' => $userId]);
@@ -47,7 +50,7 @@ $trajetsPassager = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="form-container">
     <h2>Mes trajets réservés</h2>
 
-    <h3>En tant que passager</h3>
+    <h4>En tant que passager</h4>
     <?php
       $oneTrip = false;
       foreach ($trajetsPassager as $trajet):

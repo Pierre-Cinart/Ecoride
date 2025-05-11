@@ -4,5 +4,5 @@ require_once __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/JWT.php';
 session_start();
 
-// checkToken($pdo);
+checkToken($pdo);
 ?> 

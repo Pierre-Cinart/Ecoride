@@ -1,7 +1,7 @@
 <?php
 // Fichier : front/user/reserv.php
-require_once '../composants/autoload.php'; // Class BDD JWT 
-require_once '../../back/composants/checkAcess.php';//control d accés
+require_once '../../back/composants/autoload.php'; // Class BDD JWT 
+require_once '../../back/composants/checkAccess.php';//control d accés
 
 checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
 

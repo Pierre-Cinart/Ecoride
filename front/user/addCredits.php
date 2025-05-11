@@ -1,5 +1,6 @@
 <?php
-
+ // chargement des classes et demarage de session 
+  require_once '../composants/autoload.php';
 $_SESSION['navSelected'] = 'account';
 
 $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';

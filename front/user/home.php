@@ -1,6 +1,6 @@
 <?php
-  // chargement des classes
-  include_once '../composants/autoload.php';
+  // cahargement des classes et demarage de session 
+  require_once '../composants/autoload.php';
   //bouton select dans la navbar
   $_SESSION['navSelected'] = 'home';
 ?>

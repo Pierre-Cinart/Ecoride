@@ -1,6 +1,7 @@
 <!-- Page : refundRequest.php -->
 <?php
-
+ // chargement des classes et demarage de session 
+  require_once '../composants/autoload.php';
 $_SESSION['navSelected'] = 'account';
 $pseudo = $_SESSION['pseudo'] ?? 'NomUtilisateur';
 $credits = $_SESSION['credits'] ?? 20; // affiché mais non modifiable

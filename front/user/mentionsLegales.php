@@ -1,3 +1,6 @@
+<?php
+ // chargement des classes et demarage de session 
+  require_once '../composants/autoload.php';?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
