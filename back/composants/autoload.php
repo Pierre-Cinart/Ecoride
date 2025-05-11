@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/SimpleUser.php';
-require_once __DIR__ . '/../classes/Driver.php';
-require_once __DIR__ . '/../classes/Employee.php';
-require_once __DIR__ . '/../classes/Admin.php';
+require_once __DIR__ .'/loadClasses.php';
+require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/JWT.php';
 session_start();
+
+// checkToken($pdo);
 ?> 

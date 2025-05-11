@@ -10,9 +10,9 @@
 // - Le trajet retrouve une place disponible
 // =============================================================
 
+// chargement des class accé à la bdd verification et update JWT
 require_once './composants/autoload.php';
-require_once './composants/db_connect.php';
-require_once './composants/JWT.php';
+
 
 // 1. Protection par méthode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,17 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// 2. Vérification de session utilisateur + token
-if (!isset($_SESSION['user']) || !checkToken($pdo)) {
-    $_SESSION['error'] = "Session expirée ou invalide. Veuillez vous reconnecter.";
-    header('Location: ../front/user/login.php');
-    exit();
-}
-
-// 3. Mise à jour du token pour prolonger la session
-updateToken($pdo, $_SESSION['jwt'], $_SESSION['user']->getId());
-
-// 4. Récupération des données du formulaire
+// 2. Récupération des données du formulaire
 $tripId = $_POST['trip_id'] ?? null;
 $user = $_SESSION['user'];
 $userId = $user->getId();
@@ -43,7 +33,7 @@ if (!$tripId || !is_numeric($tripId)) {
 }
 
 try {
-    // 5. Vérification de la participation de l'utilisateur à ce trajet
+    // 3. Vérification de la participation de l'utilisateur à ce trajet
     $stmt = $pdo->prepare("SELECT tp.*, t.departure_date FROM trip_participants tp JOIN trips t ON tp.trip_id = t.id WHERE tp.trip_id = :tripId AND tp.user_id = :userId AND tp.confirmed = 1");
     $stmt->execute([':tripId' => $tripId, ':userId' => $userId]);
     $participation = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -54,7 +44,7 @@ try {
         exit();
     }
 
-    // 6. Vérifie l'éligibilité à l'annulation (24h à l'avance)
+    // 4. Vérifie l'éligibilité à l'annulation (24h à l'avance)
     $departureDate = new DateTime($participation['departure_date']);
     $now = new DateTime();
     $hoursUntilDeparture = ($departureDate->getTimestamp() - $now->getTimestamp()) / 3600;
@@ -65,7 +55,7 @@ try {
         exit();
     }
 
-    // 7. Appel à la méthode de la classe User pour gérer l'annulation complète
+    // 5. Appel à la méthode de la classe User pour gérer l'annulation complète
     $success = $user->cancelTrip($pdo, $tripId, (int)$participation['id'], (int)$participation['credits_used']);
 
     if ($success) {

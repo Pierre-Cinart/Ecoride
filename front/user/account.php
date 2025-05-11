@@ -1,12 +1,12 @@
 <?php
-  // chagement des classes et démarage de session
+  // chagement des classes et démarage de session + jwt
   require_once '../../back/composants/autoload.php';
   // bouton selected navBarr
   $_SESSION['navSelected'] = 'account';
 
   // Redirection si non connecté en tant que SimpleUser ou Driver
-  include_once '../../back/composants/checkAccess.php';
-  checkAccess(['SimpleUser', 'Driver']);
+  // include_once '../../back/composants/checkAccess.php';
+  // checkAccess(['SimpleUser', 'Driver']);
 
   // Récupération des infos utilisateur depuis l'objet User en session
   $user = $_SESSION['user'];

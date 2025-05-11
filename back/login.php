@@ -2,9 +2,9 @@
 // Chargement des composants nécessaires
 require_once './composants/db_connect.php';        // Connexion à la base de données
 require_once './composants/sanitizeArray.php';     // Nettoyage des entrées utilisateur
-require_once './composants/JWT.php';               // Génération du JWT
 require_once './composants/antiflood.php';         // Protection anti-flood
-require_once './composants/autoload.php';          // Chargement des classes + session_start()
+require_once './composants/loadClasses.php';          // Chargement des classes 
+require_once './composants/JWT.php';                 // creation du jwt
 
 // Vérifie que le formulaire est soumis par POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -59,11 +59,7 @@ try {
 
     // 7. Création d’un token JWT de session
     $jwtToken = createToken();
-    $update = $pdo->prepare("UPDATE users SET jwt_token = :token, jwt_token_time = CURRENT_TIMESTAMP WHERE id = :id");
-    $update->execute([
-        ':token' => $jwtToken,
-        ':id' => $data['id']
-    ]);
+    updateToken( $pdo,  $jwtToken,  $data['id']);
 
     // 8. Instanciation de la classe correspondant à son rôle
     $args = [

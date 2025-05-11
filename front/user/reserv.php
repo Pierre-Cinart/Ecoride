@@ -1,7 +1,9 @@
 <?php
 // Fichier : front/user/reserv.php
-require_once '../composants/autoload.php';
-require_once '../../back/composants/db_connect.php';
+require_once '../composants/autoload.php'; // Class BDD JWT 
+require_once '../../back/composants/checkAcess.php';//control d accés
+
+checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
 
 $_SESSION['navSelected'] = 'account';
 

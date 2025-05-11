@@ -1,10 +1,21 @@
 <?php 
+// chargement des class + demarage de sessions
 require_once './composants/autoload.php';
+// accés à la base données
 require_once './composants/db_connect.php';
-session_start();
+//verification et update JWT
+require_once './composants/JWT.php';
+
 
 if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
     $_SESSION['error'] = "Vous devez être connecté pour réserver.";
+    header('Location: ../front/user/login.php');
+    exit;
+}
+
+// Vérifie et renouvelle le token
+if (!checkToken($pdo)) {
+    $_SESSION['error'] = "Session expirée. Veuillez vous reconnecter.";
     header('Location: ../front/user/login.php');
     exit;
 }
