@@ -1,6 +1,7 @@
 <?php
 // Classe parente User : toutes les autres classes hériteront de celle-ci
 class User {
+    // Attributs protégés (accessibles aux classes filles)
     protected $id;
     protected $pseudo;
     protected $firstName;
@@ -10,6 +11,7 @@ class User {
     protected $role;
     protected $credits;
 
+    // Constructeur
     public function __construct($id, $pseudo, $firstName, $lastName, $email, $phoneNumber, $role, $credits = 0) {
         $this->id = $id;
         $this->pseudo = $pseudo;
@@ -21,7 +23,7 @@ class User {
         $this->credits = $credits;
     }
 
-    // Getters
+    // ----- GETTERS -----
     public function getFullName() {
         return $this->firstName . ' ' . $this->lastName;
     }
@@ -46,42 +48,77 @@ class User {
         return $this->id;
     }
 
-    // Setters
+    // ----- SETTERS -----
+    // Setter interne (modifie la valeur en mémoire, sans toucher à la base de données)
     public function setCredits(int $credits): void {
         $this->credits = $credits;
     }
 
-    // Réservation d'un trajet
+    // Mise à jour des crédits (BDD + objet)
+    public function updateCredits(PDO $pdo, int $delta): bool {
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET credits = credits + :delta WHERE id = :id");
+            $stmt->execute([':delta' => $delta, ':id' => $this->id]);
+
+            $this->credits += $delta;
+            return true;
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Erreur lors de la mise à jour des crédits.";
+            return false;
+        }
+    }
+
+    // ----- Réservation d'un trajet -----
     public function reserv(PDO $pdo, int $tripId): bool {
         try {
-            $stmt = $pdo->prepare("SELECT t.id, t.price, t.available_seats FROM trips t WHERE t.id = :id AND t.status = 'planned' AND t.available_seats > 0 FOR UPDATE");
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare("SELECT id, price, available_seats, status FROM trips WHERE id = :id FOR UPDATE");
             $stmt->execute([':id' => $tripId]);
             $trip = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$trip) throw new Exception("Trajet invalide ou complet.");
+            if (!$trip || $trip['status'] !== 'planned' || $trip['available_seats'] <= 0) {
+                throw new Exception("Ce trajet n’est pas disponible.");
+            }
+
             $price = (int)$trip['price'];
-            if ($this->credits < $price) throw new Exception("Crédits insuffisants.");
 
-            $check = $pdo->prepare("SELECT id FROM trip_participants WHERE trip_id = :trip AND user_id = :user");
+            if ($this->credits < $price) {
+                throw new Exception("Crédits insuffisants.");
+            }
+
+            $check = $pdo->prepare("SELECT id, confirmed FROM trip_participants WHERE trip_id = :trip AND user_id = :user");
             $check->execute([':trip' => $tripId, ':user' => $this->id]);
-            if ($check->fetch()) throw new Exception("Vous avez déjà réservé ce trajet.");
+            $existing = $check->fetch(PDO::FETCH_ASSOC);
 
-            $pdo->beginTransaction();
+            if ($existing && $existing['confirmed']) {
+                throw new Exception("Vous avez déjà réservé ce trajet.");
+            }
 
-            $insert = $pdo->prepare("INSERT INTO trip_participants (trip_id, user_id, confirmed, credits_used, confirmation_date) VALUES (:trip, :user, 1, :credits, NOW())");
-            $insert->execute([':trip' => $tripId, ':user' => $this->id, ':credits' => $price]);
+            if ($existing && !$existing['confirmed']) {
+                $update = $pdo->prepare("UPDATE trip_participants SET confirmed = 1, confirmation_date = NOW(), credits_used = :credits WHERE id = :id");
+                $update->execute([':credits' => $price, ':id' => $existing['id']]);
+            } else {
+                $insert = $pdo->prepare("INSERT INTO trip_participants (trip_id, user_id, confirmed, credits_used, confirmation_date) VALUES (:trip, :user, 1, :credits, NOW())");
+                $insert->execute([
+                    ':trip' => $tripId,
+                    ':user' => $this->id,
+                    ':credits' => $price
+                ]);
+            }
 
             $updateTrip = $pdo->prepare("UPDATE trips SET available_seats = available_seats - 1 WHERE id = :trip AND available_seats > 0");
             $updateTrip->execute([':trip' => $tripId]);
-            if ($updateTrip->rowCount() === 0) throw new Exception("Plus de place disponible.");
+            if ($updateTrip->rowCount() === 0) {
+                throw new Exception("Plus de places disponibles.");
+            }
 
-            $updateUser = $pdo->prepare("UPDATE users SET credits = credits - :credits WHERE id = :id");
-            $updateUser->execute([':credits' => $price, ':id' => $this->id]);
+            if (!$this->updateCredits($pdo, -$price)) {
+                throw new Exception("Erreur lors du débit des crédits.");
+            }
 
             $pdo->commit();
             unset($_SESSION['tripPending']);
-            $this->setCredits($this->credits - $price);
-
             return true;
 
         } catch (Exception $e) {
@@ -91,7 +128,7 @@ class User {
         }
     }
 
-    // Annulation d'un trajet réservé (passager)
+    // ----- Annulation d'un trajet -----
     public function cancelTrip(PDO $pdo, int $tripId, int $participantId, int $creditsUsed): bool {
         try {
             $penalite = 2;
@@ -99,22 +136,18 @@ class User {
 
             $pdo->beginTransaction();
 
-            // Mise à jour de la participation (annulation)
             $updateParticipant = $pdo->prepare("UPDATE trip_participants SET confirmed = 0, confirmation_date = NOW() WHERE id = :id AND user_id = :user");
             $updateParticipant->execute([':id' => $participantId, ':user' => $this->id]);
             if ($updateParticipant->rowCount() === 0) throw new Exception("Annulation impossible : réservation introuvable.");
 
-            // Libérer une place sur le trajet
             $updateTrip = $pdo->prepare("UPDATE trips SET available_seats = available_seats + 1 WHERE id = :trip");
             $updateTrip->execute([':trip' => $tripId]);
 
-            // Créditer l'utilisateur (avec pénalité)
-            $updateUser = $pdo->prepare("UPDATE users SET credits = credits + :credits WHERE id = :id");
-            $updateUser->execute([':credits' => $remboursement, ':id' => $this->id]);
+            if (!$this->updateCredits($pdo, $remboursement)) {
+                throw new Exception("Erreur lors du remboursement.");
+            }
 
             $pdo->commit();
-            $this->setCredits($this->credits + $remboursement);
-
             return true;
 
         } catch (Exception $e) {
