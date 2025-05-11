@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(() => {
           popup.remove(); // On enlève complètement le DOM après disparition
         }, 500); // Délai après l'opacité à 0
-      }, 4000); // 4 secondes d'affichage
+      }, 5000); // 5 secondes d'affichage
     }
   });
   
