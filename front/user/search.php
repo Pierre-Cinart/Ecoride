@@ -1,8 +1,6 @@
 <?php
-//demarage de session et chargement de class et jwt si connecté
- if (isset($_SESSION['user']) && $_SESSION['user'] instanceof User) {
-    include_once '../../back/composants/autoload.php';
-} else {session_start();}
+ // chargement des classes et demarage de session 
+  require_once '../composants/autoload.php';
 
   //btn selected navbarr
   $_SESSION['navSelected'] = 'search';
