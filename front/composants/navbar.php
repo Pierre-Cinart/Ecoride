@@ -79,7 +79,7 @@ var_dump($_SESSION);
  <?php if (isset($_SESSION['tripPending']) && isset($_SESSION['user']) && ($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)): ?>
   <div class="pending-alert">
     <a href="../../back/cancelPending.php" class="close-btn" title="Annuler la réservation">x</a>
-    🚗 Vous avez une réservation en attente. <a href="/front/user/reserv.php">Cliquez ici pour finaliser</a>.
+    🚗 Vous avez une réservation en attente. <a href="reserv.php">Cliquez ici pour finaliser</a>.
   </div>
 <?php endif; ?>
 

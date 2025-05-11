@@ -1,6 +1,7 @@
 <?php
   // chargement des classes
   include_once '../composants/autoload.php';
+  require_once '../../back/composants/db_connect.php';
   //bouton select dans la navbar
   $_SESSION['navSelected'] = 'account';
 
