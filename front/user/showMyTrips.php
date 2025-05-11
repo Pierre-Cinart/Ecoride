@@ -1,39 +1,42 @@
 <?php
-  // chargement des classes
-  include_once '../composants/autoload.php';
-  //bouton select dans la navbar
-  $_SESSION['navSelected'] = 'contact';
+// Chargement des classes et démarrage de session
+require_once '../composants/autoload.php';
 
+// Contrôle d'accès : uniquement SimpleUser ou Driver
+require_once '../../back/composants/checkAccess.php';
+checkAccess(['SimpleUser', 'Driver']);
 
-// Vérif connexion // a modif
-if (!isset($_SESSION['typeOfUser'])) {
-  header("Location: login.php");
-  exit();
-}
-
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
+// Pour la navbar
 $_SESSION['navSelected'] = 'account';
 
-// Simule des trajets
-$trajetsPassager = [
-  ['date' => '2025-05-10', 'ville_depart' => 'Paris', 'ville_arrivee' => 'Lyon', 'conducteur' => 'Marie_69'],
-  ['date' => '2025-05-14', 'ville_depart' => 'Marseille', 'ville_arrivee' => 'Nice', 'conducteur' => 'Zizou_13'],
-];
+// Récupération de l'utilisateur connecté
+$user = $_SESSION['user'];
+$userId = $user->getId();
+$isDriver = $user instanceof Driver;
 
-$trajetsConducteur = ($type === 'driver') ? [
-  ['date' => '2025-05-12', 'ville_depart' => 'Toulouse', 'ville_arrivee' => 'Bordeaux', 'places_restantes' => 2],
-  ['date' => '2025-05-20', 'ville_depart' => 'Lille', 'ville_arrivee' => 'Bruxelles', 'places_restantes' => 3],
-] : [];
+// Connexion BDD
+require_once '../../back/composants/db_connect.php';
 
+// Récupération des trajets réservés (en tant que passager)
+$sql = "SELECT t.*, tp.confirmation_date
+        FROM trip_participants tp
+        JOIN trips t ON tp.trip_id = t.id
+        WHERE tp.user_id = :user_id
+        ORDER BY t.departure_date ASC, t.departure_time ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':user_id' => $userId]);
+$trajetsPassager = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>Mes trajets réservés | EcoRide</title>
+  <!-- style -->
   <link rel="stylesheet" href="../css/style.css">
+  <!-- google font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -44,52 +47,43 @@ $trajetsConducteur = ($type === 'driver') ? [
   <div class="form-container">
     <h2>Mes trajets réservés</h2>
 
-    <!-- SECTION PASSAGER -->
     <h3>En tant que passager</h3>
-    <?php if (empty($trajetsPassager)): ?>
-      <p>Vous n’avez pas encore réservé de trajet.</p>
-    <?php else: ?>
-      <?php foreach ($trajetsPassager as $trajet): ?>
-        <div style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-          <p><strong>Départ :</strong> <?= $trajet['ville_depart'] ?></p>
-          <p><strong>Arrivée :</strong> <?= $trajet['ville_arrivee'] ?></p>
-          <p><strong>Date :</strong> <?= $trajet['date'] ?></p>
-          <p><strong>Conducteur :</strong> <?= $trajet['conducteur'] ?></p>
-          <form method="post" action="annuler_trajet.php">
-            <input type="hidden" name="type" value="passager">
-            <input type="hidden" name="trajet_id" value="...">
-            <button class="red" type="submit">❌ Annuler</button>
-          </form>
-        </div>
-      <?php endforeach; ?>
-    <?php endif; ?>
+    <?php
+      $oneTrip = false;
+      foreach ($trajetsPassager as $trajet):
+        // Combinaison date + heure pour comparaison
+        $datetimeDepart = new DateTime($trajet['departure_date'] . ' ' . $trajet['departure_time']);
+        $now = new DateTime();
+        $diff = $now->diff($datetimeDepart);
+        $heuresRestantes = ($datetimeDepart->getTimestamp() - $now->getTimestamp()) / 3600;
 
-    <!-- SECTION CONDUCTEUR -->
-    <?php if ($type === 'driver'): ?>
-      <h3>En tant que conducteur</h3>
-      <?php if (empty($trajetsConducteur)): ?>
-        <p>Vous n’avez pas encore proposé de trajet.</p>
-      <?php else: ?>
-        <?php foreach ($trajetsConducteur as $trajet): ?>
-          <div style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-            <p><strong>Départ :</strong> <?= $trajet['ville_depart'] ?></p>
-            <p><strong>Arrivée :</strong> <?= $trajet['ville_arrivee'] ?></p>
-            <p><strong>Date :</strong> <?= $trajet['date'] ?></p>
-            <p><strong>Places restantes :</strong> <?= $trajet['places_restantes'] ?></p>
-            <form method="post" action="annuler_trajet.php">
-              <input type="hidden" name="type" value="conducteur">
-              <input type="hidden" name="trajet_id" value="...">
-              <button class="red" type="submit">❌ Annuler</button>
+        if ($datetimeDepart > $now):
+          $oneTrip = true;
+    ?>
+        <div style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+          <p><strong>Départ :</strong> <?= htmlspecialchars($trajet['departure_city']) ?></p>
+          <p><strong>Arrivée :</strong> <?= htmlspecialchars($trajet['arrival_city']) ?></p>
+          <p><strong>Date :</strong> <?= $trajet['departure_date'] ?> à <?= substr($trajet['departure_time'], 0, 5) ?></p>
+
+          <?php if ($heuresRestantes >= 24): ?>
+            <form method="post" action="../../back/cancelUserTrip.php" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler ce voyage ?')">
+              <input type="hidden" name="trip_id" value="<?= $trajet['id'] ?>">
+              <button type="submit" class="red">❌ Annuler</button>
             </form>
-          </div>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    <?php endif; ?>
+          <?php else: ?>
+            <p style="color:gray;"><em>Ce voyage est trop proche pour être annulé.</em></p>
+          <?php endif; ?>
+        </div>
+    <?php
+        endif;
+      endforeach;
+
+      if (!$oneTrip) echo "<p>Vous n’avez aucun trajet à venir.</p>";
+    ?>
 
   </div>
 </main>
 
-<!-- footer -->
 <?php include_once '../composants/footer.html'; ?>
 
 </body>

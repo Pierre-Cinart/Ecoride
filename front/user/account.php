@@ -1,16 +1,17 @@
 <?php
+  // chagement des classes et démarage de session
+  require_once '../../back/composants/autoload.php';
+  // bouton selected navBarr
+  $_SESSION['navSelected'] = 'account';
 
-$_SESSION['navSelected'] = 'account';
-// Redirection si non connecté
-if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && $_SESSION['typeOfUser'] != "driver")) {
-  header('Location: login.php');
-  exit();
-}
+  // Redirection si non connecté en tant que SimpleUser ou Driver
+  include_once '../../back/composants/checkAccess.php';
+  checkAccess(['SimpleUser', 'Driver']);
 
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
-$credits = $_SESSION['credits'] ?? 20;
-
+  // Récupération des infos utilisateur depuis l'objet User en session
+  $user = $_SESSION['user'];
+  $pseudo = $user->getPseudo();
+  $credits = $user->getCredits();
 ?>
 
 <!DOCTYPE html>
@@ -24,7 +25,6 @@ $credits = $_SESSION['credits'] ?? 20;
   <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
-
 </head>
 <body>
 
@@ -39,7 +39,7 @@ $credits = $_SESSION['credits'] ?? 20;
       <strong>Crédits :</strong> <?= $credits ?>
       <img src="../img/ico/coins.png" alt="Pièces" class="coin-icon">
       &nbsp;&nbsp;
-      <?php if ($type === 'driver'): ?>
+      <?php if ($user instanceof Driver): ?>
         <strong>Note :</strong> 4.5 / 5 <span style="color: gold;">★ ★ ★ ★ ☆</span>
         &nbsp;&nbsp; <strong>Statut permis :</strong>
         <!-- sera dynamique une fois le back codé -->
@@ -47,12 +47,12 @@ $credits = $_SESSION['credits'] ?? 20;
       <?php endif; ?>
     </div>
   </div>
-
-  <?php if ($type === 'user'): ?>
+    <!-- Profil passager -->
+  <?php if ($user instanceof SimpleUser): ?>
     <!-- Bloc utilisateur de base (non conducteur) -->
     <div class="section">
-      <h3>Devenir conducteur</h3>
-      <p>Vous souhaitez proposer des trajets ?</p>
+      <h4>Devenir conducteur</h4>
+      <p> Vous souhaitez proposer des trajets ?</p>
       <button id="toggleDriverForm">Postuler en tant que conducteur</button>
     </div>
     <div class="section" id="driverForm" style="display: none;">
@@ -65,7 +65,7 @@ $credits = $_SESSION['credits'] ?? 20;
     </div>
   <?php endif; ?>
 
-  <?php if ($type === 'driver'): ?>
+  <?php if ($user instanceof Driver): ?>
     <!-- Préférences modifiables -->
     <div class="section">
       <h4>Vos préférences</h4>
@@ -90,7 +90,6 @@ $credits = $_SESSION['credits'] ?? 20;
       <!-- ajouter un véhicule -->
       <button onclick="location.href='../driver/addCar.php'">➕</button>
 
-
       <div id="vehicle-preferences" class="section" style="display:none;">
         <p><strong>Préférences du véhicule sélectionné :</strong></p>
         <ul>
@@ -103,12 +102,12 @@ $credits = $_SESSION['credits'] ?? 20;
 
   <!-- Boutons pour tous -->
   <div class="button-group">
-    <button onclick="location.href='../user/showMyTrips.php'">Mes trajets réservés</button>
+    <button onclick="location.href='./showMyTrips.php'">Mes trajets réservés</button>
     <button onclick="location.href='../user/tripsStory.php'">Historique des voyages</button>
     <button onclick="location.href='../user/showMyreviews.php'">Mes commentaires</button>
     <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
     <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
-    <?php if ($type === 'driver'): ?>
+    <?php if ($user instanceof Driver): ?>
       <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
       <button onclick="location.href='avisRecus.php'">Mes avis reçus</button>
       <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
@@ -117,9 +116,9 @@ $credits = $_SESSION['credits'] ?? 20;
 </div>
 
 <!-- footer -->
-  <?php include_once '../composants/footer.html'; ?>
-  
-  <!-- JS interactivité -->
+<?php include_once '../composants/footer.html'; ?>
+
+<!-- JS interactivité -->
 <script>
   const toggleBtn = document.getElementById("toggleDriverForm");
   if (toggleBtn) {
