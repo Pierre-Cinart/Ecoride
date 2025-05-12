@@ -30,7 +30,7 @@ if (!$tripId || !is_numeric($tripId)) {
 }
 
 // Appel de la méthode orientée objet
-if ($user->reserv($pdo, (int)$tripId)) {
+if ($user->reserveTrip($pdo, (int)$tripId)) {
     $_SESSION['user'] = $user; // met à jour en session
     $_SESSION['success'] = "Réservation confirmée.";
     header('Location: ../front/user/account.php');

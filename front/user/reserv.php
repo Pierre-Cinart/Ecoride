@@ -1,7 +1,7 @@
 <?php
-// Fichier : front/user/reserv.php
-require_once '../../back/composants/autoload.php'; // Class BDD JWT 
-require_once '../../back/composants/checkAccess.php';//control d accés
+//// A REVOIR
+require_once '../../back/composants/autoload.php'; // Class BDD JWT control d accés
+
 
 checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
 
@@ -16,7 +16,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'cancel') {
 
 // Vérifie que l'utilisateur est connecté
 if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
-    $_SESSION['error'] = "Vous devez être connecté pour réserver.";
+    $_SESSION['error'] = "Vous devez être connecté en tant que passager ou conducteur pour réserver.";
     header('Location: login.php');
     exit;
 }
@@ -59,6 +59,7 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
   <meta charset="UTF-8">
   <title>Confirmer la réservation - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
+  <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
   <style>
@@ -112,8 +113,8 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
 
 <!-- JS pour cacher les popups -->
 <script>
-  const popup = document.querySelector('.pending-alert'); // remplace par ton sélecteur exact
-  if (popup) popup.classList.add('hidden'); // ajoute la classe pour masquer
+  const popup = document.querySelector('.pending-alert'); 
+  if (popup) popup.classList.add('hidden'); 
 </script>
 
 </body>

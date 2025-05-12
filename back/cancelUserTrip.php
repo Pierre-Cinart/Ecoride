@@ -12,7 +12,8 @@
 
 // chargement des class accé à la bdd verification et update JWT
 require_once './composants/autoload.php';
-
+// control d accés
+checkAccess(['SimpleUser']);
 
 // 1. Protection par méthode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -56,7 +57,15 @@ try {
     }
 
     // 5. Appel à la méthode de la classe User pour gérer l'annulation complète
-    $success = $user->cancelTrip($pdo, $tripId, (int)$participation['id'], (int)$participation['credits_used']);
+    $logMessage = "Annulation du trajet ID #$tripId le " . date('d/m/Y', strtotime($participation['departure_date']));
+
+    $success = $user->cancelTrip(
+        $pdo,
+        $tripId,
+        (int)$participation['id'],
+        (int)$participation['credits_used'],
+        $logMessage
+    );
 
     if ($success) {
         $_SESSION['success'] = "Votre réservation a été annulée. Des crédits vous ont été remboursés (pénalité de 2 crédits appliquée).";
