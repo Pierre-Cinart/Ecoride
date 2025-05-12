@@ -80,6 +80,7 @@
     <div class="section">
       <h4>Véhicules enregistrés</h4>
       <label for="vehicule">Sélectionner un véhicule :</label><br>
+      <!-- pour test  -->
       <select name="vehicule" id="vehicule" onchange="showVehiclePreferences(this.value)">
         <option value="">-- Choisir un véhicule --</option>
         <option value="zoe">Renault Zoé - 4 places</option>
@@ -89,7 +90,7 @@
       <br>
       <!-- ajouter un véhicule -->
       <button onclick="location.href='../driver/addCar.php'">➕</button>
-
+      <!-- test affichage  -->
       <div id="vehicle-preferences" class="section" style="display:none;">
         <p><strong>Préférences du véhicule sélectionné :</strong></p>
         <ul>
@@ -103,8 +104,7 @@
   <!-- Boutons pour tous -->
   <div class="button-group">
     <button onclick="location.href='./showMyTrips.php'">Mes trajets réservés</button>
-    <button onclick="location.href='../user/tripsStory.php'">Historique des voyages</button>
-    <button onclick="location.href='../user/showMyreviews.php'">Mes commentaires</button>
+    <button onclick="location.href='../user/tripsStory.php'">Historique des voyages / gestion des avis</button>
     <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
     <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
     <?php if ($user instanceof Driver): ?>
