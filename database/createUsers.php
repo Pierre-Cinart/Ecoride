@@ -5,26 +5,18 @@ try {
     $pdo->beginTransaction();
 
     /** 1. Création des comptes utilisateurs **/
-
     $stmt = $pdo->prepare("INSERT INTO users 
         (pseudo, first_name, last_name, email, password, phone_number, role, is_verified_email)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
-    // Admin
     $stmt->execute(['admin', 'José', 'Admin', 'admin@ecoride.fr', password_hash('mot2passe', PASSWORD_DEFAULT), '0100000001', 'admin', 1]);
-
-    // Employé
     $stmt->execute(['employe1', 'Employé', 'Test', 'employe@ecoride.fr', password_hash('mot2passe', PASSWORD_DEFAULT), '0100000002', 'employee', 1]);
-
-    // Utilisateur simple
     $stmt->execute(['user1', 'User', 'Test', 'user@ecoride.fr', password_hash('mot2passe', PASSWORD_DEFAULT), '0100000003', 'user', 1]);
     $userId = $pdo->lastInsertId();
 
-    // Conducteur validé
     $stmt->execute(['driver1', 'Conducteur', 'Valide', 'driver.valide@ecoride.fr', password_hash('mot2passe', PASSWORD_DEFAULT), '0100000004', 'driver', 1]);
     $driverId1 = $pdo->lastInsertId();
 
-    // Conducteur en attente
     $stmt->execute(['driver2', 'Conducteur', 'Attente', 'driver.attente@ecoride.fr', password_hash('mot2passe', PASSWORD_DEFAULT), '0100000005', 'driver', 1]);
     $driverId2 = $pdo->lastInsertId();
 
@@ -52,6 +44,8 @@ try {
         ['Lille', 'Adresse Lille', 'Paris', 'Adresse Paris', '2025-04-24', '08:00:00'],
         ['Paris', 'Adresse Paris', 'Lyon', 'Adresse Lyon', '2025-04-29', '09:00:00'],
         ['Lyon', 'Adresse Lyon', 'Nice', 'Adresse Nice', '2025-05-04', '10:00:00'],
+        ['Nice', 'Adresse Nice', 'Marseille', 'Adresse Marseille', '2025-04-10', '08:30:00'],
+        ['Marseille', 'Adresse Marseille', 'Montpellier', 'Adresse Montpellier', '2025-04-15', '14:15:00'],
     ];
     $tripIds = [];
     foreach ($pastTrips as $trip) {
@@ -69,7 +63,7 @@ try {
         $stmtTrip->execute([$driverId1, $vehicleId, $trip[0], $trip[1], $trip[2], $trip[3], $trip[4], $trip[5], 18, 1, 2, 'planned']);
     }
 
-    /** 6. Participants confirmés **/
+    /** 6. Participants confirmés pour tous les trajets passés **/
     $stmtPart = $pdo->prepare("INSERT INTO trip_participants 
         (trip_id, user_id, confirmed, credits_used, confirmation_date) 
         VALUES (?, ?, ?, ?, ?)");
@@ -77,7 +71,7 @@ try {
         $stmtPart->execute([$tripId, $userId, 1, 20, date('Y-m-d H:i:s', strtotime("-" . (6 - $i) . " days"))]);
     }
 
-    /** 7. Participants annulés **/
+    /** 7. Trajet annulé **/
     $stmtTrip->execute([$driverId1, $vehicleId, 'Nice', 'Adresse Nice', 'Cannes', 'Adresse Cannes', '2025-05-01', '15:00:00', 18, 1, 2, 'completed']);
     $cancelTripId = $pdo->lastInsertId();
     $stmtPart->execute([$cancelTripId, $userId, 0, 18, date('Y-m-d H:i:s')]);
@@ -86,24 +80,21 @@ try {
     $stmtNote = $pdo->prepare("INSERT INTO ratings 
         (author_id, trip_id, rating, comment, status, created_at) 
         VALUES (?, ?, ?, ?, ?, ?)");
-    $notes = [
+    $acceptedNotes = [
         [4.5, 'Super trajet, conducteur au top !'],
         [3.5, 'Ponctuel et prudent.'],
         [5.0, 'Parfait, rien à dire.'],
+        [4.0, 'Chauffeur agréable et sympathique.'],
     ];
-    foreach ($tripIds as $i => $tripId) {
-        $stmtNote->execute([$userId, $tripId, $notes[$i][0], $notes[$i][1], 'accepted', date('Y-m-d H:i:s')]);
+    foreach ($acceptedNotes as $i => $note) {
+        $stmtNote->execute([$userId, $tripIds[$i], $note[0], $note[1], 'accepted', date('Y-m-d H:i:s')]);
     }
 
     /** 9. Avis en attente **/
     $pendingNotes = [
-        [2.5, 'À revoir.'],
-        [4.0, 'Bon trajet mais un peu en retard.'],
-        [3.0, 'Correct.'],
+        [2.5, 'Retard au départ, mais trajet correct.'],
     ];
-    foreach ($tripIds as $i => $tripId) {
-        $stmtNote->execute([$userId, $tripId, $pendingNotes[$i][0], $pendingNotes[$i][1], 'pending', date('Y-m-d H:i:s')]);
-    }
+    $stmtNote->execute([$userId, $tripIds[4], $pendingNotes[0][0], $pendingNotes[0][1], 'pending', date('Y-m-d H:i:s')]);
 
     $pdo->commit();
     echo "✅ Données de test injectées avec succès.";

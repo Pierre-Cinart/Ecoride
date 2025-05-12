@@ -1,0 +1,18 @@
+.trip-card {
+      border: 1px solid #ccc;
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .trip-role {
+      font-weight: bold;
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    .passenger { background: #d1ecf1; color: #0c5460; }
+    .driver { background: #e2e3e5; color: #383d41; }
+    
