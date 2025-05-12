@@ -1,8 +1,6 @@
 <?php
-   // chargement des classes et demarage de session 
-  require_once '../composants/autoload.php';
-  //bouton select dans la navbar
-  $_SESSION['navSelected'] = 'contact';
+require_once '../composants/autoload.php';
+$_SESSION['navSelected'] = 'contact';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -17,16 +15,16 @@
 </head>
 
 <body>
+
 <header>
-
-<!-- Navbar dynamique -->
-<?php include_once '../composants/navbar.php'; ?>
-
+  <?php include_once '../composants/navbar.php'; ?>
 </header>
 
+<main>
   <div class="form-container">
     <h2>Contactez-nous</h2>
-    <form action="#" method="post">
+
+    <form action="../../back/contact.php" method="post" novalidate>
       <label for="nom">Nom :</label>
       <input type="text" id="nom" name="nom" required />
 
@@ -45,9 +43,9 @@
       <button type="submit">Envoyer</button>
     </form>
   </div>
-  
-  <!-- footer -->
-  <?php include_once '../composants/footer.html'; ?>
+</main>
 
+<?php include_once '../composants/footer.html'; ?>
+<script src="../js/contact.js"></script>
 </body>
 </html>

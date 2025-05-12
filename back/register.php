@@ -1,7 +1,5 @@
 <?php
-session_start();
-require_once './composants/db_connect.php'; // Connexion à la base de données
-require_once './composants/sanitizeArray.php'; // Nettoyage des données
+require_once './composants/autoload.php'; // chargements des composants utiles 
 require_once './composants/phpMailer/src/sendMail.php'; // Pour envoyer les mails avec PHPMailer
 
 // Vérifie que le formulaire a bien été soumis en POST

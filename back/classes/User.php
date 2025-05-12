@@ -48,7 +48,6 @@ abstract class User {
         return $this->id;
     }
 
-    // METHODS // 
-    abstract public function sendMail();
+    
    
 }

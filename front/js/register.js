@@ -1,6 +1,6 @@
 // Sélection des champs
 const form = document.querySelector('form');
-const popup = document.getElementById('popup');
+
 const pseudo = document.getElementById('pseudo');
 const firstName = document.getElementById('first-name');
 const name = document.getElementById('name');
@@ -63,24 +63,7 @@ function validatePermitFile(file) {
   return (fileType === "image/jpeg" || fileType === "image/jpg");
 }
 
-// Fonction d'affichage d'erreur propre via POPUP
-function showError(message) {
-  if (popup) {
-    popup.className = 'error';  // remet la classe à error
-    popup.textContent = message;
-    popup.style.display = 'block';
-    popup.style.opacity = '1';
 
-    setTimeout(() => {
-      popup.style.opacity = '0';
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 500);
-    }, 4000);
-  } else {
-    alert(message); // sécurité au cas où pas de div popup
-  }
-}
 
 // Soumission du formulaire
 form.addEventListener('submit', function(e) {
