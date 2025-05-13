@@ -1,17 +1,17 @@
 <?php
- // chargement des classes et demarage de session 
-  require_once '../composants/autoload.php';
-  // bouton selected navBarr
-  $_SESSION['navSelected'] = 'account';
+// chargement des classes et demarage de session 
+require_once '../composants/autoload.php';
+// bouton selected navBarr
+$_SESSION['navSelected'] = 'account';
 
-  // Redirection si non connecté en tant que SimpleUser ou Driver
-  include_once '../../back/composants/checkAccess.php';
-  checkAccess(['SimpleUser', 'Driver']);
+// Redirection si non connecté en tant que SimpleUser ou Driver
+include_once '../../back/composants/checkAccess.php';
+checkAccess(['SimpleUser', 'Driver']);
 
-  // Récupération des infos utilisateur depuis l'objet User en session
-  $user = $_SESSION['user'];
-  $pseudo = $user->getPseudo();
-  $credits = $user->getCredits();
+// Récupération des infos utilisateur depuis l'objet User en session
+$user = $_SESSION['user'];
+$pseudo = $user->getPseudo();
+$credits = $user->getCredits();
 ?>
 
 <!DOCTYPE html>
@@ -40,16 +40,15 @@
       <img src="../img/ico/coins.png" alt="Pièces" class="coin-icon">
       &nbsp;&nbsp;
       <?php if ($user instanceof Driver): ?>
-        <strong>Note :</strong> 4.5 / 5 <span style="color: gold;">★ ★ ★ ★ ☆</span>
+        <strong>Note :</strong> <?= number_format($user->getAverageRating(), 1) ?> / 5
         &nbsp;&nbsp; <strong>Statut permis :</strong>
-        <!-- sera dynamique une fois le back codé -->
         <span style="color: green; font-weight:bold;">✔ Vérifié</span>
       <?php endif; ?>
     </div>
   </div>
-    <!-- Profil passager -->
-  <?php if ($user instanceof SimpleUser): ?>
-    <!-- Bloc utilisateur de base (non conducteur) -->
+
+  <!-- Profil passager -->
+  <?php if ($user instanceof SimpleUser && !$user instanceof Driver ): ?>
     <div class="section">
       <h4>Devenir conducteur</h4>
       <p> Vous souhaitez proposer des trajets ?</p>
@@ -66,31 +65,39 @@
   <?php endif; ?>
 
   <?php if ($user instanceof Driver): ?>
-    <!-- Préférences modifiables -->
+    <!-- Préférences conducteur -->
     <div class="section">
       <h4>Vos préférences</h4>
-      <div class="preferences">
-        <label><input type="checkbox" name="smoker" onchange="showSaveBtn()"> Fumeur autorisé</label>
-        <label><input type="checkbox" name="pets" onchange="showSaveBtn()"> Animaux autorisés</label>
-      </div>
-      <button id="savePreferencesBtn">Enregistrer les préférences</button>
+      <?php $prefs = $user->getPreferences(); ?>
+      <form method="post" action="../driver/updatePreferences.php">
+        <div class="preferences">
+          <label><input type="checkbox" name="smoker" <?= !empty($prefs['allows_smoking']) ? 'checked' : '' ?>> Fumeur autorisé</label>
+          <label><input type="checkbox" name="pets" <?= !empty($prefs['allows_pets']) ? 'checked' : '' ?>> Animaux autorisés</label>
+          <label>Remarques personnelles :</label>
+          <input type="text" name="note_personnelle" value="<?= htmlspecialchars($prefs['note_personnelle'] ?? '') ?>">
+        </div>
+        <button type="submit">Enregistrer les préférences</button>
+      </form>
     </div>
 
-    <!-- Véhicules -->
+    <!-- Gestions des véhicules -->
     <div class="section">
       <h4>Véhicules enregistrés</h4>
-      <label for="vehicule">Sélectionner un véhicule :</label><br>
-      <!-- pour test  -->
-      <select name="vehicule" id="vehicule" onchange="showVehiclePreferences(this.value)">
-        <option value="">-- Choisir un véhicule --</option>
-        <option value="zoe">Renault Zoé - 4 places</option>
-        <option value="tesla">Tesla Model 3 - 5 places</option>
-      </select>
-      <button class="delete-vehicle">🗑</button>
-      <br>
-      <!-- ajouter un véhicule -->
-      <button onclick="location.href='../driver/addCar.php'">➕</button>
-      <!-- test affichage  -->
+      <form method="post" action="../driver/deleteVehicle.php">
+        <label for="vehicule">Sélectionner un véhicule :</label><br>
+        <select name="vehicle_id" id="vehicule" onchange="showVehiclePreferences(this.value)">
+          <option value="">-- Choisir un véhicule --</option>
+          <?php foreach ($user->getVehicles() as $v): ?>
+            <option value="<?= $v['id'] ?>"><?= htmlspecialchars($v['brand'] . ' ' . $v['model']) ?> - <?= $v['seats'] ?> places</option>
+          <?php endforeach; ?>
+        </select>
+        <button type="submit" class="delete-vehicle">🗑 Supprimer</button>
+        <button type="button" onclick="location.href='../driver/updateDocuments.php'">📄 Mettre à jour les documents</button>
+      </form>
+
+      <label>Ajouter un véhicule :</label><br>
+      <button onclick="location.href='../driver/addCar.php'">➕ Ajouter un véhicule</button>
+
       <div id="vehicle-preferences" class="section" style="display:none;">
         <p><strong>Préférences du véhicule sélectionné :</strong></p>
         <ul>
@@ -101,7 +108,7 @@
     </div>
   <?php endif; ?>
 
-  <!-- Boutons pour tous -->
+  <!-- Actions disponibles pour tous les utilisateurs -->
   <div class="button-group">
     <button onclick="location.href='./showMyTrips.php'">Mes trajets réservés</button>
     <button onclick="location.href='../user/tripsStory.php'">Historique des voyages / gestion des avis</button>
@@ -128,17 +135,9 @@
     });
   }
 
-  function showSaveBtn() {
-    document.getElementById("savePreferencesBtn").style.display = "inline-block";
-  }
-
   function showVehiclePreferences(value) {
     const block = document.getElementById("vehicle-preferences");
-    if (value) {
-      block.style.display = "block";
-    } else {
-      block.style.display = "none";
-    }
+    block.style.display = value ? "block" : "none";
   }
 </script>
 

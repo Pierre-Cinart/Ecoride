@@ -28,6 +28,7 @@ if (!checkFlood('login', 3, 60, 3600)) {
 
 // 1. Nettoyage des données entrantes
 $_POST = sanitizeArray($_POST, '../front/user/login.php');
+
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
@@ -83,7 +84,42 @@ try {
         case 'user':    $user = new SimpleUser(...$args); break;
         case 'admin':   $user = new Admin(...$args); break;
         case 'employee':$user = new Employee(...$args); break;
-        case 'driver':  $user = new Driver(...$args); break;
+        case 'driver': 
+            // Charger les préférences du conducteur
+            $stmt = $pdo->prepare("
+                SELECT allows_smoking, allows_pets, note_personnelle
+                FROM driver_preferences
+                WHERE driver_id = :id
+            ");
+            $stmt->execute([':id' => $data['id']]);
+            $preferences = $stmt->fetch(PDO::FETCH_ASSOC) ?: [
+                'allows_smoking' => 0,
+                'allows_pets' => 0,
+                'note_personnelle' => ''
+            ];
+
+            // Charger les véhicules enregistrés par le conducteur
+            $stmt = $pdo->prepare("SELECT id FROM vehicles WHERE user_id = :id");
+            $stmt->execute([':id' => $data['id']]);
+            $vehicles = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
+
+            // Calculer la note moyenne du conducteur (avis acceptés)
+            $stmt = $pdo->prepare("
+                SELECT AVG(rating) AS average
+                FROM ratings
+                WHERE trip_id IN (
+                    SELECT id FROM trips WHERE driver_id = :id
+                ) AND status = 'accepted'
+            ");
+            $stmt->execute([':id' => $data['id']]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $averageRating = isset($result['average']) ? (float) $result['average'] : 0.0;
+
+            // Ajouter les données supplémentaires au constructeur
+            $user = new Driver(...array_merge($args, [$preferences, $vehicles, $averageRating]));
+
+        break;
+
         default:        $user = new User(...$args); break;
     }
 
