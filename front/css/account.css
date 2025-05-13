@@ -50,16 +50,12 @@
     margin-top: 0.5rem;
     padding: 0.3rem 0.8rem;
     font-size: 1.2em;
-    background-color: #ccc;
     border-radius: 6px;
     border: none;
     cursor: pointer;
   }
-  .delete-vehicle {
-    background-color: #e57373;
-    color: white;
-    margin-left: 0.5rem;
-  }
+
+
   #savePreferencesBtn {
     margin-top: 1rem;
     padding: 0.5rem 1rem;

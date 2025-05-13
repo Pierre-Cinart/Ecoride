@@ -2,6 +2,9 @@
 // Mise en surbrillance du lien actif
 $navSelected = $_SESSION['navSelected'] ?? '';
 $user = $_SESSION['user'] ?? null;
+// chargement du composant pour bouton de retour
+require_once __DIR__ .'/btnBack.php';
+//debug mode 
 var_dump($_SESSION);
 ?>
 

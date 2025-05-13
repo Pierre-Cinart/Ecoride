@@ -4,6 +4,33 @@ require_once 'User.php';
 // Classe utilisateur simple (non conducteur)
 class SimpleUser extends User {
      // ===== METHODS:  =====
+     // ===== Met à jour les données de l'utilisateur en session =====
+    public function updateUserSession(PDO $pdo): void {
+        try {
+            // Requête pour récupérer les infos de l'utilisateur à jour
+            $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits FROM users WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $this->id]);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($data) {
+                // Mise à jour des propriétés de l'objet
+                $this->pseudo       = $data['pseudo'];
+                $this->firstName    = $data['first_name'];
+                $this->lastName     = $data['last_name'];
+                $this->email        = $data['email'];
+                $this->phoneNumber  = $data['phone_number'];
+                $this->role         = $data['role'];
+                $this->credits      = (int) $data['credits'];
+
+                // Réinjection dans la session
+                $_SESSION['user'] = $this;
+            }
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Erreur lors de la mise à jour des informations utilisateur.";
+        }
+    }
+
     // ===== Mise à jour des crédits (débite ou crédite l’utilisateur) =====
     public function updateCredits(PDO $pdo, int $delta): bool {
         try {
@@ -286,8 +313,10 @@ class SimpleUser extends User {
             return false;
         }
     }
-
-
+    // ===== Envoie de mail =====
+    public function sendMail() {
+        //  à develloper
+    }
 
 }
 
