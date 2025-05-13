@@ -11,6 +11,10 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   <meta charset="UTF-8">
   <title>Ajouter des crédits - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
+   <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
   <style>
     .info-box {
       background-color: #f8f9fa;

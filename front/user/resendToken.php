@@ -17,8 +17,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 
   <?php 
-    $captchaAction = 'resend'; 
-    include_once '../composants/captcha.php'; 
+    $captchaAction = 'resend'; // action personnalisée pour cette page
+    require_once '../../back/composants/captcha.php'; 
   ?>
 </head>
 <body>
@@ -43,6 +43,10 @@
     </div>
   </main>
 
-  <?php include_once '../composants/footer.html'; ?>
+  <?php 
+    include_once '../composants/footer.html'; 
+    renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'login' 
+  // ?>
+
 </body>
 </html>

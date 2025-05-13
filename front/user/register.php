@@ -18,7 +18,7 @@
 
   <!-- google recaptcha v3 -->
   <?php $captchaAction = 'register'; // action personnalisée pour cette page
-  include_once '../composants/captcha.php'; ?> 
+  require_once '../../back/composants/captcha.php'; ?> 
 
 </head>
 <body>
@@ -88,7 +88,7 @@
   
    <!-- footer -->
   <?php include_once '../composants/footer.html'; ?>
-
+  <?php renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'login' ?>
   <script src="../js/register.js"></script>
 </body>
 </html>

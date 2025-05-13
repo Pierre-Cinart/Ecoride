@@ -17,8 +17,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 
   <!-- Google reCAPTCHA v3 -->
-  <?php $captchaAction = 'login'; // action personnalisée pour cette page
-  include_once '../composants/captcha.php'; ?> 
+  <?php 
+    $captchaAction = 'login'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
+    require_once '../../back/composants/captcha.php'; // inclut le fichier qui contient la fonction renderRecaptcha()
+  ?>
+
 
 </head>
 <body>
@@ -51,6 +54,7 @@
 
   <!-- footer -->
   <?php include_once '../composants/footer.html'; ?>
+  <?php renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'login' ?>
 
 </body>
 </html>

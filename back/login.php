@@ -1,10 +1,13 @@
 <?php
 // Chargement des composants nécessaires
-require_once './composants/db_connect.php';        // Connexion à la base de données
-require_once './composants/sanitizeArray.php';     // Nettoyage des entrées utilisateur
-require_once './composants/antiflood.php';         // Protection anti-flood
-require_once './composants/loadClasses.php';          // Chargement des classes 
-require_once './composants/JWT.php';                 // creation du jwt
+require_once __DIR__ .'../composants/loadClasses.php'; // classes
+require_once __DIR__ . '../composants/db_connect.php'; // connection bdd
+require_once __DIR__ . '../composants/JWT.php'; //jwt
+require_once __DIR__ . '../composants/checkAccess.php'; //control d accés
+require_once __DIR__ . '../composants/sanitizeArray.php'; // nettoyage des données
+require_once __DIR__ . '../composants/captcha.php'; // googleRecaptcha
+require_once __DIR__ . '../composants/antiflood.php';  // protection brute force 
+session_start();
 
 // Vérifie que le formulaire est soumis par POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -12,6 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../front/user/login.php');
     exit();
 }
+
+// verification googleCaptcha
+verifyCaptcha('login', '../front/user/login.php'); // ← action + redirection
 
 // Anti-flood : 3 tentatives max en 60 secondes, sinon blocage pendant 1h (3600s)
 if (!checkFlood('login', 3, 60, 3600)) {
@@ -45,14 +51,14 @@ try {
         exit();
     }
 
-    // 5. Vérifie que l'adresse mail est confirmée
+   // 5. Vérifie que l'adresse mail est confirmée
     if (!$data['is_verified_email']) {
         $_SESSION['error'] = "Votre adresse email n’a pas été confirmée.";
-        $_SESSION['resend_link'] = true;
         $_SESSION['email_to_verify'] = $data['email'];
-        header('Location: ../front/user/login.php');
+        header('Location: ../front/user/resendToken.php');
         exit();
     }
+
 
     // 6. Connexion réussie → suppression des traces antiflood
     clearFlood('login');
