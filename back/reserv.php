@@ -1,11 +1,18 @@
 <?php 
-// chargement des class + demarage de sessions
+// chargement des class + demarage de sessions et control anti bot + jwt
 require_once './composants/autoload.php';
-// accés à la base données
-require_once './composants/db_connect.php';
-//verification et update JWT
-require_once './composants/JWT.php';
+//Autorisation d accés
+checkAccess(['SimpleUser','Driver']);
 
+// Vérifie que le formulaire a bien été soumis en POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $_SESSION['error'] = "Méthode non autorisée.";
+    header('Location: ../front/user/reserv.php');
+    exit();
+}
+
+// 2.verification googleCaptcha
+verifyCaptcha('reserve', '../front/user/reserv.php'); // ← action + redirection
 
 if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
     $_SESSION['error'] = "Vous devez être connecté pour réserver.";
@@ -21,7 +28,7 @@ if (!checkToken($pdo)) {
 }
 
 $user = $_SESSION['user'];
-$tripId = $_POST['trip_id'] ?? null;
+$tripId = (int) $_POST['trip_id'] ?? null;
 
 if (!$tripId || !is_numeric($tripId)) {
     $_SESSION['error'] = "Trajet invalide.";
@@ -30,7 +37,7 @@ if (!$tripId || !is_numeric($tripId)) {
 }
 
 // Appel de la méthode orientée objet
-if ($user->reserveTrip($pdo, (int)$tripId)) {
+if ($user->reserveTrip($pdo, $tripId)) {
     $_SESSION['user'] = $user; // met à jour en session
     $_SESSION['success'] = "Réservation confirmée.";
     header('Location: ../front/user/account.php');

@@ -16,4 +16,15 @@ function sanitizeArray($array, $location = '../index.php') {
     }
     return $clean;
 }
+// retour cast int
+function getPostInt(string $key): ?int {
+    return (isset($_POST[$key]) && is_numeric($_POST[$key])) ? (int) $_POST[$key] : null;
+}
+// retour cast float
+function getPostFloat(string $key, int $decimal = 1): ?float {
+    return (isset($_POST[$key]) && is_numeric($_POST[$key])) 
+        ? round((float) $_POST[$key], $decimal) 
+        : null;
+}
+
 ?>

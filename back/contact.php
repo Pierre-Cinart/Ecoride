@@ -2,8 +2,13 @@
 session_start();
 require_once './composants/phpMailer/src/sendMail.php';
 require_once './composants/sanitizeArray.php';
+require_once './composants/captcha.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
+// verification googleCaptcha
+verifyCaptcha('contact', '../front/user/contact.php'); // ← action + redirection
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Nettoyage des données postées (et sécurité contre les tableaux malicieux)

@@ -51,9 +51,14 @@ if (!$trip) {
   <meta charset="UTF-8">
   <title>Laisser un avis - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
+  <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+   <!-- Google reCAPTCHA v3 -->
+  <?php 
+    $captchaAction = 'leaveReview'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
+  ?>
 </head>
 <body>
 
@@ -67,7 +72,7 @@ if (!$trip) {
     <p><strong>Trajet :</strong> <?= htmlspecialchars($trip['departure_city']) ?> → <?= htmlspecialchars($trip['arrival_city']) ?></p>
     <p><strong>Date :</strong> <?= date('d/m/Y', strtotime($trip['departure_date'])) ?></p>
 
-    <form method="post" action="../../back/saveReview.php" onsubmit="return confirm('Confirmer l\'envoi de votre avis ?')">
+    <form method="post" action="../../back/leaveReview.php" onsubmit="return confirm('Confirmer l\'envoi de votre avis ?')">
       <input type="hidden" name="trip_id" value="<?= htmlspecialchars($tripId) ?>">
 
       <label for="rating">Note (1 à 5) :</label>
@@ -76,11 +81,18 @@ if (!$trip) {
       <label for="comment">Commentaire (facultatif) :</label>
       <textarea name="comment" id="comment" rows="4" placeholder="Partagez votre expérience..."></textarea>
 
+        <!-- Champ caché pour recevoir le token reCAPTCHA -->
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+
       <button type="submit" class="green">✅ Envoyer l'avis</button>
     </form>
   </div>
 </main>
 
-<?php include_once '../composants/footer.html'; ?>
+<?php 
+  include_once '../composants/footer.html'; 
+  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'reserve' 
+?>
+
 </body>
 </html>

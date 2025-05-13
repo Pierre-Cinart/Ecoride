@@ -12,6 +12,12 @@ $_SESSION['navSelected'] = 'contact';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+   <!-- Google reCAPTCHA v3 -->
+  <?php 
+    $captchaAction = 'contact'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
+    require_once '../../back/composants/captcha.php'; // inclut le fichier qui contient la fonction renderRecaptcha()
+  ?>
+
 </head>
 
 <body>
@@ -39,13 +45,18 @@ $_SESSION['navSelected'] = 'contact';
 
       <label for="message">Message :</label>
       <textarea id="message" name="message" rows="6" required style="border-radius: 8px; border: 1px solid #ccc; padding: 0.6rem;"></textarea>
+      
+      <!-- Champ caché pour recevoir le token reCAPTCHA -->
+      <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
 
       <button type="submit">Envoyer</button>
     </form>
   </div>
 </main>
+<?php 
+  include_once '../composants/footer.html';
+  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'contact' ?>
 
-<?php include_once '../composants/footer.html'; ?>
 <script src="../js/contact.js"></script>
 </body>
 </html>

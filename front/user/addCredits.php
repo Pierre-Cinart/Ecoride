@@ -1,8 +1,9 @@
 <?php
-require_once '../composants/autoload.php';
+require_once '../../back/composants/autoload.php'; // Class BDD JWT control d accés et Recaptcha
+
+checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
 $_SESSION['navSelected'] = 'account';
 
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +16,10 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+   <!-- Google reCAPTCHA v3 -->
+  <?php 
+    $captchaAction = 'addCredits'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
+  ?>
   <style>
     .info-box {
       background-color: #f8f9fa;
@@ -33,16 +38,7 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
       display: block;
       color: #666;
     }
-    .success {
-      color: green;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
+   
   </style>
 </head>
 <body>
@@ -84,7 +80,8 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
         <option value="cb">Carte Bancaire</option>
         <option value="crypto">Crypto-monnaie</option>
       </select>
-
+      <!-- Champ caché pour recevoir le token reCAPTCHA -->
+      <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
       <button type="submit">💳 Valider l'achat</button>
     </form>
 
@@ -94,23 +91,15 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
       <a href="https://www.paypal.me/votreLien" target="_blank">ma page PayPal</a>. Merci 🙏
     </p>
   </div>
+
 </main>
 
-<?php include_once '../composants/footer.html'; ?>
+<?php 
+  include_once '../composants/footer.html'; 
+  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'reserve' 
+?>
 
-<!-- Confirmation JS -->
-<script>
-  document.getElementById('creditForm').addEventListener('submit', function(e) {
-    const amount = document.getElementById('creditAmount').value;
-    if (!amount || isNaN(amount) || amount <= 0) return;
-
-    const confirmMsg = `⚠️ Vous êtes sur le point d'ajouter ${amount} crédit(s) à votre compte.\n\nSouhaitez-vous continuer ?`;
-
-    if (!confirm(confirmMsg)) {
-      e.preventDefault();
-    }
-  });
-</script>
+<script src="../js/credits.js"></script>
 
 </body>
 </html>

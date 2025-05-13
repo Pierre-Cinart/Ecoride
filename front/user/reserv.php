@@ -1,7 +1,6 @@
 <?php
-//// A REVOIR
-require_once '../../back/composants/autoload.php'; // Class BDD JWT control d accés
 
+require_once '../../back/composants/autoload.php'; // Class BDD JWT control d accés et Recaptcha
 
 checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
 
@@ -11,13 +10,6 @@ $_SESSION['navSelected'] = 'account';
 if (isset($_GET['action']) && $_GET['action'] === 'cancel') {
     unset($_SESSION['tripPending']);
     header('Location: search.php');
-    exit;
-}
-
-// Vérifie que l'utilisateur est connecté
-if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
-    $_SESSION['error'] = "Vous devez être connecté en tant que passager ou conducteur pour réserver.";
-    header('Location: login.php');
     exit;
 }
 
@@ -62,6 +54,10 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
   <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+   <!-- Google reCAPTCHA v3 -->
+  <?php 
+    $captchaAction = 'reserve'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
+  ?>
   <style>
     .trip-summary {
       background: white;
@@ -97,6 +93,8 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
     <?php else: ?>
       <form method="post" action="../../back/reserv.php">
         <input type="hidden" name="trip_id" value="<?= $trip['id'] ?>">
+         <!-- Champ caché pour recevoir le token reCAPTCHA -->
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
         <button type="submit" class="blue">✅ Confirmer la réservation</button>
       </form>
     <?php endif; ?>
@@ -109,13 +107,12 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
   </div>
 </main>
 
-<?php include_once '../composants/footer.html'; ?>
+<?php 
+  include_once '../composants/footer.html'; 
+  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'reserve' 
+?>
 
-<!-- JS pour cacher les popups -->
-<script>
-  const popup = document.querySelector('.pending-alert'); 
-  if (popup) popup.classList.add('hidden'); 
-</script>
+
 
 </body>
 </html>
