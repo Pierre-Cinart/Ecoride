@@ -1,6 +1,23 @@
 <?php
 // JWT.php — Gestion des tokens JWT-like pour les sessions sécurisées
 
+// ===== CHEMIN DE REDIRECTION SELON LE CONTEXTE (back ou front) =====
+$dir = $_SERVER['SCRIPT_FILENAME']; // Fichier actuellement exécuté
+
+if (strpos($dir, 'back') !== false) {
+    // ➤ Si le fichier est exécuté depuis le dossier 'back' (ex: back/composants/...), 
+    // il faut remonter jusqu’au front pour accéder à la page login :
+    $redirectURL = '../../front/user/login.php';
+} elseif (strpos($dir, 'front') !== false) {
+    // ➤ Si le fichier est exécuté depuis n’importe quel sous-dossier du front 
+    // (ex: front/user/, front/driver/, front/admin/...), 
+    // on remonte d’un dossier puis on accède à user/login.php :
+    $redirectURL = '../user/login.php';
+} else {
+    // ➤ Sécurité fallback si l’on ne peut pas déterminer l’origine :
+    $redirectURL = '/front/user/login.php';
+}
+
 /**
  * Génère un token sécurisé de 128 caractères (256 bits en hexadécimal)
  * @return string
@@ -17,12 +34,12 @@ function createToken() {
  * @param int $userId L'ID de l'utilisateur concerné
  */
 function updateToken(PDO $pdo, string $token, int $userId) {
-    // Vérifie que l'utilisateur existe bien
+    global $redirectURL;
+
     $checkUser = $pdo->prepare("SELECT id FROM users WHERE id = :id");
     $checkUser->execute([':id' => $userId]);
 
     if ($checkUser->rowCount() > 0) {
-        // Met à jour le token et prolonge sa validité de 2 heures
         $update = $pdo->prepare("
             UPDATE users 
             SET jwt_token = :token, 
@@ -34,10 +51,9 @@ function updateToken(PDO $pdo, string $token, int $userId) {
             ':id' => $userId
         ]);
     } else {
-        // Utilisateur introuvable : on détruit la session et redirige
         session_unset();
         $_SESSION['error'] = "Utilisateur introuvable. Veuillez vous connecter.";
-        header('Location: ../front/user/login.php');
+        header('Location: ' . $redirectURL);
         exit();
     }
 }
@@ -50,20 +66,18 @@ function updateToken(PDO $pdo, string $token, int $userId) {
  * @return bool true si la session est valide, redirection sinon
  */
 function checkToken(PDO $pdo) {
-    // Vérifie que la session contient bien un utilisateur et un token
+    global $redirectURL;
+
     if (isset($_SESSION['user']) && isset($_SESSION['jwt'])) {
         $user = $_SESSION['user'];
         $userId = $user->getId();
         $token = $_SESSION['jwt'];
 
-        // Récupère le token et sa date d'expiration depuis la base
         $stmt = $pdo->prepare("SELECT jwt_token, jwt_token_time FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
 
         if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Vérifie que le token est correct et qu'il n'est pas expiré
             $now = new DateTime();
             $expiresAt = new DateTime($row['jwt_token_time']);
 
@@ -77,21 +91,21 @@ function checkToken(PDO $pdo) {
                 // ❌ Token incorrect ou expiré
                 session_unset();
                 $_SESSION['error'] = "Session expirée, veuillez vous reconnecter.";
-                header('Location: ../front/user/login.php');
+                header('Location: ' . $redirectURL);
                 exit();
             }
         } else {
-            // ❌ L'utilisateur n'existe plus en base
+            // ❌ Utilisateur inexistant en base
             session_unset();
             $_SESSION['error'] = "Utilisateur introuvable.";
-            header('Location: ../front/user/login.php');
+            header('Location: ' . $redirectURL);
             exit();
         }
     } else {
         // ❌ Aucun token en session
         session_unset();
         $_SESSION['error'] = "Accès refusé. Veuillez vous connecter.";
-        header('Location: ../front/user/login.php');
+        header('Location: ' . $redirectURL);
         exit();
     }
 }
