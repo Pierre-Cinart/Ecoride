@@ -1,14 +1,11 @@
 <?php
-session_start();
+require_once '../../back/composants/autoload.php';
+require_once '../../back/config/configORS'; // key = $OPEN_ROUTE_KEY
+checkAccess(['Driver']);
 $_SESSION['navSelected'] = 'offer';
 
-// Sécurité : accès uniquement aux conducteurs
-if (!isset($_SESSION['typeOfUser']) || $_SESSION['typeOfUser'] !== 'driver') {
-  header("Location: ../user/login.php");
-  exit();
-}
+$user=$_SESSION['user'];
 
-$pseudo = $_SESSION['pseudo'] ?? 'Conducteur';
 ?>
 
 <!DOCTYPE html>
@@ -17,6 +14,10 @@ $pseudo = $_SESSION['pseudo'] ?? 'Conducteur';
   <meta charset="UTF-8">
   <title>Proposer un trajet - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
+   <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -27,7 +28,7 @@ $pseudo = $_SESSION['pseudo'] ?? 'Conducteur';
 <main>
   <div class="form-container">
     <h2>Proposer un trajet</h2>
-    <p>Les trajets proposés vous coûteront <strong>2 crédits</strong>. Assurez-vous d’avoir un véhicule vérifié.</p>
+    <p>Les trajets proposés vous coûteront <strong>2 crédits</strong>. Assurez-vous d’avoir un véhicule vérifié et les crédits nécessaires.</p>
 
     <form method="post" action="confirmAjoutTrajet.php" enctype="multipart/form-data">
       <label for="departure">Ville de départ :</label>

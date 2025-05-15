@@ -1,37 +1,62 @@
 <?php
 /**
- * Composant d'autorisation d'accès basé sur les classes d'objet utilisateur
+ * Vérifie que l'utilisateur a accès à la page demandée selon son type et son statut.
  * 
- * Utilisation :
- *   include_once '../../back/composants/checkAccess.php';
+ * Usage :
+ *   require_once '../../back/composants/checkAccess.php';
  *   checkAccess(['SimpleUser', 'Driver']);
- *   
- * Cela permet uniquement aux utilisateurs de type SimpleUser ou Driver d'accéder à la page.
- * Sinon, redirection vers login.php.
  */
 
-function checkAccess(array $allowedClasses, string $redirect = 'login.php') {
-    // On vérifie que la session est bien démarrée
+function checkAccess(array $allowedClasses): void {
+    // === Démarrage de session si nécessaire ===
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
 
-    // Si aucun utilisateur connecté => redirection
+    // === Vérification : utilisateur connecté ? ===
     if (!isset($_SESSION['user'])) {
         $_SESSION['error'] = "Accès interdit. Veuillez vous connecter.";
-        header("Location: $redirect");
-        exit();
+        redirectToHome();
     }
 
-    // Vérifie que l'objet utilisateur correspond à une des classes autorisées
+    $user = $_SESSION['user'];
+
+    // === Vérification : utilisateur banni ? ===
+    if (method_exists($user, 'getStatus') && $user->getStatus() === 'banned') {
+        $_SESSION['error'] = "Votre compte a été banni. Veuillez contacter l’équipe EcoRide.";
+        session_destroy(); // Déconnecte complètement
+        redirectToHome();
+    }
+
+    // === Vérification : classe utilisateur autorisée ? ===
     foreach ($allowedClasses as $class) {
-        if ($_SESSION['user'] instanceof $class) {
-            return; // Accès autorisé, on ne fait rien
+        if ($user instanceof $class) {
+            return; // ✅ Accès autorisé
         }
     }
 
-    // Sinon redirection
-    $_SESSION['error'] = "Vous n'avez pas les droits pour accéder à cette page.";
-    header("Location: $redirect");
+    // Sinon : accès refusé
+    $_SESSION['error'] = "Vous n’avez pas les droits pour accéder à cette page.";
+    redirectToHome();
+}
+
+/**
+ * Redirige automatiquement vers la bonne page Home selon l’origine de l’appel (back ou front).
+ */
+function redirectToHome(): void {
+    $dir = $_SERVER['SCRIPT_FILENAME']; // Fichier actuellement exécuté
+
+    if (strpos($dir, 'back') !== false) {
+        // Si exécuté depuis le dossier back, on redirige vers la Home du front
+        $redirectURL = '../../front/user/home.php';
+    } elseif (strpos($dir, 'front') !== false) {
+        // Si exécuté depuis un dossier du front
+        $redirectURL = '../user/home.php';
+    } else {
+        // Par défaut, sécurité (exécute depuis racine projet)
+        $redirectURL = '/front/user/home.php';
+    }
+
+    header("Location: $redirectURL");
     exit();
 }

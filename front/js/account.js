@@ -1,27 +1,61 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // === 🌐 RÉFÉRENCES AUX ÉLÉMENTS DU DOM ===
+// === Fonction globale pour supprimer un véhicule via AJAX ===
+function ajaxDeleteVehicle() {
+  const vehicleSelect = document.getElementById("vehicle_id");
+  const vehicleId = vehicleSelect ? vehicleSelect.value : "";
 
-  // Formulaire pour devenir conducteur
+  // Vérifie qu'un véhicule est bien sélectionné
+  if (!vehicleId) {
+    alert("Veuillez d'abord sélectionner un véhicule.");
+    return;
+  }
+
+  // Confirmation utilisateur
+  const confirmDelete = confirm("Êtes-vous sûr de vouloir retirer ce véhicule de la liste ?");
+  if (!confirmDelete) return;
+
+  // Requête AJAX vers le back
+  fetch("../../back/ajax/AJAXdeleteVehicle.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: `vehicle_id=${encodeURIComponent(vehicleId)}`
+  })
+    .then(response => {
+      if (!response.ok) throw new Error("Erreur lors de la suppression du véhicule.");
+      return response.text();
+    })
+    .then(result => {
+      if (result.trim() === "OK") {
+        // Rafraîchit la page après suppression
+        location.reload();
+      } else {
+        alert("Une erreur est survenue : " + result);
+      }
+    })
+    .catch(error => {
+      console.error("Erreur AJAX :", error);
+      alert("Impossible de supprimer le véhicule.");
+    });
+}
+
+// === Quand le DOM est prêt ===
+document.addEventListener('DOMContentLoaded', () => {
+  // === RÉFÉRENCES AUX ÉLÉMENTS DU DOM ===
   const toggleDriverBtn = document.getElementById("toggleDriverForm");
   const driverForm = document.getElementById("driverForm");
-
-  // Préférences conducteur
   const smokerInput = document.querySelector('input[name="smoker"]');
   const petsInput = document.querySelector('input[name="pets"]');
   const noteInput = document.getElementById("note_personnelle");
   const savePrefsBtn = document.getElementById("btnSavePrefs");
-
-  // Sélecteur de véhicule
   const vehicleSelect = document.getElementById("vehicle_id");
   const deleteBtn = document.getElementById("btnDeleteVehicle");
   const updateDocumentsBtn = document.getElementById("btnUpdateDocuments");
-
-  // Bloc des préférences véhicule (optionnel)
   const vehiclePrefBlock = document.getElementById("vehicle-preferences");
 
-  // === 🔧 FONCTIONS UTILITAIRES ===
+  // === 🔧 FONCTIONS ===
 
-  // Affiche/Masque le formulaire pour devenir conducteur
+  // Affiche/Masque le formulaire "Devenir conducteur"
   function handleToggleDriverForm() {
     if (toggleDriverBtn && driverForm) {
       toggleDriverBtn.addEventListener("click", () => {
@@ -30,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Affiche/Masque dynamiquement les boutons liés au véhicule
+  // Gère l'affichage des boutons liés au véhicule sélectionné
   function handleVehicleButtonsVisibility() {
     if (vehicleSelect && deleteBtn && updateDocumentsBtn) {
       const toggleButtons = () => {
@@ -39,22 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDocumentsBtn.classList.toggle("hidden", !hasSelection);
       };
 
-      toggleButtons(); // initial
+      toggleButtons(); // au chargement
       vehicleSelect.addEventListener("change", toggleButtons);
     }
   }
 
-  // Confirme avant suppression d’un véhicule
-  function attachDeleteConfirmation() {
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", (e) => {
-        const confirmDelete = confirm("Êtes-vous sûr de vouloir retirer ce véhicule de la liste ?");
-        if (!confirmDelete) e.preventDefault();
-      });
-    }
-  }
-
-  // Affiche ou masque dynamiquement le bouton d’enregistrement des préférences
+  // Gère l’apparition du bouton "Enregistrer" si changement dans les préférences
   function watchPreferencesChanges() {
     if (smokerInput && petsInput && noteInput && savePrefsBtn) {
       const initialState = {
@@ -83,11 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
       petsInput.addEventListener("change", checkForChanges);
       noteInput.addEventListener("input", checkForChanges);
 
-      savePrefsBtn.classList.add("hidden"); // au chargement
+      savePrefsBtn.classList.add("hidden");
     }
   }
 
-  // Permet d'afficher dynamiquement un bloc lié au véhicule sélectionné
+  // Gère l'affichage conditionnel d'une section personnalisée
   window.showVehiclePreferences = function (value) {
     if (vehiclePrefBlock) {
       vehiclePrefBlock.style.display = value ? "block" : "none";
@@ -97,6 +121,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // === 🚀 INITIALISATION ===
   handleToggleDriverForm();
   handleVehicleButtonsVisibility();
-  attachDeleteConfirmation();
   watchPreferencesChanges();
 });

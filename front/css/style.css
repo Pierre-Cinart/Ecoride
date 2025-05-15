@@ -84,6 +84,15 @@ header {
 }
 
 /* ------------------------------------------------ */
+/* messages avertissements */
+.red-alert{
+  padding: 0.7rem;
+  border: none;
+  background-color: #f70707;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+}
 /* contenu principal  */
 main{
   flex: 1;

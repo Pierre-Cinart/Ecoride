@@ -4,33 +4,7 @@ require_once 'User.php';
 // Classe utilisateur simple (non conducteur)
 class SimpleUser extends User {
      // ===== METHODS:  =====
-     // ===== Met à jour les données de l'utilisateur en session =====
-    public function updateUserSession(PDO $pdo): void {
-        try {
-            // Requête pour récupérer les infos de l'utilisateur à jour
-            $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits FROM users WHERE id = :id LIMIT 1");
-            $stmt->execute([':id' => $this->id]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($data) {
-                // Mise à jour des propriétés de l'objet
-                $this->pseudo       = $data['pseudo'];
-                $this->firstName    = $data['first_name'];
-                $this->lastName     = $data['last_name'];
-                $this->email        = $data['email'];
-                $this->phoneNumber  = $data['phone_number'];
-                $this->role         = $data['role'];
-                $this->credits      = (int) $data['credits'];
-
-                // Réinjection dans la session
-                $_SESSION['user'] = $this;
-            }
-
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Erreur lors de la mise à jour des informations utilisateur.";
-        }
-    }
-
+ 
     // ===== Mise à jour des crédits (débite ou crédite l’utilisateur) =====
     public function updateCredits(PDO $pdo, int $delta): bool {
         try {
@@ -64,12 +38,24 @@ class SimpleUser extends User {
             return false;
         }
     }
-    // ===== Réservation d’un trajet (avec paiement immédiat) =====
+    /**
+     * ===== Réservation d’un trajet (avec paiement immédiat) =====
+     *
+     * @param PDO $pdo Connexion PDO à la base de données
+     * @param int $tripId ID du trajet à réserver
+     * @return bool true si la réservation est réussie, false sinon
+     */
     public function reserveTrip(PDO $pdo, int $tripId): bool {
         try {
+            //  0. Vérifie si l'utilisateur est autorisé à réserver
+            if ($this->status != 'authorized') {
+                $_SESSION['error'] = "Vous n’avez pas la permission de réserver un voyage. Veuillez contacter l’équipe d’EcoRide.";
+                return false;
+            }
+
             $pdo->beginTransaction();
 
-            // 1. Lecture et verrouillage du trajet
+            // 1. Lecture et verrouillage du trajet pour éviter les conflits simultanés
             $stmt = $pdo->prepare("
                 SELECT id, price, available_seats, status 
                 FROM trips 
@@ -79,17 +65,19 @@ class SimpleUser extends User {
             $stmt->execute([':id' => $tripId]);
             $trip = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // Trajet inexistant, terminé ou complet
             if (!$trip || $trip['status'] !== 'planned' || $trip['available_seats'] <= 0) {
                 throw new Exception("Ce trajet n’est pas disponible.");
             }
 
             $price = (int) $trip['price'];
 
+            //  Vérifie les crédits de l’utilisateur
             if ($this->credits < $price) {
                 throw new Exception("Crédits insuffisants.");
             }
 
-            // 2. Vérifie si déjà enregistré
+            // 2. Vérifie si déjà inscrit à ce trajet
             $check = $pdo->prepare("
                 SELECT id, confirmed 
                 FROM trip_participants 
@@ -101,7 +89,7 @@ class SimpleUser extends User {
             ]);
             $existing = $check->fetch(PDO::FETCH_ASSOC);
 
-            // 3. Insertion ou mise à jour dans trip_participants
+            // 3. Réservation ou réactivation d’une réservation annulée
             if ($existing && $existing['confirmed']) {
                 throw new Exception("Vous avez déjà réservé ce trajet.");
             }
@@ -128,7 +116,7 @@ class SimpleUser extends User {
                 ]);
             }
 
-            // 4. Décrémente les places disponibles
+            // 4. Mise à jour du nombre de places disponibles
             $updateTrip = $pdo->prepare("
                 UPDATE trips 
                 SET available_seats = available_seats - 1 
@@ -136,6 +124,7 @@ class SimpleUser extends User {
             ");
             $updateTrip->execute([':trip' => $tripId]);
 
+            // Conflit sur les places disponibles
             if ($updateTrip->rowCount() === 0) {
                 throw new Exception("Plus de places disponibles.");
             }
@@ -149,21 +138,36 @@ class SimpleUser extends User {
             return true;
 
         } catch (Exception $e) {
-            if ($pdo->inTransaction()) $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             $_SESSION['error'] = $e->getMessage();
             return false;
         }
     }
 
-    // ===== Annulation d'un trajet (log cashback, sans remboursement immédiat) =====
+
+   /**
+ * Permet à un utilisateur d’annuler sa réservation à un voyage.
+ * Applique une pénalité, rembourse partiellement, ajoute un avertissement si annulation tardive.
+ * Bloque l’utilisateur si 3 avertissements sont atteints.
+ *
+ * @param PDO $pdo Connexion active à la base
+ * @param int $tripId ID du voyage concerné
+ * @param int $participantId ID du participant (dans la table `trip_participants`)
+ * @param int $creditsUsed Crédits initialement dépensés
+ * @param string $logMessage Message à enregistrer pour l’historique
+ * @return bool True si l’opération s’est bien passée, False sinon
+ */
     public function cancelTrip(PDO $pdo, int $tripId, int $participantId, int $creditsUsed, string $logMessage): bool {
         try {
-            $penalite = 2;
+            $penalite = 2; // Coût fixe pour une annulation
             $remboursement = max(0, $creditsUsed - $penalite);
 
+            // === 1. Début de la transaction ===
             $pdo->beginTransaction();
 
-            // 1. Marque le participant comme annulé
+            // === 2. Marquer le participant comme annulé ===
             $updateParticipant = $pdo->prepare("
                 UPDATE trip_participants 
                 SET confirmed = 0, confirmation_date = NOW() 
@@ -178,14 +182,43 @@ class SimpleUser extends User {
                 throw new Exception("Annulation impossible : réservation introuvable.");
             }
 
-            // 2. Libère une place sur le trajet
+            // === 3. Vérifie si l’annulation est tardive (moins de 24h avant départ) ===
+            $stmt = $pdo->prepare("SELECT departure_date FROM trips WHERE id = :tripId");
+            $stmt->execute([':tripId' => $tripId]);
+            $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($trip) {
+                $dateDepart = new DateTime($trip['departure_date']);
+                $now = new DateTime();
+
+                $diffInHours = ($dateDepart->getTimestamp() - $now->getTimestamp()) / 3600;
+
+                if ($diffInHours > 0 && $diffInHours < 24) {
+                    // === 4. Ajoute un avertissement au passager ===
+                    $warnUpdate = $pdo->prepare("UPDATE users SET user_warnings = user_warnings + 1 WHERE id = :id");
+                    $warnUpdate->execute([':id' => $this->id]);
+
+                    // === 5. Vérifie si le seuil des avertissements est atteint ===
+                    $checkWarns = $pdo->prepare("SELECT user_warnings FROM users WHERE id = :id");
+                    $checkWarns->execute([':id' => $this->id]);
+                    $result = $checkWarns->fetch(PDO::FETCH_ASSOC);
+
+                    if ($result && (int)$result['user_warnings'] >= 3) {
+                        // Blocage de l’utilisateur s’il atteint 3 avertissements
+                        $block = $pdo->prepare("UPDATE users SET status = 'blocked' WHERE id = :id");
+                        $block->execute([':id' => $this->id]);
+                    }
+                }
+            }
+
+            // === 6. Libère une place sur le trajet ===
             $updateTrip = $pdo->prepare("
                 UPDATE trips SET available_seats = available_seats + 1 
                 WHERE id = :trip
             ");
             $updateTrip->execute([':trip' => $tripId]);
 
-            // 3. Enregistre une demande de remboursement (log uniquement)
+            // === 7. Enregistre un remboursement si applicable ===
             if ($remboursement > 0) {
                 $reason = $logMessage ?: "Annulation du trajet #$tripId";
                 if (!$this->logCashback($pdo, $remboursement, $reason, 'refund')) {
@@ -193,6 +226,7 @@ class SimpleUser extends User {
                 }
             }
 
+            // === 8. Fin de transaction ===
             $pdo->commit();
             return true;
 

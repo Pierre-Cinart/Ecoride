@@ -9,14 +9,19 @@
 
   // Récupération des infos utilisateur depuis l'objet User en session
   $user = $_SESSION['user'];
+  //debug 
+  $user->updateUserSession($pdo);//mise à jour de session user
+
+  //récupération de données pour traitement
   $pseudo = $user->getPseudo();
   $credits = $user->getCredits();
+  $status = $user->getStatus();
+
   // Initialise un tableau vide, dispo globalement pour la sélection de véhicules 
   $vehicleObjects = [];
+
   // Mise à jour automatique des infos session si c’est un conducteur
   if ($user instanceof Driver) {
-      $user->updateUserSession($pdo);
-
       // Génère dynamiquement les objets Vehicle à partir des IDs
       $vehicleObjects = [];
       foreach ($user->getVehicles() as $vehicleId) {
@@ -30,8 +35,6 @@
   }
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -51,6 +54,7 @@
   <?php include_once '../composants/navbar.php'; ?>
 </header>
 
+<!-- information de page en cours de developpement -->
 <?php include_once '../composants/inProgress.php'; ?>
 
 <div class="account-container">
@@ -66,6 +70,18 @@
         <span style="color: green; font-weight:bold;">✔ Vérifié</span>
       <?php endif; ?>
     </div>
+    <?php if ($status === 'blocked' || $status === 'all_blocked'): ?>
+      <div class="red-alert">
+        Votre compte ne permet plus de réserver de trajets <br>
+        Veillez contacter l ' équipe Ecoride pour gérer votre situation
+      </div>
+    <?php endif; ?>
+    <?php if ($status === 'drive_blocked' ): ?>
+      <div class="red-alert">
+        Votre compte ne permet plus de proposer de trajets ni de gérer vos véhicules <br>
+        Veillez contacter l ' équipe Ecoride pour gérer votre situation
+      </div>
+    <?php endif; ?>
   </div>
 
   <!-- Profil passager -->
@@ -131,28 +147,30 @@
   </div>
 
   <!-- === SECTION GESTION DES VÉHICULES === -->
-<div class="section">
-  <h4>Vos véhicules enregistrés</h4>
-  <form method="post" action="../driver/deleteVehicle.php">
-    <label for="vehicle_id">Sélectionnez un véhicule :</label><br>
-    <!-- Menu déroulant liste de véhicules -->
-    <select name="vehicle_id" id="vehicle_id">
-      <option value="">-- Choisir un véhicule --</option>
-      <?php foreach ($vehicleObjects as $vehicle): ?>
-        <option value="<?= $vehicle->getId() ?>">
-          <?= htmlspecialchars($vehicle->getDisplayName()) ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
+  <?php if ($status != 'driver_blocked' && $status != 'all_blocked'): ?>
+    <div class="section">
+    <h4>Vos véhicules enregistrés</h4>
+    <form method="post" action="../driver/deleteVehicle.php"> <!-- ici ne pas diriger en post -->
+      <label for="vehicle_id">Sélectionnez un véhicule :</label><br>
+      <!-- Menu déroulant liste de véhicules -->
+      <select name="vehicle_id" id="vehicle_id">
+        <option value="">-- Choisir un véhicule --</option>
+        <?php foreach ($vehicleObjects as $vehicle): ?>
+          <option value="<?= $vehicle->getId() ?>">
+            <?= htmlspecialchars($vehicle->getDisplayName()) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-    <!-- Actions liées au véhicule sélectionné -->
-    <div style="margin-top: 10px;">
-      <button type="button" onclick="location.href='../driver/deleteCar.php'" id="btnDeleteVehicle" class="delete-vehicle red hidden">🗑 Supprimer le véhicule</button>
-      <button type="button" onclick="location.href='../driver/updateCar.php'" id="btnUpdateDocuments" class="delete-vehicle blue hidden">Mettre à jour les documents</button>
-      <button type="button" onclick="location.href='../driver/addCar.php'">➕ Ajouter un véhicule</button>
-    </div>
-  </form>
-</div>
+      <!-- Actions liées au véhicule sélectionné -->
+      <div style="margin-top: 10px;">
+        <button type="button" onclick="ajaxDeleteVehicle()" id="btnDeleteVehicle" class="delete-vehicle red hidden">🗑 Supprimer le véhicule</button> <!-- ici executer deleteVehicule -->
+        <button type="button" onclick="location.href='../driver/updateCar.php'" id="btnUpdateDocuments" class="delete-vehicle blue hidden">Mettre à jour les documents</button>
+        <button type="button" onclick="location.href='../driver/addCar.php'">➕ Ajouter un véhicule</button>
+      </div>
+    </form>
+  </div>
+  <?php endif;?>
 
 <?php endif; ?>
 
@@ -164,7 +182,9 @@
     <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
     <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
     <?php if ($user instanceof Driver): ?>
-      <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
+      <?php if ($status != 'driver_blocked' && $status != 'all_blocked'): ?>
+        <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
+      <?php endif;?>
       <button onclick="location.href='avisRecus.php'">Mes avis reçus</button>
       <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
     <?php endif; ?>
