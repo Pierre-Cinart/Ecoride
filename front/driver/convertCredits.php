@@ -2,10 +2,7 @@
 session_start();
 $_SESSION['navSelected'] = 'account';
 
-if (!isset($_SESSION['typeOfUser']) || $_SESSION['typeOfUser'] !== 'driver') {
-  header("Location: login.php");
-  exit();
-}
+
 
 $pseudo = $_SESSION['pseudo'] ?? 'Conducteur';
 $credits = $_SESSION['credits'] ?? 20;
