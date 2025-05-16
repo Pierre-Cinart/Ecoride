@@ -8,7 +8,7 @@ require_once __DIR__ . '/composants/sanitizeArray.php'; // nettoyage des donnée
 require_once __DIR__ . '/composants/captcha.php'; // Google Recaptcha
 require_once __DIR__ . '/composants/antiflood.php';  // protection brute force 
 require_once __DIR__ . '/composants/phpMailer/src/sendMail.php'; // envoie de mails
-
+require_once __DIR__ . '/composants/uploader.php'; // gestion des uploads
 
 session_start();
 
@@ -17,6 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../front/user/register.php');
     exit();
 }
+
+// Vérification Google Captcha
+verifyCaptcha('register', '../front/user/register.php');
 
 $_POST = sanitizeArray($_POST, '../front/user/register.php');
 
@@ -75,21 +78,6 @@ if ($existing) {
     }
 }
 
-if ($isDriver) {
-    if (!isset($_FILES['permit']) || $_FILES['permit']['error'] !== 0) {
-        $_SESSION['error'] = "Le permis de conduire est obligatoire pour être chauffeur.";
-        header('Location: ../front/user/register.php');
-        exit();
-    }
-
-    $permitType = mime_content_type($_FILES['permit']['tmp_name']);
-    if ($permitType !== 'image/jpeg') {
-        $_SESSION['error'] = "Le permis doit être au format JPEG.";
-        header('Location: ../front/user/register.php');
-        exit();
-    }
-}
-
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 $emailToken = createToken();
 $emailTokenExpiration = date('Y-m-d H:i:s', strtotime('+24 hours'));
@@ -114,25 +102,15 @@ try {
     $userId = $pdo->lastInsertId();
 
     if ($isDriver) {
-        $userFolder = '../back/uploads/' . $username;
-        if (!is_dir($userFolder)) {
-            mkdir($userFolder, 0777, true);
-            file_put_contents($userFolder . '/.htaccess', "Order Deny,Allow\nDeny from all");
-        }
-
-        $fileName = uniqid('permit_') . '.jpg';
-        $filePath = $userFolder . '/' . $fileName;
-
-        if (!move_uploaded_file($_FILES['permit']['tmp_name'], $filePath)) {
-            throw new Exception("Erreur lors du téléchargement du permis.");
-        }
-
-        $insertDoc = $pdo->prepare("INSERT INTO documents (user_id, type, file_path) VALUES (:userId, :type, :filePath)");
-        $insertDoc->execute([
-            ':userId' => $userId,
-            ':type' => 'permit',
-            ':filePath' => $filePath
-        ]);
+        uploadImage(
+            $pdo,                               // Connexion PDO
+            $userId,                           // ID utilisateur
+          
+            $_FILES['permit'],                // Image envoyée
+            'documents',                     // Dossier: /uploads/[pseudo]/documents
+            '../front/user/register.php',   // Redirection en cas d'erreur 
+                
+        );
     }
 
     $subject = "Confirmation de votre inscription - EcoRide";

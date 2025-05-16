@@ -78,6 +78,9 @@
 
         <!-- Champ caché pour recevoir le token reCAPTCHA -->
         <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+        
+        <!-- input caché pour capture d erreurs  -->
+        <input type="hidden" id="errorMessage" name="errorMessage">
 
         <button type="submit">S'inscrire</button>
       </form>
