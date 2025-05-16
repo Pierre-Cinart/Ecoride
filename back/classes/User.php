@@ -17,10 +17,10 @@ abstract class User {
     protected int $credits;
     protected string $status;
     protected int $userWarnings;
-
-    protected ?string $birthdate;        // Date de naissance (YYYY-MM-DD)
-    protected ?string $gender;           // Sexe : 'male' ou 'female'
-    protected ?string $profilPicture;    // Chemin de la photo de profil
+    protected string $permitStatus;
+    protected ?string $birthdate;        
+    protected ?string $gender;           
+    protected ?string $profilPicture;   
 
     // === CONSTRUCTEUR ===
 
@@ -112,7 +112,7 @@ abstract class User {
 
     public function updateUserSession(PDO $pdo): void {
         try {
-            $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits, birthdate, gender, profil_picture FROM users WHERE id = :id LIMIT 1");
+            $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits, birthdate, gender, profil_picture , permit_status FROM users WHERE id = :id LIMIT 1");
             $stmt->execute([':id' => $this->id]);
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
 

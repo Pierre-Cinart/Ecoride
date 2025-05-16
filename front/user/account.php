@@ -1,26 +1,36 @@
 <?php
-// === Initialisation et sécurité ===
-require_once '../../back/composants/autoload.php';
-$_SESSION['navSelected'] = 'account';
-checkAccess(['SimpleUser', 'Driver']);
+  // === Initialisation et sécurité ===
+  require_once '../../back/composants/autoload.php';
+  $_SESSION['navSelected'] = 'account';
+  checkAccess(['SimpleUser', 'Driver']);
 
-$user = $_SESSION['user'];
-$user->updateUserSession($pdo);
+  //assigne l objet User en session
+  $user = $_SESSION['user'];
+  //met à jour les données du User //fonction à améliorer pour recevoir avant d envoyer
+  $user->updateUserSession($pdo);
 
-$pseudo = $user->getPseudo();
-$credits = $user->getCredits();
-$status = $user->getStatus();
+  //recupération  d informations User
+  $pseudo = $user->getPseudo();
+  $credits = $user->getCredits();
+  $status = $user->getStatus();
+  $permitStatus = $user->getPermitStatus();
 
-$vehicleObjects = [];
-if ($user instanceof Driver) {
-  foreach ($user->getVehicles() as $vehicleId) {
-    try {
-      $vehicleObjects[] = new Vehicle($pdo, $vehicleId);
-    } catch (Exception $e) {
-      continue;
+  //tableau pour la liste de véhicules
+  $vehicleObjects = [];
+  //injecte les véhicules dans le tableau si ses documents ont étaient vérifiés
+  if ($user instanceof Driver) {
+    foreach ($user->getVehicles() as $vehicleId) {
+      try {
+        $veh = new Vehicle($pdo, $vehicleId);
+        if ($veh->getDocumentsStatus() === "approved") {
+          $vehicleObjects[] = $veh;
+        }
+      } catch (Exception $e) {
+        continue;
+      }
     }
   }
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -45,16 +55,37 @@ if ($user instanceof Driver) {
   <div class="account-container">
     <!-- === Informations utilisateur === -->
     <div class="header-info">
-      <div><strong>Connecté en tant que :</strong> <?= htmlspecialchars($pseudo) ?></div>
+      <div><strong>Connecté en tant que :</strong> <?= htmlspecialchars($pseudo) ?> &nbsp;&nbsp;</div>
       <div class="credit">
-        <strong>Crédits :</strong> <?= $credits ?>
-        <img src="../img/ico/coins.png" alt="Pièces" class="coin-icon">
+       <strong>Crédits :</strong> <?= $credits ?>
+        <img src="../img/ico/coins.png" alt="Pièces" class="coin-icon"><br> 
         <?php if ($user instanceof Driver): ?>
           &nbsp;&nbsp; <strong>Note :</strong> <?= number_format($user->getAverageRating(), 1) ?> / 5
-          &nbsp;&nbsp; <strong>Statut permis :</strong> <span style="color: green; font-weight:bold;">✔ Vérifié</span>
         <?php endif; ?>
-      </div>
+        <!-- affiche l ' état de validation du permis  -->
+        <?php if ($permitStatus != "waiting"):?>
+            <strong>Verification du permis :</strong>
+          <?php
+            $permitStatus = $user->getPermitStatus();
+            $color = match ($permitStatus) {
+              'approved' => 'green',
+              'pending' => 'orange',
+              'refused' => 'red',
+              default => 'gray'
+            };
+            $label = match ($permitStatus) {
+              'approved' => '✔ Vérifié',
+              'pending' => '⏳ En attente',
+              'refused' => '❌ Refusé',
+              default => 'Non défini'
+            };
+          ?>
+        <span style="color: <?= $color ?>; font-weight:bold;"><?= $label ?></span>
+        <?php endif; ?>
 
+        
+      </div>
+      <!-- alertes avertissements et blocages -->
       <?php if ($status === 'blocked' || $status === 'all_blocked'): ?>
         <div class="red-alert">
           Votre compte ne permet plus de réserver de trajets <br>
@@ -71,7 +102,7 @@ if ($user instanceof Driver) {
     </div>
 
     <!-- === Section conducteur non inscrit === -->
-    <?php if ($user instanceof SimpleUser && !$user instanceof Driver): ?>
+    <?php if ($user instanceof SimpleUser && $permitStatus === "waiting"): ?>
       <div class="section">
         <h4>Devenir conducteur</h4>
         <p>Vous souhaitez proposer des trajets ?</p>
@@ -146,16 +177,18 @@ if ($user instanceof Driver) {
 
       <button onclick="location.href='./showMyTrips.php'">Mes trajets réservés</button>
       <button onclick="location.href='../user/tripsStory.php'">Historique des voyages / gestion des avis</button>
-      <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
+      <?php if ($status != 'blocked'):?>
+        <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
+      <?php endif; ?>
       <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
 
       <?php if ($user instanceof Driver): ?>
-        <?php if ($status != 'drive_blocked' && $status != 'all_blocked'): ?>
+        <?php if ($status != 'drive_blocked' && $status != 'all_blocked' && $permitStatus === "approved"): ?>
           <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
         <?php endif; ?>
         <button onclick="location.href='avisRecus.php'">Mes avis reçus</button>
-        <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
       <?php endif; ?>
+      <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
     </div>
   </div>
 

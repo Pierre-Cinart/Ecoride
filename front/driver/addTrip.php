@@ -2,9 +2,32 @@
 require_once '../../back/composants/autoload.php';
 require_once '../../back/config/configORS.php'; // Clé ORS : $OPEN_ROUTE_KEY
 checkAccess(['Driver']);
+
 $_SESSION['navSelected'] = 'offer';
 
 $user = $_SESSION['user'];
+$status = $user->getStatus();
+
+if ($status === 'driver_blocked' || $status ==='all_blocked'  || !$user instanceof Driver ){
+  $_SESSION['error'] = "impossible de proposer un trajet";
+  header("location: ../user/account.php");
+  exit;
+}
+
+// Liste des véhicules approuvés
+$vehicleObjects = [];
+if ($user instanceof Driver) {
+  foreach ($user->getVehicles() as $vehicleId) {
+    try {
+      $veh = new Vehicle($pdo, $vehicleId);
+      if ($veh->getDocumentsStatus() === "approved") {
+        $vehicleObjects[] = $veh;
+      }
+    } catch (Exception $e) {
+      continue;
+    }
+  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,39 +59,57 @@ $user = $_SESSION['user'];
       <h2>Proposer un trajet</h2>
       <p>Les trajets proposés vous coûteront <strong>2 crédits</strong>. Assurez-vous d’avoir un véhicule vérifié et les crédits nécessaires.</p>
 
-      <form method="post" action="confirmAjoutTrajet.php" enctype="multipart/form-data" id="offerTripForm">
-        <label for="departure_city">Ville de départ :</label>
-        <input type="text" id="depart" name="depart" list="depart-list" required>
+      <form method="post" action="../../back/confirmProposeTrip.php" id="offerTripForm">
+
+        <!-- Ville de départ -->
+        <label for="depart">Ville de départ :</label>
+        <input type="text" id="depart" name="departure_city" list="depart-list" required>
         <datalist id="depart-list"></datalist>
 
-        <label for="arrival_city">Ville d’arrivée :</label>
-        <input type="text" id="arrivee" name="arrivee" list="arrivee-list" required>
+        <!-- Adresse de départ -->
+        <label for="departure_address">Adresse précise de départ :</label>
+        <input type="text" id="departure_address" name="departure_address" required placeholder="Ex : 10 rue de la Paix">
+
+        <!-- Ville d'arrivée -->
+        <label for="arrivee">Ville d’arrivée :</label>
+        <input type="text" id="arrivee" name="arrival_city" list="arrivee-list" required>
         <datalist id="arrivee-list"></datalist>
 
+        <!-- Adresse d'arrivée -->
+        <label for="arrival_address">Adresse précise d’arrivée :</label>
+        <input type="text" id="arrival_address" name="arrival_address" required placeholder="Ex : 25 avenue du Général de Gaulle">
+
+        <!-- Date -->
         <label for="date">Date du trajet :</label>
         <input type="date" id="date" name="departure_date" min="<?= date('Y-m-d') ?>" required>
 
+        <!-- Heure -->
         <label for="time">Heure de départ :</label>
         <input type="time" id="time" name="departure_time" required>
 
+        <!-- Véhicule -->
         <label for="vehicle">Véhicule utilisé :</label>
         <select id="vehicle" name="vehicle_id" required>
           <option value="">-- Choisir un véhicule --</option>
-          <?php foreach ($user->getVehicles() as $vehicleId): ?>
-            <?php $veh = new Vehicle($pdo, $vehicleId); ?>
-            <option value="<?= $veh->getId() ?>"><?= $veh->getDisplayName() ?> (<?= $veh->getRegistrationNumber() ?>)</option>
+          <?php foreach ($vehicleObjects as $veh): ?>
+            <option value="<?= $veh->getId() ?>">
+              <?= htmlspecialchars($veh->getDisplayName()) ?> (<?= htmlspecialchars($veh->getRegistrationNumber()) ?>)
+            </option>
           <?php endforeach; ?>
         </select>
 
+        <!-- Places -->
         <label for="places">Nombre de places disponibles :</label>
         <input type="number" id="places" name="available_seats" min="1" max="6" required>
 
+        <!-- Prix -->
         <label for="price">Prix du trajet (en crédits) :</label>
         <input type="number" id="price" name="price" min="0" step="1" required>
 
+        <!-- Durée estimée -->
         <div id="duration-section">
           <label for="estimated_duration">Durée estimée (minutes) :</label>
-          <input type="number" id="estimated_duration" name="estimated_duration" readonly>
+          <input type="number" id="estimated_duration" name="estimated_duration" >
           <button type="button" id="calculateDuration">Calculer le temps de trajet</button>
         </div>
 
