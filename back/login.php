@@ -1,13 +1,13 @@
 <?php
 // Chargement des composants nécessaires
-// Chargement des composants nécessaires
-require_once __DIR__ .'../composants/loadClasses.php'; // classes
-require_once __DIR__ . '../composants/db_connect.php'; // connection bdd
-require_once __DIR__ . '../composants/JWT.php'; //jwt
-require_once __DIR__ . '../composants/checkAccess.php'; //control d accés
-require_once __DIR__ . '../composants/sanitizeArray.php'; // nettoyage des données
-require_once __DIR__ . '../composants/captcha.php'; // googleRecaptcha
-require_once __DIR__ . '../composants/antiflood.php';  // protection brute force 
+require_once __DIR__ . '/composants/loadClasses.php'; // classes
+require_once __DIR__ . '/composants/db_connect.php'; // connexion bdd
+require_once __DIR__ . '/composants/JWT.php'; // JWT
+require_once __DIR__ . '/composants/checkAccess.php'; // contrôle d'accès
+require_once __DIR__ . '/composants/sanitizeArray.php'; // nettoyage des données
+require_once __DIR__ . '/composants/captcha.php'; // Google Recaptcha
+require_once __DIR__ . '/composants/antiflood.php';  // protection brute force 
+
 session_start();
 
 // Vérifie que le formulaire est soumis par POST
