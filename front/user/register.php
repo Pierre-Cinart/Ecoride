@@ -34,24 +34,47 @@
     <div class="form-container" >
       <h2>Créer un compte</h2>
       <form action="../../back/register.php" method="post" enctype="multipart/form-data">
+        <!-- prénom-->
         <label for="first-name">Prénom :</label>
         <input type="text" id="first-name" name="first-name" required>
 
+        <!-- nom-->
         <label for="name">Nom :</label>
         <input type="text" id="name" name="name" required>
 
-        <label for="name">Pseudo :</label>
+        <!-- Date de naissance -->
+        <label for="birthdate">Date de naissance :</label>
+        <input type="date" id="birthdate" name="birthdate" required>
+
+        <!-- Sexe -->
+        <label>Sexe :</label>
+        <div class="gender-options">
+          <label>
+            <input type="radio" name="gender" id="gender-male" value="male" required>
+            Homme
+          </label>
+          <label>
+            <input type="radio" name="gender" id="gender-female" value="female">
+            Femme
+          </label>
+        </div>
+
+        <!-- pseudo-->
+        <label for="pseudo">Pseudo :</label>
         <input type="text" id="pseudo" name="pseudo" >
 
+        <!-- mail -->
         <label for="email">Adresse email :</label>
         <input type="email" id="email" name="email" required>
 
         <label for="confirm-email">Confirmer email :</label>
         <input type="email" id="confirm-email" name="confirm-email" required>
 
+        <!-- téléphone -->
         <label for="phone">Numéro de téléphone :</label>
         <input type="tel" id="phone" name="phone" required>
 
+        <!-- mot de passe -->
         <label for="password">Mot de passe :</label>
         <input type="password" id="password" name="password" required>
 
@@ -76,9 +99,9 @@
           J’accepte les <a href="mentionsLegales.php" target="_blank">mentions légales</a>
         </label>
 
-        <!-- Champ caché pour recevoir le token reCAPTCHA -->
+        <!-- input caché pour recevoir le token reCAPTCHA -->
         <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
-        
+
         <!-- input caché pour capture d erreurs  -->
         <input type="hidden" id="errorMessage" name="errorMessage">
 

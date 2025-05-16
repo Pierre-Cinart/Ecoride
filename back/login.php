@@ -1,38 +1,36 @@
 <?php
 // Chargement des composants nécessaires
-require_once __DIR__ . '/composants/loadClasses.php'; // classes
-require_once __DIR__ . '/composants/db_connect.php'; // connexion bdd
-require_once __DIR__ . '/composants/JWT.php'; // JWT
-require_once __DIR__ . '/composants/checkAccess.php'; // contrôle d'accès
-require_once __DIR__ . '/composants/sanitizeArray.php'; // nettoyage des données
-require_once __DIR__ . '/composants/captcha.php'; // Google Recaptcha
-require_once __DIR__ . '/composants/antiflood.php';  // protection brute force 
+require_once __DIR__ . '/composants/loadClasses.php';
+require_once __DIR__ . '/composants/db_connect.php';
+require_once __DIR__ . '/composants/JWT.php';
+require_once __DIR__ . '/composants/checkAccess.php';
+require_once __DIR__ . '/composants/sanitizeArray.php';
+require_once __DIR__ . '/composants/captcha.php';
+require_once __DIR__ . '/composants/antiflood.php';
 
 session_start();
 
-// Vérifie que le formulaire est soumis par POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = "Méthode non autorisée.";
     header('Location: ../front/user/login.php');
     exit();
 }
 
-// Vérification Google Captcha
+// Captcha
 verifyCaptcha('login', '../front/user/login.php');
 
-// Anti-flood : 3 tentatives max en 60 secondes, sinon blocage pendant 1h
+// Anti-flood
 if (!checkFlood('login', 3, 60, 3600)) {
     $_SESSION['error'] = "Trop de tentatives. Veuillez patienter une heure.";
     header('Location: ../front/user/login.php');
     exit();
 }
 
-// Nettoyage des données entrantes
+// Nettoyage
 $_POST = sanitizeArray($_POST, '../front/user/login.php');
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Vérifie que tous les champs sont remplis
 if (empty($email) || empty($password)) {
     $_SESSION['error'] = "Veuillez remplir tous les champs.";
     header('Location: ../front/user/login.php');
@@ -40,19 +38,16 @@ if (empty($email) || empty($password)) {
 }
 
 try {
-    // Récupère l’utilisateur
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
     $stmt->execute([':email' => $email]);
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Vérifie l’existence et le mot de passe
     if (!$data || !password_verify($password, $data['password'])) {
         $_SESSION['error'] = "Identifiants incorrects.";
         header('Location: ../front/user/login.php');
         exit();
     }
 
-    // Vérifie si l'email est confirmé
     if (!$data['is_verified_email']) {
         $_SESSION['error'] = "Votre adresse email n’a pas été confirmée.";
         $_SESSION['email_to_verify'] = $data['email'];
@@ -60,14 +55,11 @@ try {
         exit();
     }
 
-    // Connexion validée : reset anti-flood
     clearFlood('login');
-
-    // Création et enregistrement du token JWT
     $jwtToken = createToken();
     updateToken($pdo, $jwtToken, $data['id']);
 
-    // Préparation des arguments communs pour toutes les classes
+    // Données communes à tous
     $args = [
         $data['id'],
         $data['pseudo'],
@@ -78,10 +70,14 @@ try {
         $data['role'],
         (int) $data['credits'],
         $data['status'],
-        (int) $data['user_warnings']
+        (int) $data['user_warnings'],
+        $data['permit_status'],
+        $data['birthdate'],
+        $data['gender'],
+        $data['profil_picture']
     ];
 
-    // Création de l’objet utilisateur selon le rôle
+    // Création selon le rôle
     switch ($data['role']) {
         case 'user':
             $user = new SimpleUser(...$args);
@@ -110,7 +106,7 @@ try {
             $stmt->execute([':id' => $data['id']]);
             $vehicles = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
 
-            // Moyenne des notes
+            // Moyenne notes
             $stmt = $pdo->prepare("
                 SELECT AVG(rating) AS average
                 FROM ratings
@@ -120,13 +116,15 @@ try {
             ");
             $stmt->execute([':id' => $data['id']]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $averageRating = isset($result['average']) ? (float) $result['average'] : 0.0;
+            $averageRating = isset($result['average']) ? (float)$result['average'] : 0.0;
 
             // Avertissements conducteur
-            $driverWarnings = isset($data['driver_warnings']) ? (int) $data['driver_warnings'] : 0;
+            $driverWarnings = isset($data['driver_warnings']) ? (int)$data['driver_warnings'] : 0;
 
-            // Création de l'objet Driver
+            // Objet Driver
             $user = new Driver(...array_merge($args, [
+                $data['permit_picture'],
+                $data['permit_status'],
                 $preferences,
                 $vehicles,
                 $averageRating,
@@ -138,11 +136,10 @@ try {
             throw new Exception("Rôle inconnu : " . $data['role']);
     }
 
-    // Injection de l’objet utilisateur et du token en session
+    // Session
     $_SESSION['user'] = $user;
     $_SESSION['jwt'] = $jwtToken;
     $_SESSION['success'] = "Connexion réussie. Bienvenue " . $user->getPseudo() . " !";
-
     header('Location: ../front/user/home.php');
     exit();
 
