@@ -22,9 +22,9 @@
     foreach ($user->getVehicles() as $vehicleId) {
       try {
         $veh = new Vehicle($pdo, $vehicleId);
-        if ($veh->getDocumentsStatus() === "approved") {
+      
           $vehicleObjects[] = $veh;
-        }
+        
       } catch (Exception $e) {
         continue;
       }
@@ -161,13 +161,32 @@
 
             <div style="margin-top: 10px;">
               <button type="button" onclick="ajaxDeleteVehicle()" id="btnDeleteVehicle" class="delete-vehicle red hidden">🗑 Supprimer le véhicule</button>
-              <button type="button" onclick="location.href='../driver/updateCar.php'" id="btnUpdateDocuments" class="delete-vehicle blue hidden">Mettre à jour les documents</button>
+              <button type="button" id="btnUpdateDocuments" class="delete-vehicle blue hidden">Mettre à jour les documents</button>
               <button type="button" onclick="location.href='../driver/addCar.php'">➕ Ajouter un véhicule</button>
             </div>
           </form>
         </div>
       <?php endif; ?>
     <?php endif; ?>
+    <!-- upload des documents -->
+    <div id="edit-documents-block" class="document-update hidden">
+        <h3>Modifier les documents du véhicule</h3>
+        <form method="POST" action="/back/updateDocuments.php" enctype="multipart/form-data">
+          <input type="hidden" name="vehicle_id" id="vehicle_id_input">
+
+          <div class="form-group">
+            <label for="registration_document">Carte grise :</label>
+            <input type="file" name="registration_document" id="registration_document" accept=".pdf,.jpg,.jpeg,.png,.webp">
+          </div>
+
+          <div class="form-group">
+            <label for="insurance_document">Assurance :</label>
+            <input type="file" name="insurance_document" id="insurance_document" accept=".jpg,.jpeg,.png,.webp">
+          </div>
+
+          <button type="submit" id = "btnSendDocuments" class = "green" >Mettre à jour les documents</button>
+        </form>
+    </div>
 
     <!-- === Actions générales === -->
     <div class="button-group">

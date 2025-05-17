@@ -1,6 +1,6 @@
 <?php
 require_once 'SimpleUser.php';
-
+require_once __DIR__ . '/../composants/phpMailer/src/SendMail.php';
 /**
  * Classe Driver
  * Représente un conducteur (hérite de SimpleUser)
@@ -83,28 +83,22 @@ class Driver extends SimpleUser {
         return $this->driverWarnings;
     }
 
+
     /**
-     * Supprime un véhicule appartenant au conducteur et met à jour la session.
+     * Supprime un véhicule appartenant au conducteur via l'objet Vehicle
+     *
+     * @param PDO $pdo Connexion à la base
+     * @param int $vehicleId ID du véhicule à supprimer
+     * @throws Exception si le véhicule n'existe pas ou ne lui appartient pas
      */
-    public function deleteVehicule(PDO $pdo, int $vehicleId): void {
-        $stmt = $pdo->prepare("SELECT id FROM vehicles WHERE id = :vehicle_id AND user_id = :user_id");
-        $stmt->execute([
-            ':vehicle_id' => $vehicleId,
-            ':user_id' => $this->id
-        ]);
+    public function deleteVehicle(PDO $pdo, int $vehicleId): void {
+        // Instanciation du véhicule (lève une exception si l'ID est invalide)
+        $vehicle = new Vehicle($pdo, $vehicleId);
 
-        if ($stmt->rowCount() === 0) {
-            throw new Exception("Ce véhicule n'existe pas ou ne vous appartient pas.");
-        }
-
-        $deleteStmt = $pdo->prepare("DELETE FROM vehicles WHERE id = :id");
-        if (!$deleteStmt->execute([':id' => $vehicleId])) {
-            throw new Exception("Échec de la suppression du véhicule.");
-        }
-
-        $_SESSION['sucess'] = 'Votre véhicule a bien été retiré de votre liste.';
-        $this->updateUserSession($pdo);
+        // Appel à sa méthode deleteSelf avec l'ID du driver courant
+        $vehicle->deleteSelf($pdo, $this->id);
     }
+
 
     /**
      * Met à jour les données du conducteur et rafraîchit la session.
@@ -155,143 +149,77 @@ class Driver extends SimpleUser {
 
 
     /**
-     * Annule un voyage appartenant au conducteur (avec gestion des passagers et avertissements).
+     * Annule un trajet proposé par le conducteur :
+     * - Rembourse les passagers
+     * - Envoie un email de notification
+     * - Supprime les participations et le trajet
+     *
+     * @param PDO $pdo Connexion PDO
+     * @param int $tripId ID du trajet à annuler
+     * @throws Exception Si le trajet ne lui appartient pas ou autre erreur SQL
      */
     public function cancelOwnTrip(PDO $pdo, int $tripId): void {
-        // Vérification de la propriété du voyage
-        $stmt = $pdo->prepare("SELECT id FROM trips WHERE id = :trip_id AND driver_id = :driver_id");
+        // 1. Vérifie que le trajet appartient bien au conducteur
+        $stmt = $pdo->prepare("SELECT * FROM trips WHERE id = :id AND driver_id = :driver_id");
         $stmt->execute([
-            ':trip_id' => $tripId,
+            ':id' => $tripId,
             ':driver_id' => $this->id
         ]);
         $trip = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if (!$trip) {
-            throw new Exception("Ce voyage n'existe pas ou ne vous appartient pas.");
+            throw new Exception("Ce trajet ne vous appartient pas ou n'existe pas.");
         }
 
-        // Récupération des passagers
+        // 2. Récupère les participants avec les infos nécessaires
         $stmt = $pdo->prepare("
-            SELECT users.id AS user_id, users.email, users.pseudo, participants.credits_used
-            FROM trip_participants AS participants
-            JOIN users ON participants.user_id = users.id
-            WHERE participants.trip_id = :trip_id AND participants.confirmed = 1
+            SELECT u.id, u.first_name, u.email, tp.credits_used, t.departure_city, t.arrival_city, t.departure_date
+            FROM trip_participants tp
+            JOIN users u ON u.id = tp.user_id
+            JOIN trips t ON t.id = tp.trip_id
+            WHERE tp.trip_id = :trip_id
         ");
         $stmt->execute([':trip_id' => $tripId]);
-        $passengers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($passengers as $passenger) {
-            // Remboursement
-            $pdo->prepare("UPDATE users SET credits = credits + :credits WHERE id = :id")
-                ->execute([
-                    ':credits' => (int)$passenger['credits_used'],
-                    ':id' => $passenger['user_id']
+        // 3. Rembourse chaque passager et envoie un mail
+        foreach ($participants as $p) {
+            $passengerId = (int) $p['id'];
+            $refundAmount = (int) $p['credits_used'];
+            $email = $p['email'];
+            $firstName = htmlspecialchars($p['first_name']);
+
+            if ($refundAmount > 0) {
+                $refundStmt = $pdo->prepare("UPDATE users SET credits = credits + :refund WHERE id = :id");
+                $refundStmt->execute([
+                    ':refund' => $refundAmount,
+                    ':id' => $passengerId
                 ]);
+            }
 
-            // Mail passager
-            SendMail(
-                $passenger['email'],
-                "Votre voyage a été annulé",
-                "Bonjour {$passenger['pseudo']},<br><br>
-                Le voyage auquel vous étiez inscrit a été annulé.<br>
-                Vous avez été remboursé de {$passenger['credits_used']} crédits.<br><br>
-                Merci pour votre compréhension.<br><br>
-                L'équipe EcoRide"
-            );
+            // Envoie l’email (✔️ avec les bons paramètres)
+            $subject = "Annulation de votre réservation EcoRide";
+            $body = "Bonjour $firstName,<br><br>"
+                . "Le trajet que vous aviez réservé de <strong>{$p['departure_city']}</strong> à <strong>{$p['arrival_city']}</strong> "
+                . "prévu le <strong>{$p['departure_date']}</strong> a été annulé.<br><br>"
+                . "Vous avez été automatiquement remboursé(e) de <strong>{$refundAmount} crédits</strong> sur votre compte.<br><br>"
+                . "Nous vous prions de nous excuser pour ce désagrément.<br><br>"
+                . "L'équipe EcoRide.";
+
+            // ✅ Appel corrigé de SendMail (avec le prénom en 2e paramètre)
+            SendMail($email, $firstName, $subject, $body);
         }
 
-        if (!empty($passengers)) {
-            // Avertissement conducteur
-            $pdo->prepare("UPDATE users SET driver_warnings = driver_warnings + 1 WHERE id = :id")
-                ->execute([':id' => $this->id]);
+        // 4. Supprime les participations au trajet
+        $stmt = $pdo->prepare("DELETE FROM trip_participants WHERE trip_id = :trip_id");
+        $stmt->execute([':trip_id' => $tripId]);
 
-            SendMail(
-                $this->email,
-                "Annulation avec impact",
-                "Bonjour {$this->getFirstName()},<br><br>
-                Vous avez annulé un voyage comportant des passagers confirmés.<br>
-                Cela vous a généré un avertissement.<br><br>
-                Merci d'éviter les annulations de dernière minute.<br><br>
-                L'équipe EcoRide"
-            );
-        }
-
-        // Suppression des participations et du voyage
-        $pdo->prepare("DELETE FROM trip_participants WHERE trip_id = :trip_id")
-            ->execute([':trip_id' => $tripId]);
-        $pdo->prepare("DELETE FROM trips WHERE id = :trip_id")
-            ->execute([':trip_id' => $tripId]);
+        // 5. Supprime le trajet lui-même
+        $stmt = $pdo->prepare("DELETE FROM trips WHERE id = :trip_id");
+        $stmt->execute([':trip_id' => $tripId]);
     }
 
-    /**
-     * Permet au conducteur de proposer un nouveau trajet.
-     */
-    public function proposeTrip(PDO $pdo, array $tripData): void {
-        // Vérification : permis validé
-        if ($this->getPermitStatus() !== 'approved') {
-            throw new Exception("Votre permis n'est pas encore validé.");
-        }
-        //vérifcation des credits >= 2
-        if ($this->getCredits() < 2) {
-            throw new Exception("Vous n avez pas assez de crédits , veillez recharger votre compte");
-        }
-        // Vérification : statut autorisé
-        if (in_array($this->getStatus(), ['drive_blocked', 'all_blocked', 'banned'])) {
-            throw new Exception("Votre statut actuel ne vous permet pas de proposer un trajet.");
-        }
 
-        // Vérification : véhicule appartenant au conducteur
-        $stmt = $pdo->prepare("SELECT fuel_type, seats, documents_status FROM vehicles WHERE id = :vehicle_id AND user_id = :user_id");
-        $stmt->execute([
-            ':vehicle_id' => $tripData['vehicle_id'],
-            ':user_id' => $this->id
-        ]);
-        $vehicle = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$vehicle) {
-            throw new Exception("Ce véhicule ne vous appartient pas.");
-        }
-
-        if ($vehicle['documents_status'] !== 'approved') {
-            throw new Exception("Les documents du véhicule ne sont pas validés.");
-        }
-
-        // Déterminer si le trajet est écologique
-        $isEcological = $vehicle->isEcological() ? 1 : 0;
-
-        // Vérification de la cohérence des places
-        if ($tripData['available_seats'] >= $vehicle['seats']) {
-            throw new Exception("Le nombre de places disponibles ne peut pas être supérieur au nombre de sièges du véhicule.");
-        }
-
-        // Insertion du trajet
-        $stmt = $pdo->prepare("
-            INSERT INTO trips (
-                driver_id, vehicle_id, departure_city, departure_address,
-                arrival_city, arrival_address, departure_date, departure_time,
-                price, is_ecological, available_seats, status, estimated_duration
-            ) VALUES (
-                :driver_id, :vehicle_id, :departure_city, :departure_address,
-                :arrival_city, :arrival_address, :departure_date, :departure_time,
-                :price, :is_ecological, :available_seats, 'planned', :estimated_duration
-            )
-        ");
-
-        $stmt->execute([
-            ':driver_id' => $this->id,
-            ':vehicle_id' => $tripData['vehicle_id'],
-            ':departure_city' => $tripData['departure_city'],
-            ':departure_address' => $tripData['departure_address'],
-            ':arrival_city' => $tripData['arrival_city'],
-            ':arrival_address' => $tripData['arrival_address'],
-            ':departure_date' => $tripData['departure_date'],
-            ':departure_time' => $tripData['departure_time'],
-            ':price' => $tripData['price'],
-            ':is_ecological' => $isEcological,
-            ':available_seats' => $tripData['available_seats'],
-            ':estimated_duration' => $tripData['estimated_duration'] ?? null
-        ]);
-
-        $_SESSION['sucess'] = "Votre trajet a été proposé avec succès.";
-    }
 
 }

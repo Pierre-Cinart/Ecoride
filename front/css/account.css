@@ -66,3 +66,31 @@
     cursor: pointer;
     font-weight: bold;
   }
+
+  #edit-documents-block {
+    position: relative;
+    margin-top: 20px;
+    padding: 15px;
+    border: 2px solid #3A7D44;
+    background-color: #f0fff0;
+    border-radius: 10px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+#edit-documents-block .form-group {
+  margin-bottom: 15px;
+}
+
+#btnSendDocuments {
+  max-width: 200px;
+  padding: 10px 20px;
+  position: absolute;
+  right: 20px;
+}
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

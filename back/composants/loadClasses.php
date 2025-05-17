@@ -5,5 +5,5 @@
     require_once __DIR__ . '/../classes/Driver.php';
     require_once __DIR__ . '/../classes/Employee.php';
     require_once __DIR__ . '/../classes/Admin.php';
-    require_once __DIR__ . '/../classes/Vehicule.php';
+    require_once __DIR__ . '/../classes/Vehicle.php';
 ?>
