@@ -14,12 +14,22 @@ function checkAccess(array $allowedClasses): void {
     }
 
     // === Vérification : utilisateur connecté ? ===
-    if (!isset($_SESSION['user'])) {
+    if (!isset($_SESSION['user']) || !$_SESSION['user'] instanceOf User ) {
         $_SESSION['error'] = "Accès interdit. Veuillez vous connecter.";
         redirectToHome();
     }
 
     $user = $_SESSION['user'];
+    // verification de bannissement
+    if ( $user->getStatus() === 'banned'){
+        session_unset(); // Supprime toutes les variables de session
+        session_destroy(); // Détruit complètement la session
+
+        session_start(); // Redémarre une session propre pour définir le message
+        $_SESSION['error'] = "Ce compte à était bannit de nos services.Pour toute informations supplémentaires contactez l ' équipe via le formulaire de la page contact";
+        header('Location: ../user/login.php');
+        exit;
+    }
 
     // === Vérification : utilisateur banni ? ===
     if (method_exists($user, 'getStatus') && $user->getStatus() === 'banned') {
@@ -31,7 +41,7 @@ function checkAccess(array $allowedClasses): void {
     // === Vérification : classe utilisateur autorisée ? ===
     foreach ($allowedClasses as $class) {
         if ($user instanceof $class) {
-            return; // ✅ Accès autorisé
+            return; // Accès autorisé
         }
     }
 

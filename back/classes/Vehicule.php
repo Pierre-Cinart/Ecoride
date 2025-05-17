@@ -48,7 +48,12 @@ class Vehicle {
     public function getId(): int {
         return $this->id;
     }
-
+    /**
+     * Retourne l’ID du véhicule
+     */
+    public function getOwner(): int {
+        return $this->owner;
+    }
     /**
      * Retourne la marque (ex: Renault)
      */
@@ -124,5 +129,12 @@ class Vehicle {
     public function getDisplayName(): string {
         return "{$this->brand} {$this->model} - {$this->seats} places";
     }
+    /**
+     * Retourne true si le vehicule est écologique
+     */
+    public function isEcological(): bool {
+    return in_array(strtolower($this->fuelType), ['electric', 'hybrid']);
+}
+
 
 }

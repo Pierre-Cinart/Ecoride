@@ -230,7 +230,10 @@ class Driver extends SimpleUser {
         if ($this->getPermitStatus() !== 'approved') {
             throw new Exception("Votre permis n'est pas encore validé.");
         }
-
+        //vérifcation des credits >= 2
+        if ($this->getCredits() < 2) {
+            throw new Exception("Vous n avez pas assez de crédits , veillez recharger votre compte");
+        }
         // Vérification : statut autorisé
         if (in_array($this->getStatus(), ['drive_blocked', 'all_blocked', 'banned'])) {
             throw new Exception("Votre statut actuel ne vous permet pas de proposer un trajet.");
@@ -253,7 +256,7 @@ class Driver extends SimpleUser {
         }
 
         // Déterminer si le trajet est écologique
-        $isEcological = in_array($vehicle['fuel_type'], ['electric', 'hybrid']) ? 1 : 0;
+        $isEcological = $vehicle->isEcological() ? 1 : 0;
 
         // Vérification de la cohérence des places
         if ($tripData['available_seats'] >= $vehicle['seats']) {
