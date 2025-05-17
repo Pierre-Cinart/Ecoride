@@ -39,7 +39,7 @@ function sendMail($toEmail, $toName, $subject, $body, $useLocalSMTP = true) {
         $mail->addAddress($toEmail, $toName);
 
         $mail->isHTML(true);
-        $mail->Subject = $subject;
+        $mail->Subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
         $mail->Body    = $body;
 
         return $mail->send();

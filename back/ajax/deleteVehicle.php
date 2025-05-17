@@ -20,7 +20,7 @@ $user = $_SESSION['user'];
 try {
     // Exécute la suppression du véhicule via la méthode Driver
     $user->deleteVehicle($pdo, $vehicleId);
-
+    $_SESSION['success'] = "véhicule supprimé avec succé"; 
     // Succès
     exit("OK");
 

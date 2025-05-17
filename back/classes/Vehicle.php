@@ -1,6 +1,7 @@
 <?php
 // Composant pour convertir et enregistrer les images
 require_once __DIR__ . '/../composants/uploader.php';
+define('PROJECT_ROOT', dirname(__DIR__)); // remonte de 'classes' vers 'back'
 
 class Vehicle {
     private int $id;
@@ -51,9 +52,15 @@ class Vehicle {
     public function getModel(): string { return $this->model; }
     public function getSeats(): int { return $this->seats; }
     public function getDocumentsStatus(): string { return $this->documentsStatus; }
-    public function getRegistrationDocumentPath(): ?string { return $this->registrationDocument; }
-    public function getInsuranceDocumentPath(): ?string { return $this->insuranceDocument; }
-    public function getPicture(): ?string { return $this->picture; }
+   public function getRegistrationDocumentPath(): ?string {
+        return $this->registrationDocument ? PROJECT_ROOT . '/' . $this->registrationDocument : null;
+    }
+    public function getInsuranceDocumentPath(): ?string {
+        return $this->insuranceDocument ? PROJECT_ROOT . '/' . $this->insuranceDocument : null;
+    }
+    public function getPicture(): ?string {
+        return $this->picture ? PROJECT_ROOT . '/' . $this->picture : null;
+    }
     public function getRegistrationNumber(): string { return $this->registrationNumber; }
     public function getFuelType(): string { return $this->fuelType; }
     public function getFirstRegistrationDate(): string { return $this->firstRegistrationDate; }
@@ -155,28 +162,22 @@ class Vehicle {
             $stmt->execute([':vehicle_id' => $this->id]);
             $tripIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // 3. Vérification de la session utilisateur et annulation propre de chaque trajet
-            if (!isset($_SESSION['user']) || !$_SESSION['user'] instanceof Driver) {
-                throw new Exception("Utilisateur non valide ou non connecté.");
-            }
+            $driver = $_SESSION['user'];//pour utilisation des fonctions Driver connecté
 
-            /** @var Driver $driver */
-            $driver = $_SESSION['user'];
-
+            // suppression des voyages prévu avec ce vehicule
             foreach ($tripIds as $tripId) {
                 $driver->cancelOwnTrip($pdo, (int) $tripId);
             }
 
-            // 4. Suppression des fichiers liés s’ils existent
+           // Suppression des fichiers liés s’ils existent
             $paths = [
-                $this->registrationDocument,
-                $this->insuranceDocument,
-                property_exists($this, 'picture') ? $this->picture : null
+                $this->getRegistrationDocumentPath(),
+                $this->getInsuranceDocumentPath(),
+                $this->getPicture(),
             ];
-
             foreach ($paths as $path) {
                 if ($path && file_exists($path)) {
-                    @unlink($path); // Supprime silencieusement le fichier
+                    @unlink($path); // Supprime l image stockée sur le site
                 }
             }
 
