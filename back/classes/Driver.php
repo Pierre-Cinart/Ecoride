@@ -195,4 +195,64 @@ class Driver extends SimpleUser {
         $pdo->prepare("DELETE FROM trips WHERE id = :trip_id")
             ->execute([':trip_id' => $tripId]);
     }
+    /**
+     * Ajoute un véhicule à la base de données pour ce conducteur.
+     * Ne traite pas les documents dans l’insertion : ils seront traités après.
+     *
+     * @param PDO $pdo Connexion PDO
+     * @param array $post Données POST nettoyées (via sanitizeArray par exemple)
+     * @param array $files Données FILES du formulaire (photo, carte grise, assurance)
+     * @return void
+     * @throws Exception En cas d’erreur SQL ou logique
+     */
+    public function addVehicle(PDO $pdo, array $post, array $files): void {
+        // 1. Extraire les champs nécessaires
+        $brand     = $post['brand'];
+        $model     = $post['model'];
+        $fuelType  = $post['fuel_type'];
+        $seats     = (int)$post['seats'];
+        $color     = $post['color'] ?? 'non précisée';
+        $registrationNumber = $post['registration_number'] ?? 'non renseignée';
+        $firstRegistrationDate = $post['first_registration_date'] ?? date('Y-m-d');
+
+        // 2. Insertion du véhicule (documents et photo seront traités ensuite)
+        $stmt = $pdo->prepare("
+            INSERT INTO vehicles 
+            (user_id, brand, model, color, fuel_type, registration_number, first_registration_date, seats, documents_status) 
+            VALUES 
+            (:user_id, :brand, :model, :color, :fuel_type, :registration_number, :first_date, :seats, 'pending')
+        ");
+
+        $stmt->execute([
+            ':user_id' => $this->getId(),
+            ':brand'   => $brand,
+            ':model'   => $model,
+            ':color'   => $color,
+            ':fuel_type' => $fuelType,
+            ':registration_number' => $registrationNumber,
+            ':first_date' => $firstRegistrationDate,
+            ':seats' => $seats
+        ]);
+
+        // 3. Récupération de l’ID nouvellement créé
+        $vehicleId = (int)$pdo->lastInsertId();
+
+        // 4. Instancier l'objet Vehicle
+        $vehicle = new Vehicle($pdo, $vehicleId);
+
+        // 5. Upload des documents si fournis
+        if (!empty($files['registration_document']['tmp_name'])) {
+            $vehicle->uploadDocument('registration', $files['registration_document']);
+        }
+
+        if (!empty($files['insurance_document']['tmp_name'])) {
+            $vehicle->uploadDocument('insurance', $files['insurance_document']);
+        }
+
+        if (!empty($files['photo']['tmp_name'])) {
+            $vehicle->uploadDocument('picture', $files['photo']);
+        }
+
+    }
+
 }

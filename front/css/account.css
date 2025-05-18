@@ -1,80 +1,120 @@
 .account-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  }
-  .header-info {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
-  .credit img.coin-icon {
-    width: 24px;
-    vertical-align: middle;
-  }
-  .section {
-    margin-top: 1.5rem;
-  }
-  .button-group {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .button-group button {
-    padding: 0.8rem;
-    background-color: #60775D;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .button-group button:hover {
-    background-color: #4a5f48;
-  }
-  .preferences label {
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-  select {
-    padding: 0.5rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  .add-vehicle, .delete-vehicle {
-    margin-top: 0.5rem;
-    padding: 0.3rem 0.8rem;
-    font-size: 1.2em;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-  }
+  max-width: 900px;
+  margin: 2rem auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
 
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
 
-  #savePreferencesBtn {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #52EE0A;
-    border: none;
-    border-radius: 6px;
-    display: none;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.header-info div {
+  margin-bottom: 0.5rem;
+}
 
-  #edit-documents-block {
-    position: relative;
-    margin-top: 20px;
-    padding: 15px;
-    border: 2px solid #3A7D44;
-    background-color: #f0fff0;
-    border-radius: 10px;
-    animation: fadeIn 0.4s ease-in-out;
+.credit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.credit img.coin-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.section {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+input[type="checkbox"],
+select {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.preferences label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.vehicle-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button-group {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.button-group button {
+  padding: 0.8rem;
+  background-color: #60775D;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button-group button:hover {
+  background-color: #4a5f48;
+}
+
+.add-vehicle, .delete-vehicle {
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 1.2em;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+#savePreferencesBtn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #52EE0A;
+  border: none;
+  border-radius: 6px;
+  display: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#edit-documents-block {
+  position: relative;
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid #3A7D44;
+  background-color: #f0fff0;
+  border-radius: 10px;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 #edit-documents-block .form-group {
@@ -88,7 +128,9 @@
   right: 20px;
 }
 
-
+.stars {
+  color: #FFD700;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -162,7 +162,7 @@
             <div style="margin-top: 10px;">
               <button type="button" onclick="ajaxDeleteVehicle()" id="btnDeleteVehicle" class="delete-vehicle red hidden">🗑 Supprimer le véhicule</button>
               <button type="button" id="btnUpdateDocuments" class="delete-vehicle blue hidden">Mettre à jour les documents</button>
-              <button type="button" onclick="location.href='../driver/addCar.php'">➕ Ajouter un véhicule</button>
+              <button type="button" onclick="location.href='../driver/addVehicle.php'">➕ Ajouter un véhicule</button>
             </div>
           </form>
         </div>

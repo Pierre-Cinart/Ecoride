@@ -1,7 +1,7 @@
 <?php
 // Composant pour convertir et enregistrer les images
 require_once __DIR__ . '/../composants/uploader.php';
-define('PROJECT_ROOT', dirname(__DIR__)); // remonte de 'classes' vers 'back'
+
 
 class Vehicle {
     private PDO $pdo;

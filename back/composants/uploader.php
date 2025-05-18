@@ -1,21 +1,24 @@
 <?php
-// back/composants/uploader.php
+// Définir le chemin racine du projet
+if (!defined('PROJECT_ROOT')) {
+    define('PROJECT_ROOT', dirname(__DIR__)); // ça pointe vers /back
+}
 
 /**
  * Fonction uploadImage
- * Convertit une image (jpg, png, gif, webp) en WebP, la redimensionne,
+ * Convertit une image en WebP, la redimensionne,
  * la sauvegarde sur le serveur et met à jour la base de données avec le chemin.
  *
- * @param PDO $pdo Connexion PDO
- * @param int $userId ID utilisateur
- * @param array $image Fichier $_FILES['...']
- * @param string $typeOfPicture 'profil', 'vehicle', 'document', 'permit'
- * @param string $backUrl Redirection si erreur
- * @param int|null $vehicleId ID du véhicule si besoin
- * @param string|null $typeOfDocument Type de document : 'registration' ou 'insurance'
- * @param int $width Largeur cible (défaut 512px)
- * @param int $height Hauteur cible (défaut 512px)
- * @return string|false Chemin WebP (commençant par "uploads/") ou false si échec
+ * @param PDO $pdo
+ * @param int $userId
+ * @param array $image
+ * @param string $typeOfPicture
+ * @param string $backUrl
+ * @param int|null $vehicleId
+ * @param string|null $typeOfDocument
+ * @param int $width
+ * @param int $height
+ * @return string|false
  */
 function uploadImage(
     PDO $pdo,
@@ -29,7 +32,7 @@ function uploadImage(
     int $height = 512
 ): string|false {
 
-    // Vérifier les formats autorisés
+    // Vérifier le type MIME
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!in_array($image['type'], $allowedTypes)) {
         $_SESSION['error'] = "Formats acceptés : JPG, PNG, GIF, WebP uniquement.";
@@ -37,7 +40,7 @@ function uploadImage(
         exit;
     }
 
-    // Créer une image GD selon le type
+    // Convertir l’image source en ressource GD
     switch ($image['type']) {
         case 'image/jpeg':
             $src = imagecreatefromjpeg($image['tmp_name']);
@@ -75,27 +78,19 @@ function uploadImage(
     $stmt->execute([':id' => $userId]);
     $pseudo = $stmt->fetchColumn();
 
-    // Créer dossier de destination
-    $folder = __DIR__ . '/../uploads/' . $pseudo . '/' . $typeOfPicture;
+    // Créer le dossier de destination
+    $folder = PROJECT_ROOT . '/uploads/' . $pseudo . '/' . $typeOfPicture;
     if (!is_dir($folder)) {
         mkdir($folder, 0777, true);
         file_put_contents($folder . '/.htaccess', "Order Deny,Allow\nDeny from all");
     }
 
-    // Nom et chemin final
+    // Générer le nom et chemin final
     $filename = uniqid() . '.webp';
     $pathToSave = $folder . '/' . $filename;
     $relativePath = 'uploads/' . $pseudo . '/' . $typeOfPicture . '/' . $filename;
 
-    // Sauvegarde WebP
-    if (!imagewebp($resized, $pathToSave, 80)) {
-        $_SESSION['error'] = "Échec lors de l'enregistrement de l’image.";
-        header("Location: $backUrl");
-        exit;
-    }
-    imagedestroy($resized);
-
-    // Déterminer la colonne à mettre à jour en base
+    // Déterminer la colonne à mettre à jour
     $column = match ($typeOfPicture) {
         'profil' => 'profil_picture',
         'permit' => 'permit_picture',
@@ -108,10 +103,9 @@ function uploadImage(
         default => null
     };
 
-    // Si aucune colonne à mettre à jour, on retourne simplement le chemin
     if (!$column) return $relativePath;
 
-    // Récupérer l'ancienne image pour la supprimer
+    // Récupérer le chemin de l’ancien fichier
     if (in_array($typeOfPicture, ['profil', 'permit'])) {
         $stmt = $pdo->prepare("SELECT $column FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
@@ -121,18 +115,29 @@ function uploadImage(
     }
     $oldPath = $stmt->fetchColumn();
 
-    // Mise à jour en base de données
+    // Supprimer l’ancienne image si elle existe
+    if ($oldPath) {
+        $absoluteOldPath = PROJECT_ROOT . '/' . ltrim($oldPath, '/');
+        if (file_exists($absoluteOldPath)) {
+            @unlink($absoluteOldPath);
+        }
+    }
+
+    // Enregistrer la nouvelle image
+    if (!imagewebp($resized, $pathToSave, 80)) {
+        $_SESSION['error'] = "Échec lors de l'enregistrement de l’image.";
+        header("Location: $backUrl");
+        exit;
+    }
+    imagedestroy($resized);
+
+    // Mise à jour BDD
     if (in_array($typeOfPicture, ['profil', 'permit'])) {
         $stmt = $pdo->prepare("UPDATE users SET $column = :path WHERE id = :id");
         $stmt->execute([':path' => $relativePath, ':id' => $userId]);
     } else {
         $stmt = $pdo->prepare("UPDATE vehicles SET $column = :path WHERE id = :id");
         $stmt->execute([':path' => $relativePath, ':id' => $vehicleId]);
-    }
-
-    // Supprimer l’ancienne image
-    if ($oldPath && file_exists(__DIR__ . '/../' . $oldPath)) {
-        unlink(__DIR__ . '/../' . $oldPath);
     }
 
     return $relativePath;
