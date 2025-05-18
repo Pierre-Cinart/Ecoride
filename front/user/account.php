@@ -171,7 +171,7 @@
     <!-- upload des documents -->
     <div id="edit-documents-block" class="document-update hidden">
         <h3>Modifier les documents du véhicule</h3>
-        <form method="POST" action="/back/updateDocuments.php" enctype="multipart/form-data">
+        <form method="POST" action="#" enctype="multipart/form-data">
           <input type="hidden" name="vehicle_id" id="vehicle_id_input">
 
           <div class="form-group">
@@ -184,7 +184,12 @@
             <input type="file" name="insurance_document" id="insurance_document" accept=".jpg,.jpeg,.png,.webp">
           </div>
 
-          <button type="submit" id = "btnSendDocuments" class = "green" >Mettre à jour les documents</button>
+          <div class="form-group">
+            <label for="picture_document">Photo :</label>
+            <input type="file" name="picture_document" id="picture_document" accept=".jpg,.jpeg,.png,.webp">
+          </div>
+
+          <button type="submit" id = "btnSendDocuments" class = "green" onclick = "sendDocuments()">Télécharger une photo</button>
         </form>
     </div>
 

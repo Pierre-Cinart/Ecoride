@@ -15,7 +15,7 @@
  * @param string|null $typeOfDocument Type de document : 'registration' ou 'insurance'
  * @param int $width Largeur cible (défaut 512px)
  * @param int $height Hauteur cible (défaut 512px)
- * @return string|false Chemin WebP ou false si échec
+ * @return string|false Chemin WebP (commençant par "uploads/") ou false si échec
  */
 function uploadImage(
     PDO $pdo,
@@ -95,7 +95,7 @@ function uploadImage(
     }
     imagedestroy($resized);
 
-    // Définir la colonne cible selon le type d’image
+    // Déterminer la colonne à mettre à jour en base
     $column = match ($typeOfPicture) {
         'profil' => 'profil_picture',
         'permit' => 'permit_picture',
@@ -108,10 +108,10 @@ function uploadImage(
         default => null
     };
 
-    // Si aucune colonne à mettre à jour → on retourne le chemin sans update BDD
+    // Si aucune colonne à mettre à jour, on retourne simplement le chemin
     if (!$column) return $relativePath;
 
-    // Récupérer l’ancienne image
+    // Récupérer l'ancienne image pour la supprimer
     if (in_array($typeOfPicture, ['profil', 'permit'])) {
         $stmt = $pdo->prepare("SELECT $column FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
@@ -121,7 +121,7 @@ function uploadImage(
     }
     $oldPath = $stmt->fetchColumn();
 
-    // Mettre à jour la BDD
+    // Mise à jour en base de données
     if (in_array($typeOfPicture, ['profil', 'permit'])) {
         $stmt = $pdo->prepare("UPDATE users SET $column = :path WHERE id = :id");
         $stmt->execute([':path' => $relativePath, ':id' => $userId]);

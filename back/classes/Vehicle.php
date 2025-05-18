@@ -4,6 +4,7 @@ require_once __DIR__ . '/../composants/uploader.php';
 define('PROJECT_ROOT', dirname(__DIR__)); // remonte de 'classes' vers 'back'
 
 class Vehicle {
+    private PDO $pdo;
     private int $id;
     private int $owner;
     private string $brand;
@@ -22,6 +23,7 @@ class Vehicle {
      * Constructeur : charge les données du véhicule depuis la base à partir de son ID
      */
     public function __construct(PDO $pdo, int $id) {
+        $this->pdo = $pdo;
         $stmt = $pdo->prepare("SELECT * FROM vehicles WHERE id = :id");
         $stmt->execute([':id' => $id]);
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -52,108 +54,99 @@ class Vehicle {
     public function getModel(): string { return $this->model; }
     public function getSeats(): int { return $this->seats; }
     public function getDocumentsStatus(): string { return $this->documentsStatus; }
-   public function getRegistrationDocumentPath(): ?string {
+
+    public function getRegistrationDocumentPath(): ?string {
         return $this->registrationDocument ? PROJECT_ROOT . '/' . $this->registrationDocument : null;
     }
+
     public function getInsuranceDocumentPath(): ?string {
         return $this->insuranceDocument ? PROJECT_ROOT . '/' . $this->insuranceDocument : null;
     }
+
     public function getPicture(): ?string {
         return $this->picture ? PROJECT_ROOT . '/' . $this->picture : null;
     }
+
     public function getRegistrationNumber(): string { return $this->registrationNumber; }
     public function getFuelType(): string { return $this->fuelType; }
     public function getFirstRegistrationDate(): string { return $this->firstRegistrationDate; }
     public function getColor(): string { return $this->color; }
+
     public function getDisplayName(): string {
         return "{$this->brand} {$this->model} - {$this->seats} places";
     }
+
     public function isEcological(): bool {
         return in_array(strtolower($this->fuelType), ['electric', 'hybrid']);
     }
 
     /**
-     * Upload et met à jour la carte grise du véhicule
+     * Upload un document lié au véhicule (photo, carte grise ou assurance).
      */
-    public function uploadRegistrationDocument(PDO $pdo, array $file): void {
+    public function uploadDocument(string $type, array $file): bool {
         try {
-            $path = Uploader::upload($file, [
-                'targetDir' => 'uploads/vehicle_documents/registration/',
-                'allowedExtensions' => ['jpg', 'jpeg', 'png', 'webp'],
-                'resize' => true,
-                'rename' => "vehicle_{$this->id}_registration"
-            ]);
+            $validTypes = ['picture', 'registration', 'insurance'];
+            if (!in_array($type, $validTypes)) {
+                throw new Exception("Type de document invalide : $type");
+            }
 
-            $stmt = $pdo->prepare("UPDATE vehicles SET registration_document = :path, documents_status = 'pending' WHERE id = :id");
-            $stmt->execute([':path' => $path, ':id' => $this->id]);
+            $backUrl = '/user/account.php';
+            $typeOfPicture = ($type === 'picture') ? 'vehicle' : 'document';
+            $typeOfDocument = in_array($type, ['registration', 'insurance']) ? $type : null;
 
-            $this->registrationDocument = $path;
+            $imagePath = uploadImage(
+                $this->pdo,
+                $this->getOwner(),
+                $file,
+                $typeOfPicture,
+                $backUrl,
+                $this->id,
+                $typeOfDocument
+            );
+
+            if (!$imagePath) {
+                throw new Exception("Upload échoué ou chemin invalide.");
+            }
+
+            switch ($type) {
+                case 'picture':
+                    $this->picture = $imagePath;
+                    $dbField = 'picture';
+                    break;
+                case 'registration':
+                    $this->registrationDocument = $imagePath;
+                    $dbField = 'registration_document';
+                    break;
+                case 'insurance':
+                    $this->insuranceDocument = $imagePath;
+                    $dbField = 'insurance_document';
+                    break;
+            }
+
             $this->documentsStatus = 'pending';
-        } catch (Exception $e) {
-            throw new Exception("Erreur lors de l'upload de la carte grise : " . $e->getMessage());
-        }
-    }
 
-    /**
-     * Upload et met à jour l'assurance du véhicule
-     */
-    public function uploadInsuranceDocument(PDO $pdo, array $file): void {
-        try {
-            $path = Uploader::upload($file, [
-                'targetDir' => 'uploads/vehicle_documents/insurance/',
-                'allowedExtensions' => ['jpg', 'jpeg', 'png', 'webp'],
-                'resize' => true,
-                'rename' => "vehicle_{$this->id}_insurance"
+            $stmt = $this->pdo->prepare("UPDATE vehicles SET $dbField = :path, documents_status = 'pending' WHERE id = :id");
+            $stmt->execute([
+                ':path' => $imagePath,
+                ':id'   => $this->id
             ]);
 
-            $stmt = $pdo->prepare("UPDATE vehicles SET insurance_document = :path, documents_status = 'pending' WHERE id = :id");
-            $stmt->execute([':path' => $path, ':id' => $this->id]);
-
-            $this->insuranceDocument = $path;
-            $this->documentsStatus = 'pending';
+            return true;
         } catch (Exception $e) {
-            throw new Exception("Erreur lors de l'upload de l'assurance : " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Upload et met à jour la photo illustrative du véhicule
-     */
-    public function uploadPicture(PDO $pdo, array $file): void {
-        try {
-            $path = Uploader::upload($file, [
-                'targetDir' => 'uploads/vehicle_documents/pictures/',
-                'allowedExtensions' => ['jpg', 'jpeg', 'png', 'webp'],
-                'resize' => true,
-                'rename' => "vehicle_{$this->id}_picture"
-            ]);
-
-            $stmt = $pdo->prepare("UPDATE vehicles SET picture = :path WHERE id = :id");
-            $stmt->execute([':path' => $path, ':id' => $this->id]);
-
-            $this->picture = $path;
-        } catch (Exception $e) {
-            throw new Exception("Erreur lors de l'upload de la photo du véhicule : " . $e->getMessage());
+            error_log("Erreur Vehicle::uploadDocument() : " . $e->getMessage());
+            return false;
         }
     }
 
     /**
      * Supprime ce véhicule de la base après avoir annulé les trajets futurs liés.
-     * Utilise le Driver stocké en session pour annuler proprement les trajets associés,
-     * supprime les fichiers liés (assurance, carte grise, photo), puis efface le véhicule de la base.
-     *
-     * @param PDO $pdo Connexion à la base
-     * @param int $driverId ID du conducteur demandant la suppression
-     * @throws Exception Si le propriétaire n’est pas valide ou autre erreur SQL/logique
      */
     public function deleteSelf(PDO $pdo, int $driverId): void {
-        // 1. Vérification que le conducteur connecté est bien le propriétaire du véhicule
         if ($driverId !== $this->owner) {
             throw new Exception("Erreur : vous n’êtes pas autorisé à supprimer ce véhicule.");
         }
 
         try {
-            // 2. Récupération des IDs des trajets encore planifiés liés à ce véhicule
             $stmt = $pdo->prepare("
                 SELECT id 
                 FROM trips 
@@ -162,14 +155,12 @@ class Vehicle {
             $stmt->execute([':vehicle_id' => $this->id]);
             $tripIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-            $driver = $_SESSION['user'];//pour utilisation des fonctions Driver connecté
+            $driver = $_SESSION['user'];
 
-            // suppression des voyages prévu avec ce vehicule
             foreach ($tripIds as $tripId) {
                 $driver->cancelOwnTrip($pdo, (int) $tripId);
             }
 
-           // Suppression des fichiers liés s’ils existent
             $paths = [
                 $this->getRegistrationDocumentPath(),
                 $this->getInsuranceDocumentPath(),
@@ -177,11 +168,10 @@ class Vehicle {
             ];
             foreach ($paths as $path) {
                 if ($path && file_exists($path)) {
-                    @unlink($path); // Supprime l image stockée sur le site
+                    @unlink($path);
                 }
             }
 
-            // 5. Suppression finale du véhicule en base de données
             $stmtDelete = $pdo->prepare("DELETE FROM vehicles WHERE id = :id");
             $stmtDelete->execute([':id' => $this->id]);
 
@@ -189,6 +179,4 @@ class Vehicle {
             throw new Exception("Erreur lors de la suppression du véhicule : " . $e->getMessage());
         }
     }
-
-
 }

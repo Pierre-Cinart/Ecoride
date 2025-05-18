@@ -1,47 +1,3 @@
-// === Fonction AJAX pour supprimer un véhicule ===
-async function ajaxDeleteVehicle() {
-  const vehicleSelect = document.getElementById("vehicle_id");
-
-  if (!vehicleSelect || !vehicleSelect.value) {
-    alert("Veuillez d'abord sélectionner un véhicule.");
-    return;
-  }
-
-  // Récupération du nom du véhicule pour l'affichage du message
-  const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
-  const vehicleName = selectedOption.textContent.trim();
-
-  const confirmation = confirm(
-    `⚠ Vous êtes sur le point de supprimer le véhicule : "${vehicleName}".\n\n` +
-    "Si vous avez des trajets prévus avec ce véhicule, ils seront tous annulés.\n" +
-    "Vous risquez de recevoir des pénalités.\n\n" +
-    "Êtes-vous sûr de vouloir continuer ?"
-  );
-
-  if (!confirmation) return;
-
-  try {
-    const response = await fetch("../../back/ajax/deleteVehicle.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `vehicle_id=${encodeURIComponent(vehicleSelect.value)}`
-    });
-
-    const result = await response.text();
-
-    if (result.trim() === "OK") {
-      location.reload(); // recharge la page pour mettre à jour la liste des véhicules
-    } else {
-      alert("Une erreur est survenue : " + result);
-    }
-  } catch (err) {
-    console.error("Erreur AJAX :", err);
-    alert("Impossible de supprimer le véhicule.");
-  }
-}
-
 // === Quand le DOM est prêt ===
 document.addEventListener('DOMContentLoaded', () => {
   // === RÉFÉRENCES AUX ÉLÉMENTS DU DOM ===
@@ -144,3 +100,95 @@ document.addEventListener('DOMContentLoaded', () => {
   watchPreferencesChanges();
   handleEditDocumentsBlock(); // gestion dynamique des documents
 });
+
+/////////////////////////////
+//FONCTIONS AJAX
+/////////////////////////////
+
+// === Fonction AJAX pour supprimer un véhicule ===
+async function ajaxDeleteVehicle() {
+  const vehicleSelect = document.getElementById("vehicle_id");
+
+  if (!vehicleSelect || !vehicleSelect.value) {
+    alert("Veuillez d'abord sélectionner un véhicule.");
+    return;
+  }
+
+  // Récupération du nom du véhicule pour l'affichage du message
+  const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+  const vehicleName = selectedOption.textContent.trim();
+
+  const confirmation = confirm(
+    `⚠ Vous êtes sur le point de supprimer le véhicule : "${vehicleName}".\n\n` +
+    "Si vous avez des trajets prévus avec ce véhicule, ils seront tous annulés.\n" +
+    "Vous risquez de recevoir des pénalités.\n\n" +
+    "Êtes-vous sûr de vouloir continuer ?"
+  );
+
+  if (!confirmation) return;
+
+  try {
+    const response = await fetch("../../back/ajax/deleteVehicle.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `vehicle_id=${encodeURIComponent(vehicleSelect.value)}`
+    });
+
+    const result = await response.text();
+
+    if (result.trim() === "OK") {
+      location.reload(); // recharge la page pour mettre à jour la liste des véhicules
+    } else {
+      alert("Une erreur est survenue : " + result);
+    }
+  } catch (err) {
+    console.error("Erreur AJAX :", err);
+    alert("Impossible de supprimer le véhicule.");
+  }
+}
+// === Fonction AJAX pour envoyer les documents liés au véhicule ===
+async function sendDocuments() {
+  const vehicleId = document.getElementById("vehicle_id")?.value;
+  if (!vehicleId) {
+    alert("Veuillez sélectionner un véhicule avant d'envoyer des documents.");
+    return;
+  }
+
+  // Récupération des fichiers sélectionnés
+  const registration = document.getElementById("registration_document")?.files[0];
+  const insurance = document.getElementById("insurance_document")?.files[0];
+  const picture = document.getElementById("picture_document")?.files[0];
+
+  if (!registration && !insurance && !picture) {
+    alert("Aucun fichier sélectionné. Merci de choisir au moins un document à envoyer.");
+    return;
+  }
+
+  // Construction de l'objet FormData
+  const formData = new FormData();
+  formData.append("vehicle_id", vehicleId);
+  if (registration) formData.append("registration_document", registration);
+  if (insurance) formData.append("insurance_document", insurance);
+  if (picture) formData.append("picture_document", picture);
+
+  try {
+    const response = await fetch("../../back/ajax/uploadVehicleDocuments.php", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.text();
+
+    if (result.trim() === "OK") {
+      alert("✅ Documents envoyés avec succès. Ils seront vérifiés prochainement.");
+      location.reload();
+    } else {
+      alert("❌ Erreur : " + result);
+    }
+  } catch (error) {
+    console.error("Erreur AJAX :", error);
+    alert("❌ Une erreur s'est produite pendant l'envoi des documents.");
+  }
+}
