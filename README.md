@@ -11,16 +11,13 @@ Développée dans le cadre du TP Développeur Web & Web Mobile, elle propose dif
 - Système d'avis et de notation
 - Interface d'administration et de gestion
 - Statistiques et crédits virtuels
-- Intégration (prévue) de Google Maps pour les itinéraires
+- Intégration de Leaflet.js pour l'affichage des cartes
+- Utilisation d'OpenRouteService (ORS) pour le calcul d'itinéraires
 - Paiement factice et gestion de crédits
 - Téléversement de permis (vérification manuelle par l’équipe)
 - Envoi de mails
+- Autocomplétion des villes via Geo API
 
-## Arborescence du projet (extrait)
-
-## Arborescence du projet (mise à jour)
-
-```
 ## Arborescence du projet (simplifiée avec commentaires)
 
 ```
@@ -29,10 +26,10 @@ Ecoride/
 ├── README.md                      ← Fichier de documentation
 ├── back/                          ← Traitements serveur (PHP)
 │   ├── ajax/                      ← Fichiers appelés en JS (AJAX)
-│   ├── api/                       ← Requêtes API internes sécurisées (à venir)
+│   ├── api/                       ← Requêtes API internes sécurisées
 │   ├── classes/                   ← Définition des classes utilisateurs, véhicules...
 │   ├── composants/                ← Fonctions réutilisables (autoloader, sanitize, PHPMailer...)
-│   ├── config/                    ← Fichiers de configuration (DB, captcha, ORS, MongoDB)
+│   ├── config/                    ← Fichiers de configuration (DB, captcha, ORS, Firebase)
 │   ├── uploads/                   ← Dossiers contenant les fichiers envoyés par les utilisateurs
 │   └── *.php                      ← Actions principales : connexion, inscription, trajets...
 ├── database/                      ← Scripts pour initialiser la base et injecter des données
@@ -46,9 +43,6 @@ Ecoride/
 │   └── *.php/html                 ← Pages transversales (accueil, debug, mise à jour session)
 ```
 
-
-
-
 ## Installation & configuration
 
 ### Prérequis
@@ -58,9 +52,9 @@ Ecoride/
 - MySQL 8+
 - phpMyAdmin (recommandé)
 - Git
-- Compte Google (reCAPTCHA v3 requis : https://developers.google.com/recaptcha/docs/v3?hl=fr)
+- Compte Google (reCAPTCHA v3 requis)
 - PHPMailer
-- MailHog pour les tests de mails (recommandé)
+- MailHog (pour tester les mails en local)
 
 ## Cloner le projet
 
@@ -71,13 +65,11 @@ cd ecoride
 
 ## Base de données relationnelle
 
-Importer le fichier `ecoride.sql` (structure de la base MySQL) via phpMyAdmin.
+Importer le fichier `ecoride.sql` via phpMyAdmin.
 
-Créer manuellement les fichiers non suivis par Git :
+### Fichiers de configuration requis
 
-### (config de la connexion à la base de données)
-
-/back/config/db_config.php
+#### /back/config/db_config.php
 
 ```php
 <?php 
@@ -88,149 +80,194 @@ $DB_PASS = "votre mot de passe";
 ?>
 ```
 
-### (config Google reCAPTCHA)
-
-/back/config/configCaptcha.php
+#### /back/config/configCaptcha.php
 
 ```php
 <?php
 $RECAPTCHA_PUBLIC_KEY = 'votre clé publique';
 $RECAPTCHA_PRIVATE_KEY = 'votre clé privée';
+?>
 ```
 
-### Vérifiez que les chemins suivants sont bien dans `.gitignore` :
+#### /back/config/configORS.php
+
+```php
+<?php 
+$OPEN_ROUTE_KEY = 'votre_clé_ORS';
+?>
+```
+
+#### Fichiers à ignorer dans Git :
 
 ```
 /back/config/db_config.php
 /back/config/configCaptcha.php
+/back/config/configORS.php
+/back/config/configAnalytics.php
+/back/config/service-account.json
 ```
 
-## Base de données NoSQL avec MongoDB Atlas
+## Google Analytics – Statistiques de fréquentation
 
-Le projet utilise **MongoDB Atlas** comme base de données NoSQL pour certaines fonctionnalités (statistiques, messagerie interne...).
+Le projet utilise **Google Analytics 4** pour afficher les statistiques de visites hebdomadaires (via l'API Analytics Data).
 
-- La base est hébergée sur **MongoDB Atlas Free Tier**
-- Les données sont accessibles via la **Data API** fournie par MongoDB
-- Les identifiants d'accès (clé API + URL de l'app) sont stockés dans :
+### 📌 Prérequis
 
-`/back/config/mongodb_config.php`
+Si vous souhaitez activer les statistiques de visite sur votre version du projet, vous devez configurer votre propre compte Google Analytics.
+
+### 🔐 Étapes de configuration
+
+1. Créez un compte sur [Google Analytics](https://analytics.google.com/)
+2. Créez une propriété GA4
+3. Activez l'API \"Google Analytics Data API v1\" dans Google Cloud Console
+4. Générez une clé de service (fichier `.json`)
+5. Placez-la ici :
+
+```
+/back/config/service-account.json
+```
+
+> Le fichier doit être nommé exactement **`service-account.json`**
+
+6. Créez le fichier :
+
+```
+/back/config/configAnalytics.php
+```
+
+Contenu :
 
 ```php
 <?php
-$MONGODB_API_KEY = 'votre_clé_api';
-$MONGODB_ENDPOINT = 'https://data.mongodb-api.com/app/...';
-$MONGODB_DATABASE = 'ecoride_db';
+$ANALYTICS_KEY = 'VOTRE_CLE_ANALYTICS';
+$AUTDOMAIN = 'votre-domaine.firebaseapp.com';
+$PROJECT_ID = 'votre-id-projet';
+$STORAGE_BUCKET = 'votre-bucket.appspot.com';
+$MESSAGE_ID_SENDER = 'votre-message-id';
+$APP_ID = 'votre-app-id';
+$MESUREMENT_ID = 'votre-id-mesure';
+$PROPRIETY_ID = 'votre-property-id-GA4';
+?>
 ```
 
-⚠️ Ce fichier est ignoré par Git (voir `.gitignore`).
+> Les deux fichiers doivent être dans `.gitignore`
 
-### Reproduire la base MongoDB (pour test ou évaluation)
+### ⚠️ Important
 
-1. Créez un compte MongoDB Atlas : https://www.mongodb.com/cloud/atlas
-2. Créez un cluster gratuit (M0)
-3. Activez la Data API via App Services
-4. Générez votre propre clé API + URL
-5. Créez le fichier `/back/config/mongodb_config.php` comme montré ci-dessus
+Sans ces fichiers, les graphiques de visite ne pourront pas fonctionner.
 
-Toutes les instructions sont également disponibles dans `README.md`.  
-Si vous souhaitez injecter des documents de test, utilisez l'import JSON depuis l'interface Atlas ou un script local.
+## Services tiers utilisés
 
-## Injecter des comptes de test (Admin, Employé, Utilisateur, Conducteurs)
+### 🌍 OpenRouteService (ORS)
 
-### 🔐 1. Désactiver temporairement la protection .htaccess
+ORS est utilisé pour **le calcul d'itinéraires** dans les trajets.  
+Créer un compte : https://openrouteservice.org/
 
-Si vous avez placé un fichier `.htaccess` dans le dossier `/database/`, commentez temporairement son contenu (ajoutez `#` en début de ligne) afin de pouvoir exécuter le script PHP.
-
-### ⚙️ 2. Modifier les comptes à injecter (facultatif)
-
-Le fichier `/database/CreateUsers.php` injecte automatiquement plusieurs comptes de démonstration (admin, employé, utilisateurs, conducteurs…).
-
-Si vous souhaitez changer les pseudos, emails ou mots de passe, vous pouvez modifier directement les blocs de création dans ce fichier.
-
-### 🚀 3. Exécuter le script
-
-Accédez à l’URL suivante dans votre navigateur (depuis localhost ou votre hébergement) :
+Configurer :
 
 ```
-http://VotreSite/database/CreateUsers.php
+/back/config/configORS.php
 ```
 
-Vous verrez un message de confirmation si les données ont bien été injectées.
-
-### 👤 Comptes créés automatiquement
-
-- 1 administrateur  
-- 1 employé  
-- 1 utilisateur simple  
-- 1 conducteur avec permis validé  
-- 1 conducteur avec permis en attente  
-
-⚠️ Le fichier `test.jpg` doit être présent dans le dossier suivant pour simuler un permis :
-
-```
-/back/uploads/test/test.jpg
+```php
+<?php 
+$OPEN_ROUTE_KEY = 'votre_clé_ORS';
+?>
 ```
 
-Une fois terminé, remettez en place la protection `.htaccess` du dossier `/database/` pour empêcher toute réexécution ou accès non autorisé.
+### ✅ Google reCAPTCHA v3
 
-Les mots de passe sont automatiquement hachés avec `password_hash()` avant d'être enregistrés.
+reCAPTCHA protège les formulaires du site.  
+Créer une clé publique + privée : https://www.google.com/recaptcha/admin/
+
+Configurer :
+
+```
+/back/config/configCaptcha.php
+```
+
+```php
+<?php
+$RECAPTCHA_PUBLIC_KEY = 'votre_clé_publique';
+$RECAPTCHA_PRIVATE_KEY = 'votre_clé_privée';
+?>
+```
+
+### 📊 Autres bibliothèques utilisées
+
+- **Chart.js** : affichage des statistiques (visites, trajets, crédits…)
+- **Leaflet.js** : cartes interactives (trajets)
+- **Geo API** : autocomplétion des villes (https://api.gouv.fr/api/geo)
+
+Aucune clé n’est requise pour Chart.js ou Geo API.
+
+## Injecter des comptes de test
+
+### 🔐 1. Désactiver `.htaccess` temporairement
+
+Si présent dans `/database/`, commentez son contenu.
+
+### ⚙️ 2. Modifier le fichier createUsers.php
+
+Changez les pseudos, emails ou mots de passe si besoin.
+
+### 🚀 3. Lancer l’injection
+
+Accéder à :
+
+```
+http://VotreSite/database/createUsers.php
+```
+
+### 👤 Comptes créés
+
+- Admin
+- Employé
+- Utilisateur simple
+- Conducteur validé
+- Conducteur en attente
+
+> Le fichier `/back/uploads/test/test.jpg` doit exister pour simuler un permis.
 
 ## Envoi d’e-mails avec PHPMailer et MailHog
 
-Le projet utilise PHPMailer pour gérer l’envoi des e-mails (confirmation d’inscription, renouvellement de lien de vérification...).
+### 🔧 Mode local
 
-### Mode local avec MailHog
+- Télécharger MailHog : https://github.com/mailhog/MailHog/releases
+- Lancer `MailHog.exe`
+- Accéder à : http://localhost:8025
 
-Pour tester l’envoi de mails en local :
-
-1. Téléchargez et lancez MailHog :  
-   https://github.com/mailhog/MailHog/releases
-
-2. Lancez l’exécutable `MailHog.exe`.  
-   L’interface de réception des e-mails est accessible via :  
-   http://localhost:8025
-
-### Configuration du mode local
-
-Dans le fichier `/back/config/db_config.php`, assurez-vous que la variable suivante est bien définie :
+Configurer dans `/back/config/db_config.php` :
 
 ```php
-$onLine = false; // indique qu'on est en local
+$onLine = false;
 $webAddress = 'http://localhost/nom-du-site';
 ```
 
-PHPMailer enverra alors les e-mails vers MailHog via `localhost:1025`.
-
-### Mode production (en ligne)
-
-Pour passer en ligne, mettez simplement :
+### 🌐 Mode production
 
 ```php
 $onLine = true;
 $webAddress = 'https://votre-domaine.fr';
 ```
 
-Dans ce mode, configurez également les paramètres SMTP réels dans le fichier `sendMail.php`, section `else`.
-
-Le lien d’activation ou de réinitialisation sera automatiquement généré avec `$webAddress` comme base, ce qui garantit un fonctionnement correct en local comme en production.
+Configurer le SMTP réel dans `sendMail.php`.
 
 ## À venir
 
-- Authentification sécurisée via tokens (JWT-like)
-- Intégration de Google Maps (affichage et calculs d’itinéraires)
-- Envoi d’e-mails via PHPMailer
-- Stockage des statistiques avec MongoDB (via Data API)
-- Mise en place de tests fonctionnels
+- Authentification sécurisée via JWT-like
+- Intégration de la messagerie Firebase
+- Système de badges
+- Pages publiques pour les trajets
 
 ## Développeur
 
-Projet réalisé par **Pierre Cinart** dans le cadre de la formation **TP Développeur Web & Web Mobile**.  
-Pour toute suggestion ou retour, vous pouvez me contacter via la messagerie du projet.
+Projet réalisé par **Pierre Cinart** dans le cadre de la formation **TP Développeur Web & Web Mobile**.
 
 ## Mention importante
 
 Ce site est une maquette pédagogique.  
-Les systèmes de paiement sont fictifs, et aucune transaction réelle n’est effectuée.
+Aucun paiement réel n’est effectué.
 
 ## Licence
 

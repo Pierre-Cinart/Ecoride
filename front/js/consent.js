@@ -12,7 +12,7 @@ function setCookie(name, value, hours) {
 function loadGoogleAnalytics() {
   const script = document.createElement('script');
   script.type = 'module';
-  script.src = '../js/googleAnalytics.js'; // Ton script déjà préparé
+  script.src = '../js/googleAnalytics.js';
   document.body.appendChild(script);
 }
 
@@ -22,27 +22,28 @@ document.addEventListener('DOMContentLoaded', function () {
   const refuseBtn = document.getElementById('refuse-cookies');
   const banner = document.getElementById('cookie-consent-banner');
 
-  // Si la bannière ou les boutons ne sont pas présents, on arrête
+  // Si cookie déjà accepté, on charge GA sans poser de question
+  const cookies = document.cookie.split(';').map(cookie => cookie.trim());
+  const consentCookie = cookies.find(cookie => cookie.startsWith('EcoRideGAConsent='));
+  const hasConsented = consentCookie && consentCookie.split('=')[1] === 'true';
+
+  if (hasConsented) {
+    loadGoogleAnalytics();
+    if (banner) banner.remove(); // On supprime la bannière même si elle est là par erreur
+    return;
+  }
+
+  // Sinon, on attend le clic utilisateur
   if (!banner || (!acceptBtn && !refuseBtn)) return;
 
-  // Bouton ACCEPTER
-  acceptBtn.addEventListener('click', function () {
+    acceptBtn.addEventListener('click', function () {
     setCookie('EcoRideGAConsent', 'true', 24 * 30 * 6); // 6 mois
     banner.remove();
-    loadGoogleAnalytics(); // On charge GA maintenant que l'utilisateur a accepté
+    loadGoogleAnalytics();
   });
 
-  // Bouton REFUSER
   refuseBtn.addEventListener('click', function () {
     setCookie('EcoRideGAConsent', 'false', 2); // 2 heures seulement
     banner.remove();
-    // Rien d'autre à faire, Google Analytics ne sera jamais appelé
   });
-
-  // Bonus : si le cookie existe déjà à "true", on charge automatiquement Analytics
-  const cookies = document.cookie.split(';').map(c => c.trim());
-  const consentCookie = cookies.find(c => c.startsWith('EcoRideGAConsent='));
-  if (consentCookie && consentCookie.split('=')[1] === 'true') {
-    loadGoogleAnalytics();
-  }
 });

@@ -1,16 +1,9 @@
 <?php
-session_start();
+require_once '../../back/composants/autoload.php';
+checkAccess(['Admin']);
 
-$_SESSION['navSelected'] = 'manage';
-// Redirection si non connecté
-if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "admin" ) ) {
-  header('Location: ../user/login.php');
-  exit();
-}
-
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
-
+$_SESSION['navSelected'] = 'stats';
+$user = $_SESSION['user'];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -18,16 +11,15 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tableau de bord - Admin | EcoRide</title>
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Ton CSS principal -->
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/charts.css" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
+  <header>
     <?php include_once '../composants/navbar.php'; ?>
   </header>
 
@@ -62,59 +54,34 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
           <canvas id="creditsTotauxChart"></canvas>
         </div>
 
-      </div>
+        <!--  Graphique 4 : visites par jour -->
+        <div class="chart-block">
+          <canvas id="visitesChart"></canvas>
+        </div>
 
+      </div>
     </div>
   </main>
-
   <br><br>
-     <!-- footer -->
-     <?php include_once '../composants/footer.html'; ?>
-     
+
+  <?php include_once '../composants/footer.php'; ?>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/charts.js"></script>
+  
+
   <script>
-    //  Supprime les attributs height/width par défaut pour éviter le débordement
+    // Suppression des attributs height/width par défaut
     document.querySelectorAll("canvas").forEach(canvas => {
       canvas.removeAttribute("height");
       canvas.removeAttribute("width");
     });
 
-    // Graphique 1 - Nombre de trajets par jour
-    new Chart(document.getElementById('trajetsChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-        datasets: [{
-          label: 'Trajets par jour',
-          data: [22, 35, 41, 28, 49, 56, 38],
-          backgroundColor: '#60775D'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
+   
 
-    // Graphique 2 - Crédits gagnés par jour
-    new Chart(document.getElementById('creditsParJourChart'), {
-      type: 'line',
-      data: {
-        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-        datasets: [{
-          label: 'Crédits par jour',
-          data: [12, 20, 18, 30, 22, 40, 35],
-          backgroundColor: 'rgba(96,119,93,0.3)',
-          borderColor: '#60775D',
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
 
-    // Graphique 3 - Répartition crédits collectés
+
+    // Graphique 3 - Répartition crédits collectés (exemple)
     new Chart(document.getElementById('creditsTotauxChart'), {
       type: 'doughnut',
       data: {
@@ -129,7 +96,8 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
         maintainAspectRatio: false
       }
     });
+
+    
   </script>
-  <?php include_once '../composants/footer.php'; ?>
 </body>
 </html>
