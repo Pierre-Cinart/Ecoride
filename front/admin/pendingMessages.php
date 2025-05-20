@@ -28,7 +28,7 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
       <?php include_once '../composants/navbar.php'; ?>
   </header>
 
-    <?php include_once '../composants/inProgress.php'; ?>
+    
 
   <div class="form-container manage-container">
     <!-- Bouton retour -->
@@ -71,6 +71,6 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
     </div>
   </div>
     <!-- footer -->
-    <?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
 </body>
 </html>

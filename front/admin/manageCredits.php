@@ -20,6 +20,6 @@ if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser'] != "admin" )){
   <main>
     <?php include_once '../composants/InProgress.php'; ?>
   </main>
-  <?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
 </body>
 </html>

@@ -53,9 +53,10 @@ $_SESSION['navSelected'] = 'contact';
     </form>
   </div>
 </main>
+
 <?php 
-  include_once '../composants/footer.html';
-  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'contact' ?>
+ include_once '../composants/footer.php';  
+ renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'contact' ?>
 
 <script src="../js/contact.js"></script>
 </body>

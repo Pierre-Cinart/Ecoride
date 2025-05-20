@@ -43,7 +43,7 @@ $credits = $_SESSION['credits'] ?? 20;
 </main>
 
 <footer>
-  <?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
 </footer>
 
 </body>

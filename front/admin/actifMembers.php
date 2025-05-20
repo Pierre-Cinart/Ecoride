@@ -46,6 +46,6 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
       ← Précédent | Page 1 sur 1 | Suivant →
     </div>
   </div>
-
+   <?php include_once '../composants/footer.php'; ?>
 </body>
 </html>

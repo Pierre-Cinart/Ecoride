@@ -98,8 +98,8 @@
   </div>
 </div>
 
-<?php include_once '../composants/footer.html'; ?>
-
+ <?php include_once '../composants/footer.php'; ?>
+ 
 <!-- Librairies JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="../js/geoApi.js"></script>

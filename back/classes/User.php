@@ -109,7 +109,6 @@ abstract class User {
     }
 
     // === MISE À JOUR SESSION ===
-
     public function updateUserSession(PDO $pdo): void {
         try {
             $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits, birthdate, gender, profil_picture , permit_status FROM users WHERE id = :id LIMIT 1");

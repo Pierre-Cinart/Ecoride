@@ -32,5 +32,6 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur'; ?>
   </main>
   <br><br>
      <!-- footer -->
-     <?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
 </body>
+</html>

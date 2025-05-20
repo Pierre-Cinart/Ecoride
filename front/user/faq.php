@@ -72,8 +72,7 @@
   </div>
 </div>
 
-<?php include_once '../composants/footer.html'; ?>
-
+ <?php include_once '../composants/footer.php'; ?>
 </body>
 </html>
 

@@ -63,7 +63,7 @@ $pseudo = $user->getPseudo();
     </div>
   </main>
 
-  <?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
   <script src="../js/addVehicle.js"></script>
 
 </body>

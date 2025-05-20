@@ -53,8 +53,9 @@
   </div>
 
   <!-- footer -->
-  <?php include_once '../composants/footer.html'; ?>
-  <?php renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'login' ?>
+ <?php 
+  include_once '../composants/footer.php'; 
+  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'login' ?>
 
 </body>
 </html>

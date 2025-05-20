@@ -36,7 +36,7 @@ $expirationDate = new DateTime($user['email_token_expires_at']);
 if ($currentDate > $expirationDate) {
     $_SESSION['error'] = "Ce lien a expiré. Vous pouvez demander un nouveau lien de confirmation.";
     $_SESSION['resend_token_id'] = $user['id']; // utile pour un bouton "renvoyer le lien"
-    header('Location: ../front/user/resendToken.php'); // tu pourras créer cette page plus tard
+    header('Location: ../front/user/resendToken.php'); 
     exit();
 }
 

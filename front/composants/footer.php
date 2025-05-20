@@ -32,4 +32,23 @@
   </footer>
   <script src="../js/burger.js"></script>
   <script src="../js/popUp.js"></script>
-  
+  <!-- recupération de config google analytics -->
+  <?php  
+    $configAnalytics = include_once __DIR__ . '/../../back/config/configAnalytics.php';
+  ?>
+  <script>
+    const firebaseConfig = {
+    apiKey: <?= json_encode($ANALYTICS_KEY) ?>,
+    authDomain: <?= json_encode($AUTDOMAIN) ?>,
+    projectId: <?= json_encode($PROJECT_ID) ?>,
+    storageBucket: <?= json_encode($STORAGE_BUCKET) ?>,
+    messagingSenderId: <?= json_encode($MESSAGE_ID_SENDER) ?>,
+    appId: <?= json_encode($APP_ID) ?>,
+    measurementId: <?= json_encode($MESUREMENT_ID) ?>
+  };
+</script>
+ 
+  <!-- consentement cookie et chargement google analytics -->
+  <script src="../js/consent.js" defer></script>
+ 
+

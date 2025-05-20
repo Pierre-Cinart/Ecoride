@@ -1,6 +1,8 @@
 <?php
 // Mise en surbrillance du lien actif
 $navSelected = $_SESSION['navSelected'] ?? '';
+
+// detection si user connecté
 $user = $_SESSION['user'] ?? null;
 
 // chargement du composant pour bouton de retour
@@ -79,6 +81,9 @@ var_dump($_SESSION);
   </div>
   <?php unset($_SESSION['success'], $_SESSION['error']); ?>
 
+   <!-- Bannière de consentement RGPD -->
+<?php include_once '../composants/consentBanner.php'; ?>
+
  <!-- reservation en attente de validation -->
  <?php if (isset($_SESSION['tripPending']) && isset($_SESSION['user']) && ($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)): ?>
   <div class="pending-alert">
@@ -86,5 +91,6 @@ var_dump($_SESSION);
     🚗 Vous avez une réservation en attente. <a href="reserv.php">Cliquez ici pour finaliser</a>.
   </div>
 <?php endif; ?>
+
 
 

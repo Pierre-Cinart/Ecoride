@@ -1,5 +1,5 @@
 <?php
-  // cahargement des classes et demarage de session 
+  // chargement des classes et demarage de session 
   require_once '../composants/autoload.php';
   //bouton select dans la navbar
   $_SESSION['navSelected'] = 'home';
@@ -54,7 +54,7 @@
   </section>
 </main>
 
-<?php include_once '../composants/footer.html'; ?>
+  <?php include_once '../composants/footer.php'; ?>
 
 <!-- Autocomplétion avec GeoAPI.gouv -->
 <script src="../js/geoApi.js"></script>

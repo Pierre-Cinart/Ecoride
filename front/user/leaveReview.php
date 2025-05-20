@@ -90,7 +90,7 @@ if (!$trip) {
 </main>
 
 <?php 
-  include_once '../composants/footer.html'; 
+  include_once '../composants/footer.php'; 
   renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'reserve' 
 ?>
 

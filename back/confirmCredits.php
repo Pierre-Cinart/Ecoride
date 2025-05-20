@@ -18,7 +18,8 @@ verifyCaptcha('addCredits', '../front/user/addCredits.php');
 $_POST = sanitizeArray($_POST, '../front/user/addCredits.php');
 
 // Récupération du montant à ajouter
-$creditAmount = (int) ($_POST['creditAmount'] ?? 0);
+$creditAmount = getPostInt('trip_id') ?? 0;
+
 if ($creditAmount <= 0) {
     $_SESSION['error'] = "Montant de crédits invalide.";
     header('Location: ../front/user/addCredits.php');

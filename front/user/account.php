@@ -217,7 +217,7 @@
   </div>
 
   <footer>
-    <?php include_once '../composants/footer.html'; ?>
+    <?php include_once '../composants/footer.php'; ?>
   </footer>
 
   <script src="../js/account.js"></script>

@@ -6,24 +6,24 @@
      * Fonction front : injecte le script de Google reCAPTCHA v3 avec l’action souhaitée
      */
     function renderRecaptcha(string $action = 'submit') {
-    global $RECAPTCHA_PUBLIC_KEY;
+        global $RECAPTCHA_PUBLIC_KEY;
 
-    echo <<<HTML
-<script src="https://www.google.com/recaptcha/api.js?render={$RECAPTCHA_PUBLIC_KEY}"></script>
-<script>
-  grecaptcha.ready(function() {
-    grecaptcha.execute('{$RECAPTCHA_PUBLIC_KEY}', {action: '{$action}'}).then(function(token) {
-      const responseField = document.getElementById('g-recaptcha-response');
-      if (responseField) responseField.value = token;
+        echo <<<HTML
+    <script src="https://www.google.com/recaptcha/api.js?render={$RECAPTCHA_PUBLIC_KEY}"></script>
+    <script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute('{$RECAPTCHA_PUBLIC_KEY}', {action: '{$action}'}).then(function(token) {
+        const responseField = document.getElementById('g-recaptcha-response');
+        if (responseField) responseField.value = token;
+        });
     });
-  });
-</script>
-<!-- Badge reCAPTCHA v3 -->
-<style>
-  .grecaptcha-badge { visibility: visible !important; }
-</style>
-HTML;
-}
+    </script>
+    <!-- Badge reCAPTCHA v3 -->
+    <style>
+    .grecaptcha-badge { visibility: visible !important; }
+    </style>
+    HTML;
+    }
 
 
     /**
