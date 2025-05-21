@@ -1,6 +1,6 @@
 <?php
 // Chargement des composants nécessaires
-require_once '../composants/autoload.php';
+require_once './composants/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = "Méthode non autorisée.";

@@ -162,7 +162,9 @@ try {
     updateToken($pdo, $jwtToken, $user->getId());
     $_SESSION['user'] = $user;
     $_SESSION['jwt'] = $jwtToken;
-    $_SESSION['success'] = "Connexion réussie. Bienvenue " . $user->getPseudo() . " !";
+    if ($user instanceof Employee || $user instanceof Admin){
+        $_SESSION['success'] = "Connexion réussie. Bienvenue " . $user->getFullName() . " !";
+    } else {    $_SESSION['success'] = "Connexion réussie. Bienvenue " . $user->getPseudo() . " !"; }
     header('Location: ../front/user/home.php');
     exit();
 

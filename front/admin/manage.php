@@ -44,7 +44,7 @@ if ($user instanceof Employee){
         <button type="button" onclick="location.href='userlocking.php?action=unblock'">Débloquer un membre</button>
         <!-- bouton admin pour gérer les employee -->
         <?php if ($user instanceof Admin): ?>
-          <button type="button" onclick="location.href='manageEmployees.php'">Gérer les employés</button>
+          <button type="button" onclick="location.href='manageEmployee.php'">Gérer les employés</button>
           <button type="button" onclick="location.href='manageCredits.php'">Gestions de crédits</button>
         <?php endif; ?>
       </form>
