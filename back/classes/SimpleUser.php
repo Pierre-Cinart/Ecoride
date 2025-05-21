@@ -161,7 +161,7 @@ class SimpleUser extends User {
  */
     public function cancelTrip(PDO $pdo, int $tripId, int $participantId, int $creditsUsed, string $logMessage): bool {
         try {
-            $penalite = 2; // Coût fixe pour une annulation
+            $penalite = 2;
             $remboursement = max(0, $creditsUsed - $penalite);
 
             $pdo->beginTransaction();
@@ -189,15 +189,48 @@ class SimpleUser extends User {
             if ($trip) {
                 $dateDepart = new DateTime($trip['departure_date']);
                 $now = new DateTime();
-
                 $diffInHours = ($dateDepart->getTimestamp() - $now->getTimestamp()) / 3600;
 
                 if ($diffInHours > 0 && $diffInHours < 24) {
-                    // 3. Ajout d’un avertissement
-                    $warnUpdate = $pdo->prepare("UPDATE users SET user_warnings = user_warnings + 1 WHERE id = :id");
-                    $warnUpdate->execute([':id' => $this->id]);
+                    // 3. Récupération du nombre actuel d'avertissements
+                    $stmt = $pdo->prepare("SELECT user_warnings FROM users WHERE id = :id");
+                    $stmt->execute([':id' => $this->id]);
+                    $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $currentWarnings = (int) $userData['user_warnings'];
 
-                    // 4. Enregistrement des frais dans la table transactions
+                    // 4. Calcul du nouveau nombre d'avertissements
+                    $modulo = $currentWarnings % 10;
+                    if ($modulo < 3) {
+                        $newWarnings = $currentWarnings + 1;
+                    } else if ($currentWarnings === 3 || $currentWarnings === 13) {
+                        $newWarnings = $currentWarnings + 10;
+                    } else if ($currentWarnings >= 23) {
+                        $newWarnings = $currentWarnings;
+                    }
+
+                    // 5. Mise à jour des avertissements
+                    $pdo->prepare("UPDATE users SET user_warnings = :warnings WHERE id = :id")
+                        ->execute([
+                            ':warnings' => $newWarnings ?? $currentWarnings,
+                            ':id' => $this->id
+                        ]);
+
+                    // 6. Mise à jour du statut si seuil atteint
+                    if (($newWarnings ?? 0) >= 23) {
+                        $newStatus = 'banned';
+                    } else if (($newWarnings ?? 0) % 10 === 3) {
+                        $newStatus = 'blocked';
+                    }
+
+                    if (isset($newStatus)) {
+                        $pdo->prepare("UPDATE users SET status = :status WHERE id = :id")
+                            ->execute([
+                                ':status' => $newStatus,
+                                ':id' => $this->id
+                            ]);
+                    }
+
+                    // 7. Frais d’annulation (transaction)
                     $pdo->prepare("
                         INSERT INTO transactions (user_id, credits, type, description, created_at)
                         VALUES (:uid, :credits, 'fee', :desc, NOW())
@@ -206,27 +239,14 @@ class SimpleUser extends User {
                         ':credits' => $penalite,
                         ':desc' => "Frais d’annulation pour le trajet ID $tripId"
                     ]);
-
-                    // 5. Blocage si 3 avertissements atteints
-                    $checkWarns = $pdo->prepare("SELECT user_warnings FROM users WHERE id = :id");
-                    $checkWarns->execute([':id' => $this->id]);
-                    $result = $checkWarns->fetch(PDO::FETCH_ASSOC);
-
-                    if ($result && (int)$result['user_warnings'] >= 3) {
-                        $pdo->prepare("UPDATE users SET status = 'blocked' WHERE id = :id")
-                            ->execute([':id' => $this->id]);
-                    }
                 }
             }
 
-            // 6. Libère une place sur le trajet
-            $updateTrip = $pdo->prepare("
-                UPDATE trips SET available_seats = available_seats + 1 
-                WHERE id = :trip
-            ");
-            $updateTrip->execute([':trip' => $tripId]);
+            // 8. Libère une place sur le trajet
+            $pdo->prepare("UPDATE trips SET available_seats = available_seats + 1 WHERE id = :trip")
+                ->execute([':trip' => $tripId]);
 
-            // 7. Enregistre un remboursement si applicable
+            // 9. Remboursement s’il y en a
             if ($remboursement > 0) {
                 $reason = $logMessage ?: "Annulation du trajet #$tripId";
                 if (!$this->logCashback($pdo, $remboursement, $reason, 'refund')) {
@@ -243,7 +263,6 @@ class SimpleUser extends User {
             return false;
         }
     }
-
 
     // ===== Laisse un avis ou le met à jour si existant =====
     public function leaveReview(PDO $pdo, int $tripId, float $rating, ?string $comment = null): bool {
