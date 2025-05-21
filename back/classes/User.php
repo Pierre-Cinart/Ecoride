@@ -110,30 +110,37 @@ abstract class User {
 
     // === MISE À JOUR SESSION ===
     public function updateUserSession(PDO $pdo): void {
-        try {
-            $stmt = $pdo->prepare("SELECT pseudo, first_name, last_name, email, phone_number, role, credits, birthdate, gender, profil_picture , permit_status FROM users WHERE id = :id LIMIT 1");
-            $stmt->execute([':id' => $this->id]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    try {
+        $stmt = $pdo->prepare("
+            SELECT pseudo, first_name, last_name, email, phone_number, role, credits, birthdate, gender, profil_picture, permit_status, status 
+            FROM users 
+            WHERE id = :id 
+            LIMIT 1
+        ");
+        $stmt->execute([':id' => $this->id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($data) {
-                $this->pseudo = $data['pseudo'];
-                $this->firstName = $data['first_name'];
-                $this->lastName = $data['last_name'];
-                $this->email = $data['email'];
-                $this->phoneNumber = $data['phone_number'];
-                $this->role = $data['role'];
-                $this->credits = (int) $data['credits'];
-                $this->permitStatus = $data['permit_status'];
-                $this->birthdate = $data['birthdate'];
-                $this->gender = $data['gender'];
-                $this->profilPicture = $data['profil_picture'];
+        if ($data) {
+            $this->pseudo = $data['pseudo'];
+            $this->firstName = $data['first_name'];
+            $this->lastName = $data['last_name'];
+            $this->email = $data['email'];
+            $this->phoneNumber = $data['phone_number'];
+            $this->role = $data['role'];
+            $this->credits = (int) $data['credits'];
+            $this->permitStatus = $data['permit_status'];
+            $this->status = $data['status']; 
+            $this->birthdate = $data['birthdate'];
+            $this->gender = $data['gender'];
+            $this->profilPicture = $data['profil_picture'];
 
-                $_SESSION['user'] = $this;
-            }
-
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Erreur lors de la mise à jour des informations utilisateur.";
+            $_SESSION['user'] = $this;
         }
+
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Erreur lors de la mise à jour des informations utilisateur.";
     }
+}
+
 }
 ?>

@@ -77,53 +77,26 @@ class Driver extends SimpleUser {
     /**
      * Met à jour les données du conducteur et rafraîchit la session.
      */
-    public function updateUserSession(PDO $pdo): void {
-        try {
-            parent::updateUserSession($pdo);
-
-            $stmt = $pdo->prepare("SELECT allows_smoking, allows_pets, note_personnelle FROM driver_preferences WHERE driver_id = :id");
-            $stmt->execute([':id' => $this->id]);
-            $this->preferences = $stmt->fetch(PDO::FETCH_ASSOC) ?: [
-                'allows_smoking' => 0,
-                'allows_pets' => 0,
-                'note_personnelle' => ''
-            ];
-
-            $stmt = $pdo->prepare("SELECT id FROM vehicles WHERE user_id = :id");
-            $stmt->execute([':id' => $this->id]);
-            $this->vehicles = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'id');
-
-            $stmt = $pdo->prepare("SELECT AVG(rating) AS average FROM ratings WHERE trip_id IN (SELECT id FROM trips WHERE driver_id = :id) AND status = 'accepted'");
-            $stmt->execute([':id' => $this->id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $this->averageRating = isset($result['average']) ? (float)$result['average'] : 0.0;
-
-            $stmt = $pdo->prepare("SELECT permit_picture FROM users WHERE id = :id");
-            $stmt->execute([':id' => $this->id]);
-            $this->permitPicture = $stmt->fetchColumn();
-
-            $_SESSION['user'] = $this;
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Erreur lors de la mise à jour du conducteur.";
-        }
-    }
-
     /**
-     * Propose un nouveau trajet
-     */
+ * Propose un nouveau trajet
+ */
     public function proposeTrip(PDO $pdo, array $tripData): void {
+        // Vérification du permis
         if ($this->getPermitStatus() !== 'approved') {
             throw new Exception("Votre permis n'est pas encore validé.");
         }
 
+        // Vérification du solde
         if ($this->getCredits() < 2) {
-            throw new Exception("Vous n'avez pas assez de crédits.");
+            throw new Exception("Vous n'avez pas assez de crédits pour proposer un trajet (minimum 2 crédits requis).");
         }
 
+        // Statut bloquant
         if (in_array($this->getStatus(), ['drive_blocked', 'all_blocked', 'banned'])) {
             throw new Exception("Votre statut actuel ne vous permet pas de proposer un trajet.");
         }
 
+        // Vérification du véhicule
         $stmt = $pdo->prepare("SELECT id FROM vehicles WHERE id = :vehicle_id AND user_id = :user_id");
         $stmt->execute([':vehicle_id' => $tripData['vehicle_id'], ':user_id' => $this->id]);
         if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -139,6 +112,17 @@ class Driver extends SimpleUser {
             throw new Exception("Le nombre de places disponibles est incorrect.");
         }
 
+        // Déduction des crédits du conducteur
+        $pdo->prepare("UPDATE users SET credits = credits - 2 WHERE id = :id")
+            ->execute([':id' => $this->id]);
+
+        // Transaction : frais de publication
+        $pdo->prepare("
+            INSERT INTO transactions (user_id, credits, type, description, created_at)
+            VALUES (:uid, 2, 'fee', 'Frais de mise en ligne du trajet', NOW())
+        ")->execute([':uid' => $this->id]);
+
+        // Insertion du trajet
         $stmt = $pdo->prepare("INSERT INTO trips (driver_id, vehicle_id, departure_city, departure_address, arrival_city, arrival_address, departure_date, departure_time, price, is_ecological, available_seats, status, estimated_duration) VALUES (:driver_id, :vehicle_id, :departure_city, :departure_address, :arrival_city, :arrival_address, :departure_date, :departure_time, :price, :is_ecological, :available_seats, 'planned', :estimated_duration)");
         $stmt->execute([
             ':driver_id' => $this->id,
@@ -155,13 +139,16 @@ class Driver extends SimpleUser {
             ':estimated_duration' => $tripData['estimated_duration'] ?? null
         ]);
 
-        $_SESSION['sucess'] = "Votre trajet a été proposé avec succès.";
+        // Message confirmation
+        $_SESSION['success'] = "Votre trajet a été proposé avec succès (2 crédits ont été débités).";
     }
+
 
     /**
      * Annule un trajet proposé par le conducteur
      */
     public function cancelOwnTrip(PDO $pdo, int $tripId): void {
+        // 1. Vérification que le trajet appartient bien au conducteur
         $stmt = $pdo->prepare("SELECT * FROM trips WHERE id = :id AND driver_id = :driver_id");
         $stmt->execute([':id' => $tripId, ':driver_id' => $this->id]);
         $trip = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -170,23 +157,167 @@ class Driver extends SimpleUser {
             throw new Exception("Ce trajet ne vous appartient pas ou n'existe pas.");
         }
 
-        $stmt = $pdo->prepare("SELECT u.id, u.first_name, u.email, tp.credits_used, t.departure_city, t.arrival_city, t.departure_date FROM trip_participants tp JOIN users u ON u.id = tp.user_id JOIN trips t ON t.id = tp.trip_id WHERE tp.trip_id = :trip_id");
+        // 2. Récupération des passagers à rembourser
+        $stmt = $pdo->prepare("
+            SELECT u.id, u.first_name, u.email, tp.credits_used, t.departure_city, t.arrival_city, t.departure_date, t.departure_time
+            FROM trip_participants tp 
+            JOIN users u ON u.id = tp.user_id 
+            JOIN trips t ON t.id = tp.trip_id 
+            WHERE tp.trip_id = :trip_id
+        ");
         $stmt->execute([':trip_id' => $tripId]);
         $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $hadParticipants = count($participants) > 0;
+
         foreach ($participants as $p) {
             $refundAmount = (int) $p['credits_used'];
+
             if ($refundAmount > 0) {
                 $pdo->prepare("UPDATE users SET credits = credits + :refund WHERE id = :id")
                     ->execute([':refund' => $refundAmount, ':id' => $p['id']]);
+
+                $pdo->prepare("
+                    INSERT INTO transactions (user_id, credits, type, description, created_at)
+                    VALUES (:uid, :credits, 'refund', :desc, NOW())
+                ")->execute([
+                    ':uid'     => $p['id'],
+                    ':credits' => $refundAmount,
+                    ':desc'    => 'Remboursement suite à annulation trajet ' . $tripId
+                ]);
             }
 
             SendMail(
                 $p['email'],
                 htmlspecialchars($p['first_name']),
                 "Annulation de votre réservation EcoRide",
-                "Bonjour {$p['first_name']},<br><br>Le trajet de <strong>{$p['departure_city']}</strong> à <strong>{$p['arrival_city']}</strong> prévu le <strong>{$p['departure_date']}</strong> a été annulé.<br>Un remboursement de <strong>{$refundAmount} crédits</strong> a été effectué.<br><br>L'équipe EcoRide."
+                "Bonjour {$p['first_name']},<br><br>
+                Le trajet de <strong>{$p['departure_city']}</strong> à <strong>{$p['arrival_city']}</strong>
+                prévu le <strong>{$p['departure_date']}</strong> à <strong>{$p['departure_time']}</strong> a été annulé.<br>
+                Un remboursement de <strong>{$refundAmount} crédits</strong> a été effectué.<br><br>
+                L'équipe EcoRide."
             );
+        }
+
+        $penaltyApplied = false;
+        $statusBlocked = false;
+        $message = "Trajet annulé avec succès.";
+
+        if ($hadParticipants) {
+            $penaltyAmount = 2;
+
+            $stmt = $pdo->prepare("SELECT credits, driver_warnings FROM users WHERE id = :id");
+            $stmt->execute([':id' => $this->id]);
+            $driverData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $currentCredits = (int) $driverData['credits'];
+            $currentWarnings = (int) $driverData['driver_warnings'];
+
+            $pdo->prepare("UPDATE users SET credits = credits - :penalty WHERE id = :id")
+                ->execute([':penalty' => $penaltyAmount, ':id' => $this->id]);
+
+            $pdo->prepare("
+                INSERT INTO transactions (user_id, credits, type, description, created_at)
+                VALUES (:uid, :credits, 'penalty', :desc, NOW())
+            ")->execute([
+                ':uid'     => $this->id,
+                ':credits' => $penaltyAmount,
+                ':desc'    => "Pénalité pour annulation de trajet avec participants (ID $tripId)"
+            ]);
+
+            $penaltyApplied = true;
+
+            $stmt = $pdo->prepare("SELECT credits FROM users WHERE id = :id");
+            $stmt->execute([':id' => $this->id]);
+            $newCredits = (int) $stmt->fetchColumn();
+
+            $modulo = $currentWarnings % 10;
+
+            if ($modulo < 3) {
+                $newWarnings = $currentWarnings + 1;
+            } elseif ($currentWarnings === 3 || $currentWarnings === 13) {
+                $newWarnings = $currentWarnings + 10;
+            } elseif ($currentWarnings >= 23) {
+                $newWarnings = $currentWarnings;
+            } else {
+                $newWarnings = $currentWarnings + 1;
+            }
+
+            $pdo->prepare("UPDATE users SET driver_warnings = :warnings WHERE id = :id")
+                ->execute([':warnings' => $newWarnings, ':id' => $this->id]);
+
+            if ($newWarnings >= 23) {
+                $newStatus = 'banned';
+                $statusBlocked = true;
+
+                $message = "Trajet annulé. Vous avez été définitivement banni du service. Tous vos trajets à venir ont été annulés et vos passagers remboursés.";
+
+                $stmt = $pdo->prepare("SELECT * FROM trips WHERE driver_id = :driver_id AND status = 'planned'");
+                $stmt->execute([':driver_id' => $this->id]);
+                $futureTrips = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($futureTrips as $tripRow) {
+                    $tid = (int)$tripRow['id'];
+
+                    $stmtP = $pdo->prepare("
+                        SELECT u.id, u.first_name, u.email, tp.credits_used, t.departure_city, t.arrival_city, t.departure_date, t.departure_time
+                        FROM trip_participants tp
+                        JOIN users u ON u.id = tp.user_id
+                        JOIN trips t ON t.id = tp.trip_id
+                        WHERE tp.trip_id = :trip_id
+                    ");
+                    $stmtP->execute([':trip_id' => $tid]);
+                    $passengers = $stmtP->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($passengers as $pass) {
+                        $refund = (int) $pass['credits_used'];
+
+                        if ($refund > 0) {
+                            $pdo->prepare("UPDATE users SET credits = credits + :refund WHERE id = :id")
+                                ->execute([':refund' => $refund, ':id' => $pass['id']]);
+
+                            $pdo->prepare("
+                                INSERT INTO transactions (user_id, credits, type, description, created_at)
+                                VALUES (:uid, :credits, 'refund', :desc, NOW())
+                            ")->execute([
+                                ':uid'     => $pass['id'],
+                                ':credits' => $refund,
+                                ':desc'    => "Remboursement suite à bannissement conducteur, trajet $tid"
+                            ]);
+                        }
+
+                        SendMail(
+                            $pass['email'],
+                            htmlspecialchars($pass['first_name']),
+                            "Annulation de votre trajet EcoRide",
+                            "Bonjour {$pass['first_name']},<br><br>
+                            Nous sommes désolés, ce conducteur a été retiré de nos services suite à de nombreux signalements.<br>
+                            Votre trajet prévu le <strong>{$pass['departure_date']}</strong> à <strong>{$pass['departure_time']}</strong> entre <strong>{$pass['departure_city']}</strong> et <strong>{$pass['arrival_city']}</strong> a été annulé.<br>
+                            Un remboursement de <strong>{$refund} crédits</strong> a été effectué.<br><br>
+                            Merci de votre compréhension.<br>L'équipe EcoRide."
+                        );
+                    }
+
+                    $pdo->prepare("DELETE FROM trip_participants WHERE trip_id = :trip_id")
+                        ->execute([':trip_id' => $tid]);
+
+                    $pdo->prepare("DELETE FROM trips WHERE id = :trip_id")
+                        ->execute([':trip_id' => $tid]);
+                }
+            } elseif ($newWarnings % 10 === 3 || $newCredits < 0) {
+                $newStatus = 'drive_blocked';
+                $statusBlocked = true;
+                $message = ($newCredits < 0)
+                    ? "Trajet annulé. Vous avez reçu une pénalité. Votre compte est débiteur et votre statut de conducteur est bloqué jusqu’à régularisation."
+                    : "Trajet annulé. Vous avez reçu une pénalité et votre statut de conducteur est temporairement bloqué.";
+            } else {
+                $message = "Trajet annulé. Vous avez reçu une pénalité de 2 crédits.";
+            }
+
+            if (isset($newStatus)) {
+                $pdo->prepare("UPDATE users SET status = :status WHERE id = :id")
+                    ->execute([':status' => $newStatus, ':id' => $this->id]);
+            }
         }
 
         $pdo->prepare("DELETE FROM trip_participants WHERE trip_id = :trip_id")
@@ -194,7 +325,15 @@ class Driver extends SimpleUser {
 
         $pdo->prepare("DELETE FROM trips WHERE id = :trip_id")
             ->execute([':trip_id' => $tripId]);
+
+        // Affectation finale dans la bonne session
+        if ($penaltyApplied || $statusBlocked) {
+            $_SESSION['error'] = $message;
+        } else {
+            $_SESSION['success'] = $message;
+        }
     }
+
     /**
      * Ajoute un véhicule à la base de données pour ce conducteur.
      * Ne traite pas les documents dans l’insertion : ils seront traités après.

@@ -1,7 +1,7 @@
 <?php
-require_once '../../back/composants/autoload.php'; // Class BDD JWT control d accés et Recaptcha
+require_once '../../back/composants/autoload.php'; // Chargement des classes, session, sécurité, etc.
 
-checkAccess(['SimpleUser', 'Driver']);//(autorisation d accés )
+checkAccess(['SimpleUser', 'Driver']); // Autorisation d’accès uniquement aux utilisateurs connectés
 $_SESSION['navSelected'] = 'account';
 
 ?>
@@ -12,33 +12,35 @@ $_SESSION['navSelected'] = 'account';
   <meta charset="UTF-8">
   <title>Ajouter des crédits - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
-   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
-   <!-- Google reCAPTCHA v3 -->
-  <?php 
-    $captchaAction = 'addCredits'; // action personnalisée pour cette page (ex : login, register, contact, etc.)
-  ?>
   <style>
-    .info-box {
-      background-color: #f8f9fa;
-      border-left: 4px solid #17a2b8;
+    .cb-simulation-box {
+      background-color: #f0f0f0;
       padding: 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-      color: #333;
-    }
-    .info-box strong {
-      color: #17a2b8;
-    }
-    .don-link {
-      font-size: 0.9rem;
+      border-radius: 8px;
       margin-top: 1rem;
-      display: block;
+      font-size: 0.9rem;
+    }
+
+    .cb-simulation-box label {
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+
+    .cb-simulation-box input {
+      background-color: #e9ecef;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
+
+    .cb-simulation-box p {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
       color: #666;
     }
-   
   </style>
 </head>
 <body>
@@ -49,10 +51,9 @@ $_SESSION['navSelected'] = 'account';
 
 <main>
   <div class="form-container">
-    <h2>Obtenir des crédits</h2>
-    <p>Ajoutez des crédits à votre compte pour réserver des trajets ou participer en tant que conducteur.</p>
+    <h2>Ajouter des crédits</h2>
+    <p>Remplissez le formulaire pour simuler un achat de crédits via carte bancaire.</p>
 
-    <!-- Message de confirmation (session) -->
     <?php if (isset($_SESSION['success'])): ?>
       <p class="success"><?= $_SESSION['success'] ?></p>
       <?php unset($_SESSION['success']); ?>
@@ -63,43 +64,53 @@ $_SESSION['navSelected'] = 'account';
       <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
-    <!-- Message de simulation -->
-    <div class="info-box">
-      <strong>🔒 Simulation :</strong> Cette plateforme est fictive. Aucun paiement réel ne sera effectué.
-      Ce formulaire permet uniquement de <strong>simuler l’ajout de crédits</strong> dans un environnement de test.
-    </div>
+    <form method="post" action="../../back/addCredits.php" onsubmit="return confirmCreditAmount()">
+      <label for="creditAmount">Montant de crédits à ajouter :</label>
+      <input type="number" name="creditAmount" id="creditAmount" min="1" required placeholder="Ex : 10, 20, 50...">
 
-    <!-- Formulaire -->
-    <form method="post" action="../../back/confirmCredits.php" id="creditForm">
-      <label for="creditAmount">Nombre de crédits à ajouter :</label>
-      <input type="number" id="creditAmount" name="creditAmount" min="1" required placeholder="Ex : 10, 20, 50...">
+      <input type="hidden" name="paymentMethod" value="cb">
 
-      <label for="fakePayment">Méthode de paiement :</label>
-      <select id="fakePayment" name="fakePayment" required>
-        <option value="paypal">PayPal</option>
-        <option value="cb">Carte Bancaire</option>
-        <option value="crypto">Crypto-monnaie</option>
-      </select>
-      <!-- Champ caché pour recevoir le token reCAPTCHA -->
+      <div class="cb-simulation-box">
+        <h3>Carte bancaire (simulation)</h3>
+
+        <label>Nom sur la carte :</label>
+        <input type="text" value="XXXX XXXX" readonly>
+
+        <label>Numéro de carte :</label>
+        <input type="text" value="4242 4242 4242 4242" readonly>
+
+        <label>Date d’expiration :</label>
+        <input type="text" value="12/34" readonly>
+
+        <label>Cryptogramme :</label>
+        <input type="text" value="123" readonly>
+
+        <p><strong>Simulation :</strong> Ces informations sont fictives. Aucun paiement réel ne sera effectué.</p>
+      </div>
+
+      <!-- reCAPTCHA -->
       <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
-      <button type="submit">💳 Valider l'achat</button>
+      
+      <button type="submit">Valider l’achat simulé</button>
     </form>
-
-    <!-- Don -->
-    <p class="don-link">
-      ❤️ Ce projet est un exercice de simulation. Pour le soutenir, vous pouvez faire un don sur
-      <a href="https://www.paypal.me/votreLien" target="_blank">ma page PayPal</a>. Merci 🙏
-    </p>
   </div>
-
 </main>
 
 <?php 
   include_once '../composants/footer.php'; 
-  renderRecaptcha($captchaAction); // Injection du script reCAPTCHA v3 invisible avec l'action 'reserve' 
-  ?>
+  renderRecaptcha('addCredits'); // Ajout dynamique du script reCAPTCHA
+?>
 
-<script src="../js/credits.js"></script>
+<script>
+  function confirmCreditAmount() {
+    const amount = document.getElementById("creditAmount").value;
+    if (!amount || amount <= 0) {
+      alert("Veuillez entrer un montant valide.");
+      return false;
+    }
+    return confirm(`Vous êtes sur le point d’ajouter ${amount} crédits à votre compte. Confirmez-vous cet achat simulé ?`);
+  }
+</script>
 
 </body>
 </html>

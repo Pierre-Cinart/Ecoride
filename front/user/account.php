@@ -198,7 +198,7 @@
     <!-- === Actions générales === -->
     <div class="button-group">
       <?php if ($user instanceof Driver): ?>
-        <button onclick="location.href='../driver/showMyOwnTrips.php'">Mes trajets prévus</button>
+        <button onclick="location.href='../driver/OwnTrips.php'">Mes trajets prévus</button>
       <?php endif; ?>
 
       <button onclick="location.href='./showMyTrips.php'">Mes trajets réservés</button>
