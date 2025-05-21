@@ -164,10 +164,9 @@ class SimpleUser extends User {
             $penalite = 2; // Coût fixe pour une annulation
             $remboursement = max(0, $creditsUsed - $penalite);
 
-            // === 1. Début de la transaction ===
             $pdo->beginTransaction();
 
-            // === 2. Marquer le participant comme annulé ===
+            // 1. Marquer le participant comme annulé
             $updateParticipant = $pdo->prepare("
                 UPDATE trip_participants 
                 SET confirmed = 0, confirmation_date = NOW() 
@@ -182,7 +181,7 @@ class SimpleUser extends User {
                 throw new Exception("Annulation impossible : réservation introuvable.");
             }
 
-            // === 3. Vérifie si l’annulation est tardive (moins de 24h avant départ) ===
+            // 2. Vérifie si l’annulation est tardive (< 24h avant départ)
             $stmt = $pdo->prepare("SELECT departure_date FROM trips WHERE id = :tripId");
             $stmt->execute([':tripId' => $tripId]);
             $trip = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -194,31 +193,40 @@ class SimpleUser extends User {
                 $diffInHours = ($dateDepart->getTimestamp() - $now->getTimestamp()) / 3600;
 
                 if ($diffInHours > 0 && $diffInHours < 24) {
-                    // === 4. Ajoute un avertissement au passager ===
+                    // 3. Ajout d’un avertissement
                     $warnUpdate = $pdo->prepare("UPDATE users SET user_warnings = user_warnings + 1 WHERE id = :id");
                     $warnUpdate->execute([':id' => $this->id]);
 
-                    // === 5. Vérifie si le seuil des avertissements est atteint ===
+                    // 4. Enregistrement des frais dans la table transactions
+                    $pdo->prepare("
+                        INSERT INTO transactions (user_id, credits, type, description, created_at)
+                        VALUES (:uid, :credits, 'fee', :desc, NOW())
+                    ")->execute([
+                        ':uid' => $this->id,
+                        ':credits' => $penalite,
+                        ':desc' => "Frais d’annulation pour le trajet ID $tripId"
+                    ]);
+
+                    // 5. Blocage si 3 avertissements atteints
                     $checkWarns = $pdo->prepare("SELECT user_warnings FROM users WHERE id = :id");
                     $checkWarns->execute([':id' => $this->id]);
                     $result = $checkWarns->fetch(PDO::FETCH_ASSOC);
 
                     if ($result && (int)$result['user_warnings'] >= 3) {
-                        // Blocage de l’utilisateur s’il atteint 3 avertissements
-                        $block = $pdo->prepare("UPDATE users SET status = 'blocked' WHERE id = :id");
-                        $block->execute([':id' => $this->id]);
+                        $pdo->prepare("UPDATE users SET status = 'blocked' WHERE id = :id")
+                            ->execute([':id' => $this->id]);
                     }
                 }
             }
 
-            // === 6. Libère une place sur le trajet ===
+            // 6. Libère une place sur le trajet
             $updateTrip = $pdo->prepare("
                 UPDATE trips SET available_seats = available_seats + 1 
                 WHERE id = :trip
             ");
             $updateTrip->execute([':trip' => $tripId]);
 
-            // === 7. Enregistre un remboursement si applicable ===
+            // 7. Enregistre un remboursement si applicable
             if ($remboursement > 0) {
                 $reason = $logMessage ?: "Annulation du trajet #$tripId";
                 if (!$this->logCashback($pdo, $remboursement, $reason, 'refund')) {
@@ -226,7 +234,6 @@ class SimpleUser extends User {
                 }
             }
 
-            // === 8. Fin de transaction ===
             $pdo->commit();
             return true;
 
@@ -236,6 +243,7 @@ class SimpleUser extends User {
             return false;
         }
     }
+
 
     // ===== Laisse un avis ou le met à jour si existant =====
     public function leaveReview(PDO $pdo, int $tripId, float $rating, ?string $comment = null): bool {
