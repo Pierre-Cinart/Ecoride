@@ -1,52 +1,45 @@
 <?php
+
 require_once 'User.php';
 
-// Classe employé (hérite de User)
-class Employee extends User {
-
-    // ===== Envoie de mail =====
-    public function sendMail() {
-        // À développer
+/**
+ * Classe représentant un employé EcoRide.
+ * Hérite de la classe User.
+ */
+class Employee extends User
+{
+    // Constructeur allégé spécifique à un employé
+    public function __construct(int $id, string $firstName, string $lastName, string $email, string $role = 'employee')
+    {
+        $this->id = $id;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->email = $email;
+        $this->role = $role;
     }
 
-    // ===== Bloque un utilisateur =====
-    public function blockUser() {
-        // À développer
-    }
+    /**
+     * Permet à l'employé de gérer (modérer) un commentaire utilisateur.
+     *
+     * @param PDO $pdo Connexion PDO à la base de données
+     * @param int $reviewId ID de l'avis à traiter
+     * @param string $action Action à effectuer : 'approve', 'refused' ou 'delete'
+     * @return bool True si la requête a réussi, False sinon
+     */
+    public function manageReview(PDO $pdo, int $reviewId, string $action): bool
+    {
+        $status = match ($action) {
+            'approve' => 'accepted',
+            'refused' => 'refused',
+            'delete'  => 'deleted',
+            default   => null
+        };
 
-    // ===== Débloque un utilisateur =====
-    public function unblockUser() {
-        // À développer
-    }
+        if ($status === null) return false;
 
-    // ===== Valide un commentaire =====
-    public function validateReview() {
-        // À développer
-    }
-
-    // ===== Refuse un commentaire =====
-    public function rejectReview() {
-        // À développer
-    }
-
-    // ===== Ajoute des crédits à un utilisateur =====
-    public function grantCredits() {
-        // À développer
-    }
-
-    // ===== Supprime un avis (modération) =====
-    public function deleteReview() {
-        // À développer
-    }
-
-    // ===== Marque une demande de remboursement comme traitée =====
-    public function processCashbackRequest() {
-        // À développer
-    }
-
-    // ===== Consulter toutes les demandes de remboursement =====
-    public function viewCashbackRequests() {
-        // À développer
+        $stmt = $pdo->prepare("UPDATE ratings SET status = :status WHERE id = :id");
+        $stmt->bindValue(':status', $status);
+        $stmt->bindValue(':id', $reviewId, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }
-?>
