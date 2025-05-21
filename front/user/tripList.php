@@ -84,6 +84,7 @@ $trips = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <title>Résultats de recherche - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/tripList.css">
+  <!-- font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">

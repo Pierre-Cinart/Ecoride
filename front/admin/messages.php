@@ -1,15 +1,4 @@
-<?php
-session_start();
 
-$_SESSION['navSelected'] = 'messages';
-// Redirection si non connecté
-if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_SESSION['typeOfUser'] != "admin" && $_SESSION['typeOfUser'] != "employee" ) ) ) {
-  header('Location: ../user/login.php');
-  exit();
-}
-
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
 
 ?>
 <!DOCTYPE html>
@@ -20,6 +9,11 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/manage.css" />
+  <!-- fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+
 
 </head>
 <body>
@@ -30,8 +24,8 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   <main>
     <div class="form-container messagerie-container">
       <h2>Messagerie</h2>
-      <button onclick="location.href='./pendingMessages.php'"> Messages en attente</button>
-      <button onclick="location.href='storyMessages.php'"> Historique des messages</button>
+      Messagerie interne non développer , à devellopper si le temps le permet
+      les messages sont gérer par mail avec phpmailer pour le moment
     </div>
   </main>
 

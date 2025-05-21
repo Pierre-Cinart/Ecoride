@@ -187,7 +187,11 @@ button {
 button:hover {
   background-color: #4a5f48;
 }
-  
+
+.btn-back {
+width : 100px;
+margin: auto;
+}
 a {
   color: #60775D;
   text-decoration: none;
@@ -223,7 +227,11 @@ a:hover {
 .red:hover {
   background-color: rgb(255, 94, 0) !important;
 }
-
+/* ------------------------------------------------ */
+/*search bar*/
+.search-bar{
+  margin: auto;
+}
 /* ------------------------------------------------ */
 /*footer*/
 footer {

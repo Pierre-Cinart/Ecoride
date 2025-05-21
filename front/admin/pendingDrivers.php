@@ -1,63 +1,31 @@
-<?php
-session_start();
+<?php // faire la requette en fonction du get ?>
+<div class="user-card">
+  <p><strong>Pseudo :</strong> exemple_user</p>
+  <p><strong>Email :</strong> user@email.com</p>
+  <p><strong>Rôle :</strong> Conducteur (en attente)</p>
+  <div id="showPermit">
+    <h2>permis</h2>
+    <!-- injecter le permis en miniaturisé ouverture about_blank en grand format -->
 
-$_SESSION['navSelected'] = 'manage';
-// Redirection si non connecté
-if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_SESSION['typeOfUser'] != "admin" && $_SESSION['typeOfUser'] != "employee" ) ) ) {
-  header('Location: ../user/login.php');
-  exit();
-}
-
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
-
-?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Chauffeurs à valider | EcoRide</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/manage.css" />
-</head>
-<body>
-  <header>
-      <?php include_once '../composants/navbar.php'; ?>
-  </header>
-
-    <?php include_once '../composants/inProgress.php'; ?>
-  <main>
-    <div class="form-container manage-container">
-      <div class="top-buttons">
-          <button type="button"  class = "blue" onclick="location.href='manage.php'" >⬅ Retour</button>
+     <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
+     <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
+  </div>
+  <!-- faire un foreach pour tout recupérer -->
+  <div id="vehicles_documents(+id du vehicule)">
+    <!-- injecter les documents en attentes trier par vehicule enregistré en miniaturisé ouverture about_blank en grand format -->
+      <div id="registration+id du vehicule">
+        <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
+        <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
       </div>
-      <h2>Chauffeurs à valider</h2>
-
-      <div class="search-bar">
-        <input type="text" placeholder="Laisser vide pour afficher tous les membres...">
-        <button type="submit">🔍 Rechercher</button>
+       <div id="insurance+id du vehicule">
+        <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
+        <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
       </div>
+     
+  </div>
+</div>
+     
 
-      <div class="user-list">
-        <div class="user-card">
-          <p><strong>Pseudo :</strong> exemple_user</p>
-          <p><strong>Email :</strong> user@email.com</p>
-          <p><strong>Rôle :</strong> Conducteur (en attente)</p>
-          
-          <button class="green">Valider le permis</button>
-          <button class="blue">Consulter les documents</button>
+     
+    
 
-        </div>
-      </div>
-
-      <div class="pagination">
-        ← Précédent | Page 1 sur 1 | Suivant →
-      </div>
-    </div>
-  </main>
-  </main>
-  <!-- footer -->
-  <?php include_once '../composants/footer.php'; ?>
-</body>
-</html>

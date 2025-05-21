@@ -14,18 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // 2.verification googleCaptcha
 verifyCaptcha('reserve', '../front/user/reserv.php'); // ← action + redirection
 
-if (!isset($_SESSION['user']) || !($_SESSION['user'] instanceof SimpleUser || $_SESSION['user'] instanceof Driver)) {
-    $_SESSION['error'] = "Vous devez être connecté pour réserver.";
-    header('Location: ../front/user/login.php');
-    exit;
-}
-
-// Vérifie et renouvelle le token
-if (!checkToken($pdo)) {
-    $_SESSION['error'] = "Session expirée. Veuillez vous reconnecter.";
-    header('Location: ../front/user/login.php');
-    exit;
-}
 
 $user = $_SESSION['user'];
 $tripId = (int) $_POST['trip_id'] ?? null;

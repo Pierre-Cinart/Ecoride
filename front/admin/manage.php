@@ -1,15 +1,12 @@
 <?php
-session_start();
+require_once '../../back/composants/autoload.php';
+checkAccess(['Admin','Employee']);
 
-$_SESSION['navSelected'] = 'manage';
-// Redirection si non connecté
-if (!isset($_SESSION['typeOfUser']) || ($_SESSION['typeOfUser']!= "user" && ( $_SESSION['typeOfUser'] != "admin" && $_SESSION['typeOfUser'] != "employee" ) ) ) {
-  header('Location: ../user/login.php');
-  exit();
-}
+$user = $_SESSION['user'];
 
-$type = $_SESSION['typeOfUser'];
-$pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
+if ($user instanceof Employee){
+  $gestionTitle = 'Employé';
+} else {$gestionTitle = 'Admin';}
 
 ?>
 
@@ -18,9 +15,14 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Espace Employé - EcoRide</title>
+  <title>Espace <?php echo $gestionTitle ?> - EcoRide</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/manage.css" />
+   <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
+</head>
  
 </head>
 <body>
@@ -29,19 +31,21 @@ $pseudo = $_SESSION['pseudo'] ?? 'Utilisateur';
   </header>
   <main>
     <div class="form-container manage-container">
-      <h2>gestion - Espace Employé</h2>
+      <h2>Gestion - Espace Employé</h2>
       <form>
         <button type="button" onclick="location.href='manageReviews.php'">Gérer les avis des passagers</button>
-        <button type="button" onclick="location.href='reportedTrips.php'">Consulter les trajets signalés</button>
-        <button type="button" onclick="location.href='contactDrivers.php'">Contacter les conducteurs</button>
+        <button type="button" onclick="location.href='reportedTrips.php'">Consulter les signalements</button>
+        <button type="button" onclick="location.href='contactUser.php'">Contacter un utilisateur</button>
         <button type="button" onclick="location.href='showUsers.php'">Afficher les infos utilisateur</button>
-        <button type="button" onclick="location.href='pendingDrivers.php'">Chauffeurs en attente de validation</button>
-        <button type="button" onclick="location.href='blockMember.php'">Bloquer un membre</button>
-        <button type="button" onclick="location.href='unblockMember.php'">Débloquer un membre</button>
+        <button type="button" onclick="location.href='showUsers.php?type=driver&status=authorized&documents=waiting'">
+          Chauffeurs en attente de validation
+        </button>
+        <button type="button" onclick="location.href='userlocking.php?action=block'">Bloquer un membre</button>
+        <button type="button" onclick="location.href='userlocking.php?action=unblock'">Débloquer un membre</button>
         <!-- bouton admin pour gérer les employee -->
-        <?php if ($type === 'admin'): ?>
+        <?php if ($user instanceof Admin): ?>
           <button type="button" onclick="location.href='manageEmployees.php'">Gérer les employés</button>
-          <button type="button" onclick="location.href='manageCredits.php'">Offrir des crédits</button>
+          <button type="button" onclick="location.href='manageCredits.php'">Gestions de crédits</button>
         <?php endif; ?>
       </form>
     </div>
