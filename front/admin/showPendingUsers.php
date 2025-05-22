@@ -1,3 +1,4 @@
+UTILISATEURS EN ATTENTE DE VALIDATIONS DE DOCUMENTS
 <?php // faire la requette en fonction du get ?>
 <div class="user-card">
   <p><strong>Pseudo :</strong> exemple_user</p>
@@ -25,7 +26,7 @@
   </div>
 </div>
      
-
+ 
      
     
 

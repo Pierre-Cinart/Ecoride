@@ -68,12 +68,16 @@ $totalReviews = $countStmt->fetchColumn();
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gérer les avis | EcoRide</title>
-  <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/manage.css" />
+     <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">
 </head>
 <body>
 
