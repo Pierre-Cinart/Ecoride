@@ -1,3 +1,6 @@
+/* certaines classes étaient prévues pour des pages 
+qui ne sont pas utilisées par manques de temps des maj sont prévues après le déploiement */
+
 .manage-container {
     max-width: 500px;
     width: 100%;
@@ -13,8 +16,6 @@
   .manage-container button {
     margin-top: 1rem;
   }
-
-  
 
   .avis-liste {
     display: flex;

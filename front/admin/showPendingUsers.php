@@ -1,32 +1,25 @@
-UTILISATEURS EN ATTENTE DE VALIDATIONS DE DOCUMENTS
-<?php // faire la requette en fonction du get ?>
-<div class="user-card">
-  <p><strong>Pseudo :</strong> exemple_user</p>
-  <p><strong>Email :</strong> user@email.com</p>
-  <p><strong>Rôle :</strong> Conducteur (en attente)</p>
-  <div id="showPermit">
-    <h2>permis</h2>
-    <!-- injecter le permis en miniaturisé ouverture about_blank en grand format -->
+<?php
+// ============================
+// MODULE : showPendingUsers.php
+// ============================
 
-     <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
-     <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
-  </div>
-  <!-- faire un foreach pour tout recupérer -->
-  <div id="vehicles_documents(+id du vehicule)">
-    <!-- injecter les documents en attentes trier par vehicule enregistré en miniaturisé ouverture about_blank en grand format -->
-      <div id="registration+id du vehicule">
-        <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
-        <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
-      </div>
-       <div id="insurance+id du vehicule">
-        <button class = 'green' onclick = 'validatePermit(true)'>Valider</button>
-        <button class = 'red' onclick ='validatePermit(false)'>Refuser</button>
-      </div>
-     
-  </div>
-</div>
-     
- 
-     
-    
+// $_GET = sanitizeArray($_GET, './showUsers.php');
+// $search = $_POST['search'] ?? '';
+// $pendingLimit = 5;
+// $pendingPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+// $pendingOffset = ($pendingPage - 1) * $pendingLimit;
 
+// $stmt = $pdo->prepare("SELECT * FROM users WHERE (permit_status = 'pending' OR EXISTS (SELECT 1 FROM vehicles WHERE vehicles.user_id = users.id AND (vehicles.registration_status = 'pending' OR vehicles.insurance_status = 'pending'))) AND pseudo LIKE :search ORDER BY created_at DESC LIMIT :offset, :limit");
+// $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+// $stmt->bindValue(':offset', $pendingOffset, PDO::PARAM_INT);
+// $stmt->bindValue(':limit', $pendingLimit, PDO::PARAM_INT);
+// $stmt->execute();
+// $pendingUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// $count = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (permit_status = 'pending' OR EXISTS (SELECT 1 FROM vehicles WHERE vehicles.user_id = users.id AND (vehicles.registration_status = 'pending' OR vehicles.insurance_status = 'pending'))) AND pseudo LIKE :search");
+// $count->bindValue(':search', "%$search%", PDO::PARAM_STR);
+// $count->execute();
+// $pendingTotal = $count->fetchColumn();
+
+// include './userCardGenerator.php';
+// renderPagination($pendingTotal, $pendingLimit, $pendingPage, 'showUsers.php');
