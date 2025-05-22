@@ -196,6 +196,7 @@
     </div>
 
     <!-- === Actions générales === -->
+     <!-- consulter et annuler des voyage prévus en conducteur -->
     <div class="button-group">
       <?php if ($user instanceof Driver): ?>
         <button onclick="location.href='../driver/OwnTrips.php'">Mes trajets prévus</button>
@@ -207,14 +208,15 @@
         <button onclick="location.href='../user/addCredits.php'">Obtenir des crédits</button>
       <?php endif; ?>
       <button onclick="location.href='../user/cashBack.php'">Demander un remboursement</button>
-
+        <!-- action suppplémentaires driver -->
       <?php if ($user instanceof Driver): ?>
         <?php if ($status != 'drive_blocked' && $status != 'all_blocked' && $permitStatus === "approved"): ?>
           <button onclick="location.href='../driver/addTRip.php'">Proposer un trajet</button>
         <?php endif; ?>
         <button onclick="location.href='avisRecus.php'">Mes avis reçus</button>
+        <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
       <?php endif; ?>
-      <button onclick="location.href='../driver/convertCredits.php'">💰 Obtenir un paiement</button>
+      <button onclick="location.href='alertUser.php'">Signaler un utilisateur</button>
     </div>
   </div>
 

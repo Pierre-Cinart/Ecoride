@@ -8,15 +8,7 @@ require_once 'User.php';
  */
 class Employee extends User
 {
-    // Constructeur allégé spécifique à un employé
-    public function __construct(int $id, string $firstName, string $lastName, string $email, string $role = 'employee')
-    {
-        $this->id = $id;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->email = $email;
-        $this->role = $role;
-    }
+ 
 
     /**
      * Permet à l'employé de gérer (modérer) un commentaire utilisateur.

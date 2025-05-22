@@ -36,8 +36,8 @@ if ($user instanceof Employee){
         <button type="button" onclick="location.href='manageReviews.php'">Gérer les avis des passagers</button>
         <button type="button" onclick="location.href='reportedTrips.php'">Consulter les signalements</button>
         <button type="button" onclick="location.href='contactUser.php'">Contacter un utilisateur</button>
-        <button type="button" onclick="location.href='showUsers.php'">Afficher les infos utilisateur</button>
-        <button type="button" onclick="location.href='showUsers.php?type=driver&status=authorized&documents=waiting'">
+        <button type="button" onclick="location.href='manageUsers.php'">Afficher les infos utilisateur</button>
+        <button type="button" onclick="location.href='manageUsers.php?type=driver&status=authorized&documents=waiting'">
           Chauffeurs en attente de validation
         </button>
         <button type="button" onclick="location.href='userlocking.php?action=block'">Bloquer un membre</button>

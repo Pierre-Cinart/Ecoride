@@ -3,6 +3,10 @@ require_once 'User.php';
 
 // Classe administrateur (hérite de Employee)
 class Admin extends Employee {
+    // ===== Constructeur =====
+    public function __construct(array $data) {
+        parent::__construct($data);
+    }
 
     // ===== Ajoute un employé =====
     public function addEmployee() {
