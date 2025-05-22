@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../composants/phpMailer/src/SendMail.php';
+require_once __DIR__ . '/../composants/phpMailer/src/sendMail.php';
 
 /**
  * Classe Driver
