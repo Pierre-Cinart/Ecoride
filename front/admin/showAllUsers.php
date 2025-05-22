@@ -5,15 +5,7 @@ $allLimit = 5;
 $allPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($allPage - 1) * $allLimit;
 
-$stmt = $pdo->prepare("
-  SELECT id, first_name, last_name, pseudo, email, role, created_at,
-         status, driver_warnings, user_warnings, permit_status, permit_picture
-  FROM users
-  WHERE pseudo LIKE :search
-  AND role NOT IN ('Admin', 'Employee')
-  ORDER BY created_at DESC
-  LIMIT :offset, :limit
-");
+$stmt = $pdo->prepare("SELECT id, first_name, last_name, pseudo, email, role, created_at, status, driver_warnings, user_warnings, permit_status, permit_picture FROM users WHERE pseudo LIKE :search AND role NOT IN ('Admin', 'Employee') ORDER BY created_at DESC LIMIT :offset, :limit");
 $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindValue(':limit', $allLimit, PDO::PARAM_INT);
@@ -44,26 +36,32 @@ function getWarningIcons(int $count): string {
 
     <hr>
 
-    <p><strong>Usager :</strong>
-      <?= getWarningIcons((int)$user['user_warnings']) ?>
+    <!-- Section Usager -->
+    <p><strong>Usager :</strong> <?= getWarningIcons((int)$user['user_warnings']) ?></p>
+    <form method="post" action="../../back/managerLockUser.php">
+      <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+      <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
       <?php if (in_array($user['status'], ['blocked', 'all_blocked'])): ?>
         <span>(bloqué)</span>
-        <button class="green">Débloquer usager</button>
+        <button class="green" type="submit" name="action" value="unblock_user">Débloquer usager</button>
       <?php else: ?>
-        <button class="red">Bloquer usager</button>
+        <button class="red" type="submit" name="action" value="block">Bloquer usager</button>
       <?php endif; ?>
-    </p>
+    </form>
 
+    <!-- Section Conducteur -->
     <?php if ($user['role'] === 'driver' || $user['status'] === 'drive_blocked' || $user['driver_warnings'] > 0): ?>
-      <p><strong>Conducteur :</strong>
-        <?= getWarningIcons((int)$user['driver_warnings']) ?>
+      <p><strong>Conducteur :</strong> <?= getWarningIcons((int)$user['driver_warnings']) ?></p>
+      <form method="post" action="../../back/managerLockUser.php">
+        <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+        <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
         <?php if (in_array($user['status'], ['drive_blocked', 'all_blocked'])): ?>
           <span>(bloqué)</span>
-          <button class="green">Débloquer conducteur</button>
+          <button class="green" type="submit" name="action" value="unblock_driver">Débloquer conducteur</button>
         <?php else: ?>
-          <button class="red">Bloquer conducteur</button>
+          <button class="red" type="submit" name="action" value="block">Bloquer conducteur</button>
         <?php endif; ?>
-      </p>
+      </form>
     <?php endif; ?>
 
     <!-- Permis en attente -->
@@ -82,7 +80,7 @@ function getWarningIcons(int $count): string {
       </div>
     <?php endif; ?>
 
-    <!-- Documents véhicules en attente -->
+    <!-- Documents véhicule en attente -->
     <?php
       $vehicleStmt = $pdo->prepare("SELECT id, model, registration_document, insurance_document FROM vehicles WHERE user_id = :uid AND documents_status = 'pending'");
       $vehicleStmt->execute([':uid' => $user['id']]);

@@ -20,8 +20,8 @@ $stmt->bindValue(':limit', $simpleLimit, PDO::PARAM_INT);
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Total pour pagination
-$countStmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE pseudo LIKE :search AND role = 'simpleUser'");
+// Total pour pagination (corrigé role = 'user')
+$countStmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE pseudo LIKE :search AND role = 'user'");
 $countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
 $countStmt->execute();
 $simpleTotalUsers = $countStmt->fetchColumn();
@@ -46,15 +46,17 @@ function getWarningIcons(int $count): string {
 
     <hr>
 
-    <p><strong>Usager :</strong>
-      <?= getWarningIcons((int)$user['user_warnings']) ?>
+    <p><strong>Usager :</strong> <?= getWarningIcons((int)$user['user_warnings']) ?></p>
+    <form method="post" action="../../back/managerLockUser.php">
+      <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+      <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
       <?php if (in_array($user['status'], ['blocked', 'all_blocked'])): ?>
         <span>(bloqué)</span>
-        <button class="green">Débloquer usager</button>
+        <button class="green" type="submit" name="action" value="unblock_user">Débloquer usager</button>
       <?php else: ?>
-        <button class="red">Bloquer usager</button>
+        <button class="red" type="submit" name="action" value="block">Bloquer usager</button>
       <?php endif; ?>
-    </p>
+    </form>
   </div>
 <?php endforeach; ?>
 

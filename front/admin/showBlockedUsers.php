@@ -55,26 +55,32 @@ function getWarningIcons(int $count): string {
 
     <hr>
 
-    <p><strong>Usager :</strong>
-      <?= getWarningIcons((int)$user['user_warnings']) ?>
+    <!-- Bloc usager -->
+    <p><strong>Usager :</strong> <?= getWarningIcons((int)$user['user_warnings']) ?></p>
+    <form method="post" action="../../back/managerLockUser.php">
+      <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+      <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
       <?php if (in_array($user['status'], ['blocked', 'all_blocked'])): ?>
         <span>(bloqué)</span>
-        <button class="green">Débloquer usager</button>
+        <button class="green" type="submit" name="action" value="unblock_user">Débloquer usager</button>
       <?php else: ?>
         <span>(non bloqué)</span>
       <?php endif; ?>
-    </p>
+    </form>
 
+    <!-- Bloc conducteur -->
     <?php if ($user['role'] === 'driver' || $user['driver_warnings'] > 0): ?>
-      <p><strong>Conducteur :</strong>
-        <?= getWarningIcons((int)$user['driver_warnings']) ?>
+      <p><strong>Conducteur :</strong> <?= getWarningIcons((int)$user['driver_warnings']) ?></p>
+      <form method="post" action="../../back/managerLockUser.php">
+        <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+        <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
         <?php if (in_array($user['status'], ['drive_blocked', 'all_blocked'])): ?>
           <span>(bloqué)</span>
-          <button class="green">Débloquer conducteur</button>
+          <button class="green" type="submit" name="action" value="unblock_driver">Débloquer conducteur</button>
         <?php else: ?>
           <span>(non bloqué)</span>
         <?php endif; ?>
-      </p>
+      </form>
     <?php endif; ?>
   </div>
 <?php endforeach; ?>

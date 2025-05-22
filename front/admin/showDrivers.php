@@ -61,26 +61,30 @@ function getWarningIcons(int $count): string {
     <hr>
 
     <!-- Avertissements passager -->
-    <p><strong>Usager :</strong>
-      <?= getWarningIcons((int)$user['user_warnings']) ?>
+    <p><strong>Usager :</strong> <?= getWarningIcons((int)$user['user_warnings']) ?></p>
+    <form method="post" action="../../back/managerLockUser.php">
+      <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+      <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
       <?php if (in_array($user['status'], ['blocked', 'all_blocked'])): ?>
         <span>(bloqué)</span>
-        <button class="green">Débloquer usager</button>
+        <button class="green" type="submit" name="action" value="unblock_user">Débloquer usager</button>
       <?php else: ?>
-        <button class="red">Bloquer usager</button>
+        <button class="red" type="submit" name="action" value="block">Bloquer usager</button>
       <?php endif; ?>
-    </p>
+    </form>
 
     <!-- Avertissements conducteur -->
-    <p><strong>Conducteur :</strong>
-      <?= getWarningIcons((int)$user['driver_warnings']) ?>
+    <p><strong>Conducteur :</strong> <?= getWarningIcons((int)$user['driver_warnings']) ?></p>
+    <form method="post" action="../../back/managerLockUser.php">
+      <input type="hidden" name="user_id" value="<?= (int)$user['id'] ?>">
+      <input type="hidden" name="status" value="<?= htmlspecialchars($user['status']) ?>">
       <?php if (in_array($user['status'], ['drive_blocked', 'all_blocked'])): ?>
         <span>(bloqué)</span>
-        <button class="green">Débloquer conducteur</button>
+        <button class="green" type="submit" name="action" value="unblock_driver">Débloquer conducteur</button>
       <?php else: ?>
-        <button class="red">Bloquer conducteur</button>
+        <button class="red" type="submit" name="action" value="block">Bloquer conducteur</button>
       <?php endif; ?>
-    </p>
+    </form>
   </div>
 <?php endforeach; ?>
 
@@ -88,7 +92,4 @@ function getWarningIcons(int $count): string {
   <p>Aucun conducteur trouvé pour cette recherche.</p>
 <?php endif; ?>
 
-<!-- ==============================
-     Pagination personnalisée
-============================== -->
 <?php renderPagination($driverTotal, $driverLimit, $driverPage, 'php?filter=drivers'); ?>
