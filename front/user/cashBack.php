@@ -13,6 +13,7 @@ $credits = $_SESSION['credits'] ?? 20; // affiché mais non modifiable
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Demande de remboursement</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap" rel="stylesheet">

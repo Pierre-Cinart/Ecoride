@@ -20,7 +20,7 @@ checkAccess(['Admin']);
         <button type="submit">🔍</button>
     </form>
       afficher le personnel trouver dans la barre de recherche dans une carte avec ses informations et un bouton suspendre et un bouton update (facultatif)
-      <button class = "green" onclick="location.href='addEmployees.php'">ajouter un nouveau membre</button>
+      <button class = "green" onclick="location.href='addEmployee.php'">ajouter un nouveau membre</button>
       <button class = "red">afficher les anciens membre</button>
     <?php include_once '../composants/InProgress.php'; ?>
     

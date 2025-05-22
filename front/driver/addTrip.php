@@ -49,6 +49,7 @@ if ($user instanceof Driver) {
 <head>
   <meta charset="UTF-8">
   <title>Proposer un trajet - EcoRide</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/search.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />

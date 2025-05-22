@@ -1,12 +1,10 @@
 <?php
 require_once 'User.php';
-
+require_once __DIR__ . '/../composants/loggerFirebase.php';
 // Classe administrateur (hérite de Employee)
 class Admin extends Employee {
-    // ===== Constructeur =====
-    public function __construct(array $data) {
-        parent::__construct($data);
-    }
+  
+  
 
     // ===== Ajoute un employé =====
     public function addEmployee() {
@@ -56,6 +54,9 @@ class Admin extends Employee {
     // ===== Modifie le rôle d’un utilisateur (promotion/déclassement) =====
     public function changeUserRole() {
         // À développer
+    }
+    public function readLog() {
+        readLogsFromFirebase();
     }
 }
 ?>

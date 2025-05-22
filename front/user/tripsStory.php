@@ -74,6 +74,7 @@ $currentPageTrips = array_slice($filteredTrips, $offset, $itemsPerPage);
 <head>
   <meta charset="UTF-8">
   <title>Historique des trajets | EcoRide</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css">
     <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

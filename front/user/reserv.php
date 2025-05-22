@@ -50,6 +50,7 @@ $hasEnoughCredits = $user->getCredits() >= $trip['price'];
 <head>
   <meta charset="UTF-8">
   <title>Confirmer la réservation - EcoRide</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css">
   <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

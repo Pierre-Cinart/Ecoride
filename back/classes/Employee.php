@@ -1,7 +1,7 @@
 <?php
 
 require_once 'User.php';
-
+require_once __DIR__ . '/../composants/loggerFirebase.php';
 /**
  * Classe représentant un employé EcoRide.
  * Hérite de la classe User.
@@ -38,7 +38,7 @@ class Employee extends User
      * déblocage passager
      */
     public function unblockUser(PDO $pdo, int $userId): void {
-        $stmt = $pdo->prepare("SELECT status, user_warnings FROM users WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT status, user_warnings , pseudo FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -49,6 +49,7 @@ class Employee extends User
 
         $status = $user['status'];
         $warnings = (int)$user['user_warnings'];
+        $pseudo = $user['pseudo'];
 
         if ($status === 'banned') {
             $_SESSION['error'] = "Cet utilisateur est banni. Déblocage impossible.";
@@ -82,14 +83,17 @@ class Employee extends User
             ':id' => $userId
         ]);
 
-        $_SESSION['success'] = "L'utilisateur a bien été débloqué.";
+            // trace log 
+            logActionToFirebase($this->getFullName(), 'Déblocage de l’utilisateur : ' . $pseudo);
+             $_SESSION['success'] = "L'utilisateur a bien été débloqué. action log";
+      
     }
 
      /**:
      * déblocage conducteur
      */
     public function unblockDriver(PDO $pdo, int $userId): void {
-        $stmt = $pdo->prepare("SELECT status, user_warnings FROM users WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT status, user_warnings , pseudo FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -100,6 +104,7 @@ class Employee extends User
 
         $status = $user['status'];
         $warnings = (int)$user['user_warnings'];
+        $pseudo = $user['pseudo'];
 
         if ($status === 'banned') {
             $_SESSION['error'] = "Cet utilisateur est banni. Déblocage impossible.";
@@ -133,6 +138,8 @@ class Employee extends User
             ':id' => $userId
         ]);
 
+         // trace log 
+        logActionToFirebase($this->getFullName(), 'Déblocage du conducteur : ' . $pseudo);
         $_SESSION['success'] = "Le conducteur a bien été débloqué.";
     }
 
@@ -140,7 +147,7 @@ class Employee extends User
      * Blocage total utilisateurs
      */
     public function blockUserCompletely(PDO $pdo, int $userId): void {
-        $stmt = $pdo->prepare("SELECT status FROM users WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT status , pseudo  FROM users WHERE id = :id");
         $stmt->execute([':id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -150,6 +157,7 @@ class Employee extends User
         }
 
         $status = $user['status'];
+        $pseudo  = $user['pseudo'];
 
         if (in_array($status, ['blocked', 'drive_blocked', 'all_blocked'])) {
             $_SESSION['error'] = "Cet utilisateur est déjà bloqué.";
@@ -165,6 +173,8 @@ class Employee extends User
         $stmt = $pdo->prepare("UPDATE users SET status = 'all_blocked' WHERE id = :id");
         $stmt->execute([':id' => $userId]);
 
+         // trace log 
+        logActionToFirebase($this->getFullName(), 'blocage utilisateur : ' . $pseudo);
         $_SESSION['success'] = "L'utilisateur a bien été bloqué.";
     }
 

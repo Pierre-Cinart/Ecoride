@@ -34,18 +34,19 @@ if ($user instanceof Employee){
       <h2>Gestion - Espace Employé</h2>
       <form>
         <button type="button" onclick="location.href='manageReviews.php'">Gérer les avis des passagers</button>
-        <button type="button" onclick="location.href='reportedTrips.php'">Consulter les signalements</button>
+        <!-- <button type="button" onclick="location.href='reportedTrips.php'">Consulter les signalements</button> (manque de temps deadline à développer)-->
         <button type="button" onclick="location.href='contactUser.php'">Contacter un utilisateur</button>
         <button type="button" onclick="location.href='manageUsers.php'">Afficher les infos utilisateur</button>
         <button type="button" onclick="location.href='manageUsers.php?type=driver&status=authorized&documents=waiting'">
           Chauffeurs en attente de validation
         </button>
-        <button type="button" onclick="location.href='userlocking.php?action=block'">Bloquer un membre</button>
-        <button type="button" onclick="location.href='userlocking.php?action=unblock'">Débloquer un membre</button>
+        <!-- <button type="button" onclick="location.href='userlocking.php?action=block'">Bloquer un membre</button>
+        <button type="button" onclick="location.href='userlocking.php?action=unblock'">Débloquer un membre</button> (manque de temps deadline à développer)--> 
         <!-- bouton admin pour gérer les employee -->
         <?php if ($user instanceof Admin): ?>
-          <button type="button" onclick="location.href='manageEmployee.php'">Gérer les employés</button>
+          <button type="button" onclick="location.href='manageEmployees.php'">Gérer les employés</button>
           <button type="button" onclick="location.href='manageCredits.php'">Gestions de crédits</button>
+           <button type="button" onclick="location.href='showLogs.php'">voir les logs</button>
         <?php endif; ?>
       </form>
     </div>

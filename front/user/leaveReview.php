@@ -50,6 +50,7 @@ if (!$trip) {
 <head>
   <meta charset="UTF-8">
   <title>Laisser un avis - EcoRide</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="../css/style.css">
   <!-- google font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

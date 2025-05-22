@@ -35,6 +35,7 @@ $trajetsPassager = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <title>Mes trajets réservés | EcoRide</title>
+   <link rel="icon" href="../../favicon.ico" type="image/x-icon">
   <!-- style -->
   <link rel="stylesheet" href="../css/style.css">
   <!-- google font -->
