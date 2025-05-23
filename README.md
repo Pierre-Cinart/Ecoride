@@ -254,11 +254,11 @@ $webAddress = 'https://votre-domaine.fr';
 Configurer le SMTP réel dans `sendMail.php`.
 
 ## À venir
-
-- Authentification sécurisée via JWT-like
 - Intégration de la messagerie Firebase
-- Système de badges
-- Pages publiques pour les trajets
+- signalement des passagers et conducteurs + validation par admin ou employé
+- validations ou refus des documents driver
+
+
 
 ## Développeur
 
