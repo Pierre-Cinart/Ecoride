@@ -8,7 +8,7 @@ require_once __DIR__ . '/composants/JWT.php';
 require_once __DIR__ . '/composants/checkAccess.php';
 require_once __DIR__ . '/composants/sanitizeArray.php';
 require_once __DIR__ . '/composants/captcha.php';
-require_once __DIR__ . '/composants/antiflood.php';
+require_once __DIR__ . '/composants/antiFlood.php';
 
 session_start();
 

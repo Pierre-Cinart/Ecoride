@@ -6,7 +6,7 @@ require_once __DIR__ . '/composants/JWT.php';
 require_once __DIR__ . '/composants/checkAccess.php';
 require_once __DIR__ . '/composants/sanitizeArray.php';
 require_once __DIR__ . '/composants/captcha.php';
-require_once __DIR__ . '/composants/antiflood.php';
+require_once __DIR__ . '/composants/antiFlood.php';
 require_once __DIR__ . '/composants/phpMailer/src/sendMail.php';
 require_once __DIR__ . '/composants/uploader.php';
 
