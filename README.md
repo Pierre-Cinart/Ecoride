@@ -273,3 +273,5 @@ Aucun paiement réel n’est effectué.
 
 Projet libre à usage éducatif.  
 Toute réutilisation doit mentionner l’auteur.
+VOUS POUVEZ CONSULTER LE SITE EN LIGNE A L ADRESSE SUIVANTE : https://ecoride-ecf.wuaze.com/
+**
